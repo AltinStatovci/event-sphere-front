@@ -34,28 +34,40 @@
           <MDBNavbarItem to="#">
             Contact
           </MDBNavbarItem>
-          <!-- Search form -->
-          <form class="d-flex input-group w-auto">
-            <input
-              type="search"
-              class="form-control"
-              placeholder="Search"
-              aria-label="Search"
-            />
-            <MDBBtn outline="primary">
-              Search
-            </MDBBtn>
-          </form>
         </MDBNavbarNav>
-       <MDBNavbarNav class="ms-auto">
-  <MDBNavbarItem class="ms-auto">
-    <a href="#" class="nav-link">
-      <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/icons/person-circle.svg" alt="Profile" class="rounded-circle" style="width: 30px; height: 30px;">
-    </a>
-  </MDBNavbarItem>
-</MDBNavbarNav>
-
-       
+        <MDBNavbarNav class="ms-auto">
+          <!-- Search form -->
+          <MDBNavbarItem>
+            <form class="d-flex input-group w-auto">
+              <input
+                type="search"
+                class="form-control"
+                placeholder="Search"
+                aria-label="Search"
+              />
+              <MDBBtn outline="primary">
+                Search
+              </MDBBtn>
+            </form>
+          </MDBNavbarItem>
+        </MDBNavbarNav>
+        <MDBNavbarNav class="ms-auto">
+          <MDBNavbarItem> <!-- Apply ms-auto here -->
+            <!-- Navbar dropdown -->
+            <MDBDropdown class="nav-item" v-model="dropdown2">
+              <MDBDropdownToggle
+                tag="a"
+                class="nav-link"
+                @click="dropdown2 = !dropdown2"
+                ><img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/icons/person-circle.svg" alt="Profile" class="rounded-circle" style="width: 30px; height: 30px;">
+              </MDBDropdownToggle>
+              <MDBDropdownMenu aria-labelledby="dropdownMenuButton">
+                <MDBDropdownItem to="#">Dashboard</MDBDropdownItem>
+                <MDBDropdownItem to="#">Login</MDBDropdownItem>
+              </MDBDropdownMenu>
+            </MDBDropdown>
+          </MDBNavbarItem>
+        </MDBNavbarNav>
       </MDBCollapse>
     </MDBNavbar>
   </header>
@@ -94,9 +106,11 @@
     setup() {
       const collapse1 = ref(false);
       const dropdown1 = ref(false);
+      const dropdown2 = ref(false); // add this line
       return {
         collapse1,
-        dropdown1
+        dropdown1,
+        dropdown2 // add this line
       }
     }
   };
