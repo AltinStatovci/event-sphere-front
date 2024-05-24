@@ -51,7 +51,7 @@
             </form>
           </MDBNavbarItem>
         </MDBNavbarNav>
-        <MDBNavbarNav class="ms-auto">
+        <MDBNavbarNav class="">
           <MDBNavbarItem> <!-- Apply ms-auto here -->
             <!-- Navbar dropdown -->
             <MDBDropdown class="nav-item" v-model="dropdown2">
@@ -118,4 +118,7 @@
 
 <style>
   /* Add any custom styles here */
+  .me-auto{
+    margin-right: 0 !important;
+  }
 </style>
