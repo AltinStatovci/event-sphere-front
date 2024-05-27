@@ -49,7 +49,8 @@ router.beforeEach((to, from) => {
     }
   } else if (!to.meta.requiresAuth && authStore.isLoggedIn) {
     return {
-      name: 'home'
+      path: '/',
+      query: { redirect: to.fullPath },
     }
   }
 })

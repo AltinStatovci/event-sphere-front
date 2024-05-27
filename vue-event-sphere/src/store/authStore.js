@@ -1,24 +1,27 @@
 import { defineStore } from 'pinia'
 import client from "../helpers/client";
-import {ref} from "vue";
+import {computed, ref} from "vue";
+import {jwtDecode} from "jwt-decode";
 
 export const useAuthStore = defineStore('auth', () =>{
   const url ='http://localhost:5220/api/';
   const token = ref(localStorage.getItem('token') || null);
 
   async function logIn(user){
-    const response = await client.post(`${url}authenticate`,user);
+    const response = await client.post(`${url}Account/authenticate`,user);
 
-      if (response.data) {
-          localStorage.setItem('token', response.data.idToken)
-          token.value = response.data.idToken;
+      if (response.status === 200) {
+          localStorage.setItem('token', response.data)
+          token.value = response.data;
       }
+      console.log(response)
+      console.log("test")
       console.log(response)
 
   }
 
     async function signUp(registerUser){
-      const  response = await client.post(`${url}register`,registerUser);
+      const  response = await client.post(`${url}Account/register`,registerUser);
     }
 
     function logOut() {
@@ -28,19 +31,19 @@ export const useAuthStore = defineStore('auth', () =>{
             // await client.post(`${url}:signUp?key=${apiKey}`, user)
         }
 
-
-        // getters
-        // const loggedInUser = computed(() => {
-        //     // nese ka token dekodoje
-        //     return token.value ? jwtDecode(token.value) : null;
-        // })
-        //
-        // const isLoggedIn = computed(() => {
-        //     return !!token.value;
-        // })
     }
+        // getters
+        const loggedInUser = computed(() => {
+            // nese ka token dekodoje
+            return token.value ? jwtDecode(token.value) : null;
+        })
+
+        const isLoggedIn = computed(() => {
+            return !!token.value;
+        })
 
 
-    return { logIn, signUp, logOut}
+
+    return { logIn, signUp, logOut , isLoggedIn , loggedInUser }
 
 })
