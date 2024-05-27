@@ -1,124 +1,67 @@
-<template>
-  <header>
-    <MDBNavbar expand="lg" light bg="light" container>
-      <MDBNavbarBrand href="#">EventSphere</MDBNavbarBrand>
-      <MDBNavbarToggler
-        @click="collapse1 = !collapse1"
-        target="#navbarSupportedContent"
-      ></MDBNavbarToggler>
-      <MDBCollapse v-model="collapse1" id="navbarSupportedContent">
-        <MDBNavbarNav class="mb-2 mb-lg-0">
-          <MDBNavbarItem to="#">
-            Home
-          </MDBNavbarItem>
-       
-          <MDBNavbarItem>
-            <!-- Navbar dropdown -->
-            <MDBDropdown class="nav-item" v-model="dropdown1">
-              <MDBDropdownToggle
-                tag="a"
-                class="nav-link"
-                @click="dropdown1 = !dropdown1"
-                >Events</MDBDropdownToggle
-              >
-              <MDBDropdownMenu aria-labelledby="dropdownMenuButton">
-                <MDBDropdownItem to="#">Sports</MDBDropdownItem>
-                <MDBDropdownItem to="#">Concerts</MDBDropdownItem>
-                <MDBDropdownItem to="#">Outside Activities</MDBDropdownItem>
-              </MDBDropdownMenu>
-            </MDBDropdown>
-          </MDBNavbarItem>
-          <MDBNavbarItem to="#">
-            About us
-          </MDBNavbarItem>
-          <MDBNavbarItem to="#">
-            Contact
-          </MDBNavbarItem>
-        </MDBNavbarNav>
-        <MDBNavbarNav class="ms-auto">
-          <!-- Search form -->
-          <MDBNavbarItem>
-            <form class="d-flex input-group w-auto">
-              <input
-                type="search"
-                class="form-control"
-                placeholder="Search"
-                aria-label="Search"
-              />
-              <MDBBtn outline="primary">
-                Search
-              </MDBBtn>
-            </form>
-          </MDBNavbarItem>
-        </MDBNavbarNav>
-        <MDBNavbarNav class="">
-          <MDBNavbarItem> <!-- Apply ms-auto here -->
-            <!-- Navbar dropdown -->
-            <MDBDropdown class="nav-item" v-model="dropdown2">
-              <MDBDropdownToggle
-                tag="a"
-                class="nav-link"
-                @click="dropdown2 = !dropdown2"
-                ><img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/icons/person-circle.svg" alt="Profile" class="rounded-circle" style="width: 30px; height: 30px;">
-              </MDBDropdownToggle>
-              <MDBDropdownMenu aria-labelledby="dropdownMenuButton">
-                <MDBDropdownItem to="#">Dashboard</MDBDropdownItem>
-                <MDBDropdownItem to="#">Log in</MDBDropdownItem>
-              </MDBDropdownMenu>
-            </MDBDropdown>
-          </MDBNavbarItem>
-        </MDBNavbarNav>
-      </MDBCollapse>
-    </MDBNavbar>
-  </header>
-</template>
+<script setup>
+import {useAuthStore} from "@/store/authStore.js";
+import {useRouter} from "vue-router";
 
-<script>
-  import {
-    MDBBtn,
-    MDBNavbar,
-    MDBNavbarToggler,
-    MDBNavbarBrand,
-    MDBNavbarNav,
-    MDBNavbarItem,
-    MDBCollapse,
-    MDBDropdown,
-    MDBDropdownToggle,
-    MDBDropdownMenu,
-    MDBDropdownItem
-  } from 'mdb-vue-ui-kit';
-  import { ref } from 'vue';
 
-  export default {
-    components: {
-      MDBBtn,
-      MDBNavbar,
-      MDBNavbarToggler,
-      MDBNavbarBrand,
-      MDBNavbarNav,
-      MDBNavbarItem,
-      MDBCollapse,
-      MDBDropdown,
-      MDBDropdownToggle,
-      MDBDropdownMenu,
-      MDBDropdownItem
-    },
-    setup() {
-      const collapse1 = ref(false);
-      const dropdown1 = ref(false);
-      const dropdown2 = ref(false); // add this line
-      return {
-        collapse1,
-        dropdown1,
-        dropdown2 // add this line
-      }
-    }
-  };
+const authStore = useAuthStore();
+const router = useRouter();
+
+function onLogOut() {
+  authStore.logOut();
+  router.push({name:'login'});
+}
+
 </script>
 
-<style>
-  /* Add any custom styles here */
-  .me-auto{
-    margin-right: 0 !important;
-  }
-</style>
+
+
+
+<template>
+
+  <nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="/">EventSphere</a>
+
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="#">Home</a>
+          </li>
+
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" >
+              Events
+            </a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="#">Sports</a></li>
+              <li><a class="dropdown-item" href="#">Concerts</a></li>
+              <li><a class="dropdown-item" href="#">OutSide Activities</a></li>
+            </ul>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link disabled">About Us</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link disabled">Contact</a></li>
+        </ul>
+        <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+          <li class="nav-item dropdown custom-margin-right">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/icons/person-circle.svg" alt="Profile" class="rounded-circle" style="width: 30px; height: 30px;">
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="#">DashBoard</a></li>
+              <li><button class="btn btn-outline-danger btn-sm m-lg-2" @click="onLogOut()">Log Out</button> </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</template>
+
+  <style>
+    .custom-margin-right {
+      margin-right: 5px;
+    }
+  </style>
