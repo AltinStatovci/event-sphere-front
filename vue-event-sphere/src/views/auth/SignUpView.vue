@@ -1,4 +1,61 @@
 <script setup>
+import {computed, reactive, ref} from "vue";
+import{useAuthStore} from "@/store/authStore.js";
+import {useRoute, useRouter} from "vue-router";
+import Swal from "sweetalert2";
+
+const authStore = useAuthStore();
+const formData = reactive({
+ name:'',
+  lastName:'',
+  email: '',
+  password: '',
+  roleId: 2,
+})
+
+const formIsValid = ref(true);
+const error = ref('');
+
+const router = useRouter();
+const route = useRoute();
+
+async function handleSubmit(){
+    formIsValid.value = true;
+
+  if(!formData.email || !formData.password || !formData.name || !formData.lastName) {
+
+    formIsValid.value = false;
+
+    error.value = 'All Fields are required.'
+
+    await Swal.fire({
+      title: "Error!",
+      text: error.value,
+      icon: "error"
+    });
+
+    return;
+  }
+
+  try {
+      await authStore.signUp(formData)
+
+      await Swal.fire({
+        title: "Signed up successfully!",
+        text: "Please login!",
+        icon: "success"
+      });
+    const redirectUrl = `${route.query.redirect || "login"}`
+
+    await router.push({name: redirectUrl});
+
+  } catch (e) {
+    formIsValid.value = false;
+    // error.value = e.response.data.error.message;
+    console.log(e)
+  }
+
+}
 
 </script>
 
@@ -12,18 +69,30 @@
         </div>
         <div class="col-md-7 col-lg-5 col-xl-5 offset-xl-1">
 
-          <form>
+          <form @submit.prevent="handleSubmit">
             <!-- Name input -->
             <div data-mdb-input-init class="form-outline mb-4">
               <label class="form-label" for="form1Example13"> Name</label>
-              <input type="email" id="form1Example13" class="form-control form-control-lg" />
+              <input
+                  type="text"
+                  id="form1Example13"
+                  class="form-control form-control-lg"
+                  placeholder="Enter Name"
+                  v-model.trim="formData.name"
+              />
 
             </div>
 
             <!-- Surname input -->
             <div data-mdb-input-init class="form-outline mb-4">
               <label class="form-label" for="form1Example13">Surname</label>
-              <input type="email" id="form1Example13" class="form-control form-control-lg" />
+              <input
+                  type="text"
+                  id="form1Example13"
+                  class="form-control form-control-lg"
+                  placeholder="Enter Surname"
+                  v-model.trim="formData.lastName"
+              />
 
             </div>
 
@@ -33,14 +102,26 @@
             <!-- Email input -->
             <div data-mdb-input-init class="form-outline mb-4">
               <label class="form-label" for="form1Example13">Email address</label>
-              <input type="email" id="form1Example13" class="form-control form-control-lg" />
+              <input
+                  type="email"
+                  id="form1Example13"
+                  class="form-control form-control-lg"
+                  placeholder="Enter email"
+                  v-model.trim="formData.email"
+              />
 
             </div>
 
             <!-- Password input -->
             <div data-mdb-input-init class="form-outline mb-4">
               <label class="form-label" for="form1Example23">Password</label>
-              <input type="password" id="form1Example23" class="form-control form-control-lg" />
+              <input
+                  type="password"
+                  id="form1Example23"
+                  class="form-control form-control-lg"
+                  placeholder="Enter password"
+                  v-model.trim="formData.password"
+              />
 
             </div>
 

@@ -1,4 +1,56 @@
 <script setup>
+import {computed, reactive, ref} from "vue";
+import {useAuthStore} from "@/store/authStore.js";
+import {useRoute, useRouter} from "vue-router";
+import Swal from "sweetalert2";
+
+const authStore = useAuthStore();
+
+const formData = reactive({
+  email: '',
+  password: '',
+});
+
+const formIsValid = ref(true);
+const error = ref('');
+
+const router = useRouter();
+const route = useRoute();
+
+
+async function handleSubmit() {
+  formIsValid.value = true;
+
+  if(!formData.email || !formData.password) {
+    formIsValid.value = false;
+    error.value = 'Email and password are required.'
+
+    await Swal.fire({
+      title: "Error!",
+      text: error.value,
+      icon: "error"
+    });
+    return;
+  }
+
+
+  try {
+    await authStore.logIn(formData);
+    const redirectUrl = `${route.query.redirect || "/"}`;
+    await router.push(redirectUrl);
+  } catch (e) {
+    await Swal.fire({
+      title: "Error!",
+      text: e.message,
+      icon: "error"
+    });
+  }
+
+}
+
+
+
+
 
 </script>
 
@@ -11,18 +63,31 @@
              class="img-fluid" alt="Phone image">
       </div>
       <div class="col-md-7 col-lg-5 col-xl-5 offset-xl-1">
-        <form>
+        <form @submit.prevent="handleSubmit">
           <!-- Email input -->
           <div data-mdb-input-init class="form-outline mb-4">
             <label class="form-label" for="form1Example13">Email address</label>
-            <input type="email" id="form1Example13" class="form-control form-control-lg" />
+            <input
+                type="email"
+                id="form1Example13"
+                class="form-control form-control-lg"
+                placeholder="Enter a valid email address"
+                v-model.trim="formData.email"
+
+            />
 
           </div>
 
           <!-- Password input -->
           <div data-mdb-input-init class="form-outline mb-4">
             <label class="form-label" for="form1Example23">Password</label>
-            <input type="password" id="form1Example23" class="form-control form-control-lg" />
+
+            <input
+                type="password"
+                id="form1Example23"
+                class="form-control form-control-lg"
+                placeholder="Enter password"
+                v-model.trim="formData.password"/>
 
           </div>
 
