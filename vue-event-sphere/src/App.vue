@@ -1,5 +1,6 @@
 <script setup>
 import { RouterLink, RouterView } from 'vue-router'
+<<<<<<< Header-Footer
 import Header from './components/Header.vue'
 import Footer from './components/Footer.vue'
 import GuestHeader from './components/GuestHeader.vue';
@@ -30,5 +31,21 @@ import GuestHeader from './components/GuestHeader.vue';
 main {
   flex: 1;
 }
+=======
+
+</script>
+
+<template>
+
+
+
+
+
+  <RouterView />
+</template>
+
+<style scoped>
+
+>>>>>>> main
 </style>
 
