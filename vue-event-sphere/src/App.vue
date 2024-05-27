@@ -3,12 +3,15 @@ import { RouterLink, RouterView } from 'vue-router'
 import Header from './components/Header.vue'
 import Footer from './components/Footer.vue'
 import GuestHeader from './components/GuestHeader.vue';
+import {useAuthStore} from "@/store/authStore.js";
+
+const authStore = useAuthStore();
 </script>
 
 <template>
   <div id="app" class="d-flex flex-column min-vh-100">
     <nav>
-      <GuestHeader/>
+      <Header v-if="authStore.isLoggedIn"/>
     </nav>
 
     <main class="flex-fill">
@@ -16,7 +19,7 @@ import GuestHeader from './components/GuestHeader.vue';
     </main>
 
     <footer>
-      <Footer/>
+      <Footer v-if="authStore.isLoggedIn"/>
     </footer>
   </div>
 </template>
