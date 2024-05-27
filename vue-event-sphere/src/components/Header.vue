@@ -63,7 +63,7 @@
               </MDBDropdownToggle>
               <MDBDropdownMenu aria-labelledby="dropdownMenuButton">
                 <MDBDropdownItem to="#">Dashboard</MDBDropdownItem>
-                <MDBDropdownItem to="#">Login</MDBDropdownItem>
+                <MDBDropdownItem to="#">Log in</MDBDropdownItem>
               </MDBDropdownMenu>
             </MDBDropdown>
           </MDBNavbarItem>
