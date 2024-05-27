@@ -9,11 +9,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-<<<<<<< Header-Footer
     "mdb-vue-ui-kit": "^5.0.0",
-=======
     "bootstrap": "^5.3.3",
->>>>>>> main
     "vue": "^3.4.21",
     "vue-router": "^4.3.0"
   },
