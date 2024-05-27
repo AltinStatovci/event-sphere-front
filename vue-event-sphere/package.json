@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "mdb-vue-ui-kit": "^5.0.0",
     "bootstrap": "^5.3.3",
     "pinia": "^2.1.7",
     "sweetalert2": "^11.11.0",
