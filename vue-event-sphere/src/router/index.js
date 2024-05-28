@@ -3,6 +3,7 @@ import HomeView from '../views/HomeView.vue'
 import LogInView from "@/views/auth/LogInView.vue";
 import SignUpView from "@/views/auth/SignUpView.vue";
 import {useAuthStore} from "@/store/authStore.js";
+import Dashboard from "@/views/Dashboard.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -18,6 +19,12 @@ const router = createRouter({
       name: 'login',
       component:LogInView,
       meta: { requiresAuth: false }
+    },
+    {
+      path: '/dashboard',
+      name: 'dashboard',
+      component:Dashboard,
+      meta: { requiresAuth: true }
     },
     {
       path: '/',

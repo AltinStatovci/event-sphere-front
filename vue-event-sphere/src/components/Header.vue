@@ -11,6 +11,10 @@ function onLogOut() {
   router.push({name:'login'});
 }
 
+const onDashboard = () =>{
+  router.push({name:'dashboard'})
+};
+
 </script>
 
 
@@ -50,7 +54,7 @@ function onLogOut() {
               <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/icons/person-circle.svg" alt="Profile" class="rounded-circle" style="width: 30px; height: 30px;">
             </a>
             <ul class="dropdown-menu dropdown-menu-end">
-              <li><a class="dropdown-item" href="#">DashBoard</a></li>
+              <li><button class="dropdown-item" @click="onDashboard">DashBoard</button></li>
               <li><button class="btn btn-outline-danger btn-sm m-lg-2" @click="onLogOut()">Log Out</button> </li>
             </ul>
           </li>
