@@ -1,22 +1,3 @@
-<!-- <script setup>
-import { useCategoryStore } from '@/store/categoryStore';
-import { onMounted } from 'vue';
-import {useEventStore} from '@/store/eventStore';
-import {computed, reactive, ref} from "vue";
-import EventCard from '@/components/EventCard.vue';
-const categoryStore = useCategoryStore();
-const eventStore = useEventStore();
-var eventsByCategoryId;
-
-
-onMounted(async () => {
-    const categoryArray = await categoryStore.getAllCategoryIds();
-    for (const categoryId of categoryArray) {
-        eventsByCategoryId = eventStore.getEventByCategory(categoryId);
-    }
-    console.log(eventsByCategoryId);
-});
-</script> -->
 
 <script setup>
 import { useCategoryStore } from '@/store/categoryStore';
@@ -27,25 +8,27 @@ import EventCard from '@/components/EventCard.vue';
 const categoryStore = useCategoryStore();
 const eventStore = useEventStore();
 
-// Use ref to make eventsByCategoryId reactive
+// Use refs to make categoryNames and eventsByCategoryId reactive
+const categoryNames = ref([]);
 const eventsByCategoryId = ref({});
 
 onMounted(async () => {
-    const categoryArray = await categoryStore.getAllCategoryIds();
-    const eventsPromises = categoryArray.map(async categoryId => {
-        const events = await eventStore.getEventByCategory(categoryId);
-        return { categoryId, events };
+    const categories = await categoryStore.getAllCategories();
+    categoryNames.value = categories.map(category => category.categoryName);
+
+    const eventsPromises = categories.map(async category => {
+        const events = await eventStore.getEventByCategory(category.id);
+        return { categoryId: category.id, categoryName: category.categoryName, events };
     });
 
     const results = await Promise.all(eventsPromises);
-    results.forEach(({ categoryId, events }) => {
-        eventsByCategoryId.value[categoryId] = events;
+    results.forEach(({ categoryId, categoryName, events }) => {
+        eventsByCategoryId.value[categoryId] = { categoryName, events };
     });
 
     console.log(eventsByCategoryId.value);
 });
 </script>
-
 
 
 <template>
@@ -59,12 +42,17 @@ onMounted(async () => {
         />
       </div>
   
-      <div v-for="(events, categoryId) in eventsByCategoryId" :key="categoryId" class="d-flex justify-content-center my-5">
-        <h2>{{ categoryId }}</h2>
-        <EventCard v-for="event in events" :key="event.id" :event="event" />
+      <br />
+  
+      <div v-for="(category, categoryId) in eventsByCategoryId" :key="categoryId" class="">
+        <h2 class="text-center">{{ category.categoryName }}</h2>
+        <div class="d-flex justify-content-center">
+          <EventCard v-for="event in category.events" :key="event.id" :event="event" />
+        </div>
       </div>
     </div>
   </template>
+  
   
 
 
