@@ -8,7 +8,7 @@ import { onMounted } from 'vue';
 const store = useEventStore();
 
 onMounted(() => {
-    store.test()
+    store.getEventByCategory()
 })
 
 </script>
