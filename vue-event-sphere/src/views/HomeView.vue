@@ -3,6 +3,14 @@
 
 import Header from '../components/Header.vue'
 import Footer from '../components/Footer.vue'
+import { useEventStore } from '@/store/eventStore';
+import { onMounted } from 'vue';
+const store = useEventStore();
+
+onMounted(() => {
+    store.test()
+})
+
 </script>
 
 <template>
