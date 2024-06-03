@@ -5,6 +5,7 @@ import SignUpView from '@/views/auth/SignUpView.vue';
 import DetailsView from '@/views/DetailsView.vue';
 import TicketsView from '@/views/TicketsView.vue';
 import { useAuthStore } from '@/store/authStore.js';
+import TicketCard from '@/components/TicketCard.vue';
 
 const routes = [
   {
@@ -32,10 +33,18 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
-    path: '/eventdetails',
+    path: '/eventdetails/:id',
     name: 'eventdetails',
     component: DetailsView,
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true },
+  //   children: [
+  //     {
+  //         path: '/ticket',
+  //         name: 'ticket',
+  //         component: TicketsView,
+        
+  //     }
+  // ]
   },
   {
     path: '/Ticket/:id/event',
@@ -54,19 +63,17 @@ router.beforeEach((to, from, next) => {
   const authStore = useAuthStore();
 
   if (to.meta.requiresAuth && !authStore.isLoggedIn) {
-    // Redirect to login if not authenticated
     next({
       name: 'login',
       query: { redirect: to.fullPath },
     });
   } else if (!to.meta.requiresAuth && authStore.isLoggedIn && (to.name === 'login' || to.name === 'register')) {
-    // Redirect authenticated users away from login and register
     next({
       path: '/',
       query: { redirect: to.fullPath },
     });
   } else {
-    next(); // proceed to route
+    next();
   }
 });
 

@@ -5,6 +5,7 @@ import axios from 'axios';
 export const useEventStore = defineStore('event', () => {
     const url = 'http://localhost:5220/api/';
     const events = ref([]);
+    const event = ref(null);
 
     async function getEventByCategory(id) {
         try {
@@ -29,6 +30,32 @@ export const useEventStore = defineStore('event', () => {
             return [];
         }
     }
+    async function getEventById(id) {
+        try {
+            const response = await axios.get(`${url}Event/${id}`);
+            const eventData = response.data;
 
-    return { getEventByCategory }; // Return the function so it can be used in components
+            const fetchedEvent = {
+                id: eventData.id,
+                eventName: eventData.eventName,
+                description: eventData.description,
+                location: eventData.location,
+                startDate: eventData.startDate,
+                endDate: eventData.endDate,
+                image: eventData.image,
+                organizer: eventData.organizerID.organizer,
+                maxAttendance: eventData.maxAttendance,
+                availableTickets: eventData.availableTickets // Assuming there is an image field
+            };
+
+            event.value = fetchedEvent;
+            console.log('Fetched event:', fetchedEvent);
+            return fetchedEvent;
+        } catch (err) {
+            console.error('Error fetching event:', err);
+            return null;
+        }
+    }
+
+    return { getEventByCategory, getEventById, event }; // Return the function so it can be used in components
 });

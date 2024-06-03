@@ -1,18 +1,23 @@
 <script setup>
+import { onMounted, computed } from 'vue';
+import { useRoute } from 'vue-router';
+import { useEventStore } from '@/store/eventStore';
+import EventDetailsCard from '@/components/EventDetailsCard.vue'; // Update with the correct path
 
+const route = useRoute();
+const eventId = route.params.id; // Assuming the route has a param named 'id'
+
+const eventStore = useEventStore();
+
+onMounted(async () => {
+  await eventStore.getEventById(eventId);
+});
+
+const eventDetails = computed(() => eventStore.event);
 </script>
 
 <template>
-<div class="card d-flex justify-content-center w-25 m-auto mt-5">
-  <img src="https://imgs.ticombo.com//tc-images-main/thumbnail/events/other/banner/crickett.jpg" class="card-img-top m-auto h-25" alt="...">
-  <div class="card-body">
-    <h5 class="card-title">Card title</h5>
-    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-    <a href="#" class="btn btn-primary d-flex justify-content-center w-25 m-auto">Buy Ticket</a>
-  </div>
-</div>
-
+  <EventDetailsCard :event="eventDetails" />
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>
