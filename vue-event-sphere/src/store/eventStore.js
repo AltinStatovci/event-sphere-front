@@ -19,7 +19,7 @@ export const useEventStore = defineStore('event', () => {
                 location: event.location,
                 startDate: event.startDate,
                 endDate: event.endDate,
-                category: event.categoryID,
+                category: event.categoryId
             }));
 
             events.value = allEvents; // Store the events in the state
@@ -43,7 +43,7 @@ export const useEventStore = defineStore('event', () => {
                 startDate: eventData.startDate,
                 endDate: eventData.endDate,
                 image: eventData.image,
-                organizer: eventData.organizerID.organizer,
+                organizer: eventData.organizer,
                 maxAttendance: eventData.maxAttendance,
                 availableTickets: eventData.availableTickets // Assuming there is an image field
             };

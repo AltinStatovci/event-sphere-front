@@ -1,6 +1,7 @@
 <script setup>
 import {useAuthStore} from "@/store/authStore.js";
 import {useRouter} from "vue-router";
+import DropdownLi from "@/components/DropdownLi.vue";
 
 
 const authStore = useAuthStore();
@@ -9,6 +10,11 @@ const router = useRouter();
 function onLogOut() {
   authStore.logOut();
   router.push({name:'login'});
+}
+
+
+const onHome = () => {
+  router.push({path:'/'});
 }
 
 </script>
@@ -25,7 +31,7 @@ function onLogOut() {
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="#">Home</a>
+            <a class="nav-link active" aria-current="page" @click="onHome">Home</a>
           </li>
 
           <li class="nav-item dropdown">
@@ -33,9 +39,7 @@ function onLogOut() {
               Events
             </a>
             <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="#">Sports</a></li>
-              <li><a class="dropdown-item" href="#">Concerts</a></li>
-              <li><a class="dropdown-item" href="#">OutSide Activities</a></li>
+              <dropdown-li/>
             </ul>
           </li>
           <li class="nav-item">
