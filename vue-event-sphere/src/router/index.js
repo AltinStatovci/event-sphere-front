@@ -6,6 +6,7 @@ import DetailsView from '@/views/DetailsView.vue';
 import TicketsView from '@/views/TicketsView.vue';
 import { useAuthStore } from '@/store/authStore.js';
 import TicketCard from '@/components/TicketCard.vue';
+import EventByCategoryView from "@/views/EventByCategoryView.vue";
 
 const routes = [
   {
@@ -24,6 +25,12 @@ const routes = [
     path: '/',
     name: 'home',
     component: HomeView,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/:id',
+    name: 'eventByCategory',
+    component: EventByCategoryView,
     meta: { requiresAuth: true }
   },
   {
@@ -51,7 +58,9 @@ const routes = [
     name: 'tickets',
     component: TicketsView,
     meta: { requiresAuth: true }
-  },
+  }
+
+
 ];
 
 const router = createRouter({
