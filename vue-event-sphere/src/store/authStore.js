@@ -34,13 +34,25 @@ export const useAuthStore = defineStore('auth', () =>{
     }
         // getters
         const loggedInUser = computed(() => {
-            // nese ka token dekodoje
-            return token.value ? jwtDecode(token.value) : null;
-        })
-
+            // Check if token exists and is valid
+            if (token.value) {
+                const decodedToken = jwtDecode(token.value);
+                // Check if name is available in decoded token
+                if (decodedToken.name) {
+                    return decodedToken;
+                } else {
+                    // Handle case where name is not available
+                    return { email: decodedToken.email, name: null }; 
+                }
+            } else {
+                return null;
+            }
+        });
         const isLoggedIn = computed(() => {
             return !!token.value;
         })
+
+        
 
 
 

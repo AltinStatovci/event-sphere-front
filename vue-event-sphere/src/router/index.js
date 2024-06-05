@@ -4,6 +4,10 @@ import LogInView from "@/views/auth/LogInView.vue";
 import SignUpView from "@/views/auth/SignUpView.vue";
 import {useAuthStore} from "@/store/authStore.js";
 import Dashboard from "@/views/Dashboard.vue";
+import SideBar from "@/components/SideBar.vue";
+import Profile from "@/views/Profile.vue";
+import Payment from "@/views/Payment.vue";
+import Report from "@/views/Report.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -23,8 +27,38 @@ const router = createRouter({
     {
       path: '/dashboard',
       name: 'dashboard',
-      component:Dashboard,
-      meta: { requiresAuth: true }
+      components: {
+        default: Dashboard,
+        sidebar: SideBar,  
+      },
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/profile',
+      name: 'profile',
+      components: {
+        default: Profile,
+        sidebar: SideBar,
+      },
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/payment',
+      name: 'payment',
+      components: {
+        default: Payment,
+        sidebar: SideBar,
+      },
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/report',
+      name: 'report',
+      components: {
+        default: Report,
+        sidebar: SideBar,
+      },
+      meta: { requiresAuth: true },
     },
     {
       path: '/',
