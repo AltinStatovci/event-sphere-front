@@ -87,7 +87,7 @@ const deletePayment = (id) => {
 .dashboard {
     display: flex;
     background-color: #3fa387;
-    height: 90vh;
+    height: 100%;
 }
 
 .content {
