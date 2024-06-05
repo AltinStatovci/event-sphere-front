@@ -16,7 +16,12 @@ function onLogOut() {
 const onHome = () => {
   router.push({path:'/'});
 }
-
+const onAboutUs = () => {
+  router.push({path:'/about'});
+}
+const onContact = () => {
+  router.push({path:'/contact'});
+}
 </script>
 
 
@@ -43,10 +48,10 @@ const onHome = () => {
             </ul>
           </li>
           <li class="nav-item">
-            <a class="nav-link disabled">About Us</a>
+            <a class="nav-link active" @click="onAboutUs">About Us</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link disabled">Contact</a></li>
+            <a class="nav-link active" @click="onContact">Contact</a></li>
         </ul>
         <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
           <li class="nav-item dropdown custom-margin-right">
