@@ -14,6 +14,7 @@ import SideBar from "@/components/SideBar.vue";
 import Profile from "@/views/Profile.vue";
 import Payment from "@/views/Payment.vue";
 import Report from "@/views/Report.vue";
+import CreateEventView from "@/views/CreateEventView.vue";
 
 
 const routes = [
@@ -95,6 +96,12 @@ const routes = [
       component:Report,
       meta: { requiresAuth: true },
     },
+  {
+    path: '/createEvent',
+    name: 'createEvent',
+    component:CreateEventView,
+    meta: { requiresAuth: true },
+  },
 ];
 
 const router = createRouter({

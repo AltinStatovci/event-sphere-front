@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import axios from 'axios';
+import client from "@/helpers/client.js";
 
 export const useEventStore = defineStore('event', () => {
     const url = 'http://localhost:5220/api/';
@@ -55,7 +56,13 @@ export const useEventStore = defineStore('event', () => {
             console.error('Error fetching event:', err);
             return null;
         }
+
+
     }
 
-    return { getEventByCategory, getEventById, event }; // Return the function so it can be used in components
+    async function addEvent(event){
+        const  response = await client.post(`${url}Event`,event);
+    }
+
+    return { getEventByCategory, getEventById,addEvent ,event }; // Return the function so it can be used in components
 });
