@@ -1,3 +1,35 @@
+<script setup>
+import { ref } from 'vue'
+import { useAuthStore } from "@/store/authStore.js";
+import { useRouter } from "vue-router";
+
+
+const is_expanded = ref(localStorage.getItem("is_expanded") === "true")
+const showLogout = ref(false)
+
+const ToggleMenu = () => {
+  is_expanded.value = !is_expanded.value
+  localStorage.setItem("is_expanded", is_expanded.value)
+}
+
+const toggleLogout = () => {
+  showLogout.value = !showLogout.value
+}
+const authStore = useAuthStore();
+const router = useRouter();
+function onLogOut() {
+  authStore.logOut();
+  router.push({ name: 'login' });
+}
+
+const handleLogout = () => {
+  // Implement your logout logic here
+  console.log('User logged out')
+  // Add your logout functionality here, e.g., clearing tokens, redirecting to login page, etc.
+}
+</script>
+
+
 <template>
   <aside :class="`${is_expanded ? 'is-expanded' : ''}`">
     <div class="logo">
@@ -58,36 +90,7 @@
   </aside>
 </template>
 
-<script setup>
-import { ref } from 'vue'
-import { useAuthStore } from "@/store/authStore.js";
-import { useRouter } from "vue-router";
-import '@/styles/global.scss';
 
-const is_expanded = ref(localStorage.getItem("is_expanded") === "true")
-const showLogout = ref(false)
-
-const ToggleMenu = () => {
-  is_expanded.value = !is_expanded.value
-  localStorage.setItem("is_expanded", is_expanded.value)
-}
-
-const toggleLogout = () => {
-  showLogout.value = !showLogout.value
-}
-const authStore = useAuthStore();
-const router = useRouter();
-function onLogOut() {
-  authStore.logOut();
-  router.push({ name: 'login' });
-}
-
-const handleLogout = () => {
-  // Implement your logout logic here
-  console.log('User logged out')
-  // Add your logout functionality here, e.g., clearing tokens, redirecting to login page, etc.
-}
-</script>
 
 <style lang="scss" scoped>
 aside {
@@ -97,7 +100,7 @@ aside {
   background-color: var(--dark);
   color: var(--light);
 
-  width: calc(2rem + 32px);
+  width: calc(3rem + 32px);
   overflow: hidden;
   height: 100vh;
   padding: 1rem;
@@ -111,6 +114,14 @@ aside {
   .logo {
     margin-bottom: 1rem;
   }
+  button {
+    cursor: pointer;
+    appearance: none;
+    border: none;
+    outline: none;
+    background: none;
+  }
+
 
   .menu-toggle-wrap {
     display: flex;

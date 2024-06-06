@@ -1,55 +1,6 @@
-<template>
-  <div class="dashboard" :style="{ backgroundColor: isDarkMode ? '#0f172a' : '#3fa387' }">
-    <div class="statistics-box">
-      <span class="material-symbols-outlined icon">
-        query_stats
-      </span>
-      <p class="count-text">Daily Statistics</p>
-    </div>
-
-    <div class="events-boxes">
-      <div class="event-count-box">
-        <span class="material-symbols-outlined icon">festival</span>
-        <p class="count-text">There are {{ eventCount }} Events</p>
-      </div>
-      <div class="event-count-box">
-        <span class="material-symbols-outlined icon">
-          groups
-        </span>
-        <p class="count-text">There are Users</p>
-      </div>
-      <div class="event-count-box">
-        <span class="material-symbols-outlined icon">
-          currency_exchange
-        </span>
-        <p class="count-text">There are {{ paymentCount }} Payments</p>
-      </div>
-      <div class="event-count-box">
-        <span class="material-symbols-outlined icon">
-          assured_workload
-        </span>
-        <p class="count-text">Secure Transactions </p>
-      </div>
-      <div class="event-count-box">
-        <span class="material-symbols-outlined icon">
-          confirmation_number
-        </span>
-        <p class="count-text">There are {{ ticketCount }} Tickets</p>
-      </div>
-    </div>
-
-    <div class="dark-mode-button-container">
-      <button @click="toggleDarkMode" class="dark-mode-button">
-        <span class="material-symbols-outlined">
-          dark_mode
-        </span>
-      </button>
-    </div>
-  </div>
-</template>
-
 <script setup>
 import { ref, onMounted } from 'vue';
+import SideBar from "@/components/SideBar.vue";
 
 const eventCount = ref(0);
 const paymentCount = ref(0);
@@ -106,15 +57,74 @@ onMounted(() => {
 });
 </script>
 
+<template>
+  <div class="d-flex">
+
+
+  <side-bar/>
+  <div class="dashboard" :style="{ backgroundColor: isDarkMode ? '#0f172a' : '#3fa387' }">
+
+    <div class="statistics-box">
+      <span class="material-symbols-outlined icon">
+        query_stats
+      </span>
+      <p class="count-text">Daily Statistics</p>
+    </div>
+
+    <div class="events-boxes">
+      <div class="event-count-box">
+        <span class="material-symbols-outlined icon">festival</span>
+        <p class="count-text">There are {{ eventCount }} Events</p>
+      </div>
+      <div class="event-count-box">
+        <span class="material-symbols-outlined icon">
+          groups
+        </span>
+        <p class="count-text">There are Users</p>
+      </div>
+      <div class="event-count-box">
+        <span class="material-symbols-outlined icon">
+          currency_exchange
+        </span>
+        <p class="count-text">There are {{ paymentCount }} Payments</p>
+      </div>
+      <div class="event-count-box">
+        <span class="material-symbols-outlined icon">
+          assured_workload
+        </span>
+        <p class="count-text">Secure Transactions </p>
+      </div>
+      <div class="event-count-box">
+        <span class="material-symbols-outlined icon">
+          confirmation_number
+        </span>
+        <p class="count-text">There are {{ ticketCount }} Tickets</p>
+      </div>
+    </div>
+
+    <div class="dark-mode-button-container">
+      <button @click="toggleDarkMode" class="dark-mode-button">
+        <span class="material-symbols-outlined">
+          dark_mode
+        </span>
+      </button>
+    </div>
+  </div>
+  </div>
+</template>
+
+
+
 <style scoped>
 .dashboard {
   padding: 20px;
   border-radius: 8px;
+  width: 100% ;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
   align-items: center;
-  height: 100%;
+  height: 100vh;
   transition: background-color 0.3s ease;
 }
 

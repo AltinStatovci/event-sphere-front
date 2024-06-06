@@ -1,3 +1,12 @@
+<script setup lang="ts">
+import {
+  MDBFooter,
+  MDBContainer,
+  MDBRow,
+  MDBCol
+} from 'mdb-vue-ui-kit';
+</script>
+
 <template>
     <MDBFooter :text="['center', 'lg-start']">
       <!-- Grid container -->
@@ -30,11 +39,3 @@
     </MDBFooter>
   </template>
 
-<script setup lang="ts">
-    import {
-    MDBFooter,
-    MDBContainer,
-    MDBRow,
-    MDBCol
-    } from 'mdb-vue-ui-kit';
-</script>

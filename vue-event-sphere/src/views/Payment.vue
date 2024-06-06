@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue';
+import SideBar from "@/components/SideBar.vue";
 
 const payments = ref([]);
 
@@ -38,6 +39,9 @@ const deletePayment = (id) => {
 </script>
 
 <template>
+
+<div class="d-flex">
+  <side-bar/>
     <div class="dashboard">
         <div class="content">
             <span class="material-icons" style="font-size: 4rem; color: gray;">wallet</span>
@@ -81,13 +85,15 @@ const deletePayment = (id) => {
             </div>
         </div>
     </div>
+</div>
 </template>
 
 <style scoped>
 .dashboard {
     display: flex;
     background-color: #3fa387;
-    height: 100%;
+    height: 100vh;
+    width: 100%;
 }
 
 .content {

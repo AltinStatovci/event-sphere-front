@@ -45,21 +45,13 @@ const routes = [
     path: '/about',
     name: 'about',
     component: () => import('@/views/AboutView.vue'),
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: false }
   },
   {
     path: '/eventdetails/:id',
     name: 'eventdetails',
     component: DetailsView,
     meta: { requiresAuth: true },
-  //   children: [
-  //     {
-  //         path: '/ticket',
-  //         name: 'ticket',
-  //         component: TicketsView,
-        
-  //     }
-  // ]
   },
   {
     path: '/Ticket/:id/event',
@@ -82,37 +74,25 @@ const routes = [
     {
       path: '/dashboard',
       name: 'dashboard',
-      components: {
-        default: Dashboard,
-        sidebar: SideBar,
-      },
+      component: Dashboard,
       meta: { requiresAuth: true },
     },
     {
       path: '/profile',
       name: 'profile',
-      components: {
-        default: Profile,
-        sidebar: SideBar,
-      },
+      component: Profile,
       meta: { requiresAuth: true },
     },
     {
       path: '/payment',
       name: 'payment',
-      components: {
-        default: Payment,
-        sidebar: SideBar,
-      },
+      component: Payment,
       meta: { requiresAuth: true },
     },
     {
       path: '/report',
       name: 'report',
-      components: {
-        default: Report,
-        sidebar: SideBar,
-      },
+      component:Report,
       meta: { requiresAuth: true },
     },
 ];
