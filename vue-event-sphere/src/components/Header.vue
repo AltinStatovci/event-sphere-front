@@ -14,7 +14,7 @@ function onLogOut() {
 
 
 const onDashboard = () =>{
-  router.push({name:'dashboard'})
+  router.push({path:'dashboard'})
 };
 
 const onHome = () => {

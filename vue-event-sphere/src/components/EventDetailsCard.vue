@@ -1,4 +1,23 @@
-<!-- EventDetailsCard.vue -->
+<script setup>
+import { defineProps } from 'vue';
+import { useRouter } from "vue-router";
+
+const router = useRouter();
+
+const props = defineProps({
+  event: {
+    type: Object,
+    required: true
+  }
+});
+
+function goToTicket(id) {
+  const redirectUrl = `/Ticket/${id}/event`;
+  router.push(redirectUrl);
+}
+</script>
+
+
 <template>
     <div v-if="event" class="card d-flex justify-content-center w-25 m-auto mt-5">
       <img :src="event.image || 'https://imgs.ticombo.com//tc-images-main/thumbnail/events/other/banner/crickett.jpg'" class="card-img-top m-auto h-25" alt="Event Image">
@@ -16,24 +35,7 @@
     </div>
   </template>
   
-  <script setup>
-  import { defineProps } from 'vue';
-  import { useRouter } from "vue-router";
-  
-  const router = useRouter();
 
-  const props = defineProps({
-    event: {
-      type: Object,
-      required: true
-    }
-  });
-
-  function goToTicket(id) {
-  const redirectUrl = `/Ticket/${id}/event`;
-  router.push(redirectUrl);
-}
-  </script>
   
   <style scoped>
   .card {

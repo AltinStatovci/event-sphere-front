@@ -1,3 +1,27 @@
+
+<script setup>
+import { ref } from 'vue';
+
+// Initialize quantity as a ref with value 1
+const quantity = ref(1);
+
+// Define functions to increase and decrease quantity
+const increase = () => { quantity.value++; }
+const decrease = () => {
+  if (quantity.value > 1) {
+    quantity.value--;
+  }
+}
+
+// Define props
+defineProps({
+  ticket: {
+    type: Object,
+    required: true
+  }
+});
+</script>
+
 <template>
     <div class="container card my-5">
       <div class="card-body">
@@ -20,29 +44,7 @@
       </div>
     </div>
   </template>
-  
-  <script setup>
-  import { ref } from 'vue';
-  
-  // Initialize quantity as a ref with value 1
-  const quantity = ref(1);
-  
-  // Define functions to increase and decrease quantity
-  const increase = () => { quantity.value++; }
-  const decrease = () => {
-    if (quantity.value > 1) {
-      quantity.value--;
-    }
-  }
-  
-  // Define props
-  defineProps({
-    ticket: {
-      type: Object,
-      required: true
-    }
-  });
-  </script>
+
   
   <style scoped>
   .quantity {

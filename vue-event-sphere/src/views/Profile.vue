@@ -1,4 +1,42 @@
+<script setup>
+import { ref, onMounted } from 'vue';
+import { useStore } from 'vuex';
+import SideBar from "@/components/SideBar.vue";
+
+const user = ref({
+  firstName: '',
+  lastName: '',
+  email: ''
+});
+
+const store = useStore();
+
+onMounted(() => {
+  fetchUserDetails();
+});
+
+const fetchUserDetails = async () => {
+  try {
+    // Fetch user details from the server
+    // Assign fetched user data to the user ref
+  } catch (error) {
+    console.error('Error fetching user details:', error.message);
+  }
+};
+
+const editProfile = () => {
+  // Redirect or show edit profile form
+};
+
+const deleteProfile = () => {
+  // Show confirmation modal for profile deletion
+};
+</script>
+
 <template>
+
+<div class="d-flex">
+  <side-bar/>
     <div class="profile">
         <div class="profile-header">
             <h1>Profile Details</h1>
@@ -31,41 +69,10 @@
             </div>
         </div>
     </div>
+</div>
 </template>
 
-<script setup>
-import { ref, onMounted } from 'vue';
-import { useStore } from 'vuex';
 
-const user = ref({
-    firstName: '',
-    lastName: '',
-    email: ''
-});
-
-const store = useStore();
-
-onMounted(() => {
-    fetchUserDetails();
-});
-
-const fetchUserDetails = async () => {
-    try {
-        // Fetch user details from the server
-        // Assign fetched user data to the user ref
-    } catch (error) {
-        console.error('Error fetching user details:', error.message);
-    }
-};
-
-const editProfile = () => {
-    // Redirect or show edit profile form
-};
-
-const deleteProfile = () => {
-    // Show confirmation modal for profile deletion
-};
-</script>
 
 <style scoped>
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');
@@ -75,7 +82,7 @@ const deleteProfile = () => {
     border-radius: 8px;
     background-color: #ffffff;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    max-width: 600px;
+    max-width: 30%;
     margin: 20px auto;
 }
 

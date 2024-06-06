@@ -7,11 +7,7 @@ import { useAuthStore } from "@/store/authStore.js";
 const authStore = useAuthStore();
 const route = useRoute();
 
-// Show sidebar only on the dashboard route
-const showSidebar = computed(() => route.name === 'dashboard' || 'profile' || 'payment' || 'report');
 
-// Determine if the current route is the dashboard
-const isDashboard = computed(() => route.name === 'dashboard' || route.name === 'profile' || route.name === 'payment' || route.name === 'report');
 </script>
 
 <template>
@@ -21,7 +17,7 @@ const isDashboard = computed(() => route.name === 'dashboard' || route.name === 
     </nav>
 
     <div class="app">
-      <RouterView name="sidebar" v-if="showSidebar" />
+
       <main>
         <RouterView />
       </main>
@@ -41,6 +37,15 @@ const isDashboard = computed(() => route.name === 'dashboard' || route.name === 
 }
 main {
   flex: 1;
+}
+:root {
+  --primary: #4ade80;
+  --primary-alt: #22c55e;
+  --grey: #64748b;
+  --dark: #1e293b;
+  --dark-alt: #334155;
+  --light: #f1f5f9;
+  --sidebar-width: 300px;
 }
 
 </style>
