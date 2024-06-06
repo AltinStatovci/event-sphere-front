@@ -62,6 +62,7 @@
 import { ref } from 'vue'
 import { useAuthStore } from "@/store/authStore.js";
 import { useRouter } from "vue-router";
+import '@/styles/global.scss';
 
 const is_expanded = ref(localStorage.getItem("is_expanded") === "true")
 const showLogout = ref(false)

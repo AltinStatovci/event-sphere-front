@@ -234,7 +234,7 @@ const toggleDarkMode = () => {
     display: flex;
     flex-direction: column;
     align-items: center;
-    height: 90vh;
+    height: 100%;
     transition: background-color 0.3s ease;
 }
 
