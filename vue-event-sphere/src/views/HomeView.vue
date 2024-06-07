@@ -10,6 +10,7 @@ const eventStore = useEventStore();
 const categoryNames = ref([]);
 const eventsByCategoryId = ref({});
 
+
 onMounted(async () => {
   const categories = await categoryStore.getAllCategories();
   categoryNames.value = categories.map(category => category.categoryName);

@@ -33,28 +33,32 @@ export const useAuthStore = defineStore('auth', () =>{
 
     }
         // getters
-    const loggedInUser = computed(() => {
-        // nese ka token dekodoje
-        return token.value ? jwtDecode(token.value) : null;
-    })
-
-    // const isAdmin = computed(() => {
-    //     return loggedInUser.value.role === 'admin';
-    // })
-
-    const id = computed(() => {
-        return loggedInUser.value?.id
-    })
-
-
-    const isLoggedIn = computed(() => {
-            return !!token.value;
+        const loggedInUser = computed(() => {
+            // nese ka token dekodoje
+            return token.value ? jwtDecode(token.value) : null;
         })
-
-        
-
-
-
-    return { logIn, signUp, logOut , isLoggedIn , loggedInUser }
+    
+        const isAdmin = computed(() => {
+            return loggedInUser.value.role === 1;
+        })
+    
+        const id = computed(() => {
+            return loggedInUser.value.ID;
+        })
+    
+        const email = computed(() => {
+            return loggedInUser.value.email;
+        })
+    
+    
+        const isLoggedIn = computed(() => {
+                return !!token.value;
+            })
+    
+    
+    
+    
+    
+        return { logIn, signUp, logOut , isLoggedIn , loggedInUser , id , email , isAdmin}
 
 })
