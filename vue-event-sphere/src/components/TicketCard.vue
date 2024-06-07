@@ -1,6 +1,10 @@
 
 <script setup>
 import { ref } from 'vue';
+import { useRouter } from "vue-router";
+
+const router = useRouter();
+
 
 // Initialize quantity as a ref with value 1
 const quantity = ref(1);
@@ -11,6 +15,10 @@ const decrease = () => {
   if (quantity.value > 1) {
     quantity.value--;
   }
+}
+function goToPayment(id) {
+  const redirectUrl = `/Payment/${id}`;
+  router.push(redirectUrl);
 }
 
 // Define props
@@ -38,7 +46,7 @@ defineProps({
               <button class="btn btn-primary ml-2" @click="increase">+</button>
               <button class="btn btn-primary ml-2" @click="decrease">-</button>
             </div>
-            <a href="#" class="btn btn-primary">Buy Ticket</a>
+            <button @click="goToPayment(ticket.id)" class="btn btn-primary">Buy Ticket</button>
           </div>
         </div>
       </div>

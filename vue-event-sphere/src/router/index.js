@@ -14,6 +14,7 @@ import SideBar from "@/components/SideBar.vue";
 import Profile from "@/views/Profile.vue";
 import Payment from "@/views/Payment.vue";
 import Report from "@/views/Report.vue";
+import PaymentPage from '@/views/PaymentPageView.vue';
 
 
 const routes = [
@@ -84,16 +85,16 @@ const routes = [
       meta: { requiresAuth: true },
     },
     {
-      path: '/payment',
-      name: 'payment',
-      component: Payment,
-      meta: { requiresAuth: true },
-    },
-    {
       path: '/report',
       name: 'report',
       component:Report,
       meta: { requiresAuth: true },
+    },
+    {
+      path: '/payment/:id',
+      name: 'payment',
+      component: PaymentPage,
+      meta: { requiresAuth: true }
     },
 ];
 
