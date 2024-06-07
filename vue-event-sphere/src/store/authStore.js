@@ -33,22 +33,21 @@ export const useAuthStore = defineStore('auth', () =>{
 
     }
         // getters
-        const loggedInUser = computed(() => {
-            // Check if token exists and is valid
-            if (token.value) {
-                const decodedToken = jwtDecode(token.value);
-                // Check if name is available in decoded token
-                if (decodedToken.name) {
-                    return decodedToken;
-                } else {
-                    // Handle case where name is not available
-                    return { email: decodedToken.email, name: null }; 
-                }
-            } else {
-                return null;
-            }
-        });
-        const isLoggedIn = computed(() => {
+    const loggedInUser = computed(() => {
+        // nese ka token dekodoje
+        return token.value ? jwtDecode(token.value) : null;
+    })
+
+    // const isAdmin = computed(() => {
+    //     return loggedInUser.value.role === 'admin';
+    // })
+
+    const id = computed(() => {
+        return loggedInUser.value?.id
+    })
+
+
+    const isLoggedIn = computed(() => {
             return !!token.value;
         })
 
