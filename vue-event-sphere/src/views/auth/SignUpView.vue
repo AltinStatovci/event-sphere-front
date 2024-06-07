@@ -19,6 +19,20 @@ const error = ref('');
 const router = useRouter();
 const route = useRoute();
 
+function validatePassword(password) {
+    // Your validation criteria
+    const minLength = 8;
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasNumbers = /\d/.test(password);
+
+    return (
+        password.length >= minLength &&
+        hasUpperCase &&
+        hasLowerCase &&
+        hasNumbers
+    );
+}
 async function handleSubmit(){
     formIsValid.value = true;
 
@@ -37,6 +51,7 @@ async function handleSubmit(){
     return;
   }
 
+ 
   try {
       await authStore.signUp(formData)
 
@@ -51,10 +66,29 @@ async function handleSubmit(){
 
   } catch (e) {
     formIsValid.value = false;
-    // error.value = e.response.data.error.message;
+     if (error.response && error.response.status === 400 && error.response.data.errors && error.response.data.errors.Email) {
+      error.value = error.response.data.errors.Email[0]; // Error message from backend
+    } else {
+      error.value = "This email is already in use.";
+    }
+      await Swal.fire({
+      title: "Error!",
+      text: error.value,
+      icon: "error"
+    });
     console.log(e)
   }
-
+if (!validatePassword(formData.password)) {
+        formIsValid.value = false;
+        error.value =
+            'Password must be at least 8 characters long and contain at least one uppercase letter and one number.';
+        await Swal.fire({
+            title: 'Error!',
+            text: error.value,
+            icon: 'error'
+        });
+        return;
+    }
 }
 
 </script>
