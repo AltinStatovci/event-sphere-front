@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import axios from 'axios';
+import client from "@/helpers/client.js";
 
 export const useEventStore = defineStore('event', () => {
     const url = 'http://localhost:5220/api/';
@@ -19,7 +20,8 @@ export const useEventStore = defineStore('event', () => {
                 location: event.location,
                 startDate: event.startDate,
                 endDate: event.endDate,
-                category: event.categoryId
+                category: event.categoryId,
+                photoData: event.photoData
             }));
 
             events.value = allEvents; // Store the events in the state
@@ -45,7 +47,8 @@ export const useEventStore = defineStore('event', () => {
                 image: eventData.image,
                 organizer: eventData.organizer,
                 maxAttendance: eventData.maxAttendance,
-                availableTickets: eventData.availableTickets // Assuming there is an image field
+                availableTickets: eventData.availableTickets,
+                photoData: eventData.photoData, 
             };
 
             event.value = fetchedEvent;
@@ -55,7 +58,28 @@ export const useEventStore = defineStore('event', () => {
             console.error('Error fetching event:', err);
             return null;
         }
+
+
     }
 
-    return { getEventByCategory, getEventById, event }; // Return the function so it can be used in components
+    async function addEvent(event) {
+        try {
+          const formData = new FormData();
+          for (const key in event) {
+            let value = event[key];
+            formData.append(key, value);
+            console.log(`Key: ${key}, Value: ${value}`);
+          }
+          const response = await client.post(`${url}Event`, formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+          });
+          return response.data; 
+        } catch (error) {
+          throw error; 
+        }
+      }
+      
+    return { getEventByCategory, getEventById,addEvent ,event }; // Return the function so it can be used in components
 });
