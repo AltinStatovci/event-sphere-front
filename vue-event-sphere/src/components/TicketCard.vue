@@ -1,13 +1,18 @@
-
 <script setup>
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { useRouter } from "vue-router";
+import { usePaymentStore } from '@/store/paymentStore'; // Import the payment store
 
 const router = useRouter();
-
+const paymentStore = usePaymentStore(); // Get the payment store
 
 // Initialize quantity as a ref with value 1
 const quantity = ref(1);
+
+// Watch for changes in quantity and update paymentStore.amount
+watch(quantity, (newQuantity) => {
+  paymentStore.amount = newQuantity;
+});
 
 // Define functions to increase and decrease quantity
 const increase = () => { quantity.value++; }
@@ -53,8 +58,7 @@ defineProps({
     </div>
   </template>
 
-  
-  <style scoped>
+<style scoped>
   .quantity {
     display: flex;
     align-items: center;
@@ -65,5 +69,4 @@ defineProps({
     text-align: center;
     margin: 0 5px;
   }
-  </style>
-  
+</style>
