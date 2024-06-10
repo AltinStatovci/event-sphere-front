@@ -61,6 +61,33 @@ export const useEventStore = defineStore('event', () => {
 
 
     }
+    async function getEvents() {
+      try {
+          const response = await axios.get(`${url}Event`);
+          const eventData = response.data;
+
+          const allEvents = eventData.map(event => ({
+              id: event.id,
+              eventName: event.eventName,
+              description: event.description,
+              location: event.location,
+              startDate: event.startDate,
+              endDate: event.endDate,
+              image: event.image,
+              organizer: event.organizer,
+              maxAttendance: event.maxAttendance,
+              availableTickets: event.availableTickets,
+              photoData: event.photoData, 
+          }));
+
+          events.value = allEvents; // Store the events in the state
+          console.log('All Events:', allEvents);
+          return allEvents;
+      } catch (err) {
+          console.error('Error fetching events:', err);
+          return [];
+      }
+  }
 
     async function addEvent(event) {
         try {
@@ -80,6 +107,24 @@ export const useEventStore = defineStore('event', () => {
           throw error; 
         }
       }
+      async function updateEvent(event) {
+        try {
+            const formData = new FormData();
+            for (const key in event) {
+                let value = event[key];
+                formData.append(key, value);
+                console.log(`Key: ${key}, Value: ${value}`);
+            }
+            const response = await client.put(`${url}Event/${event.id}`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+            return response.data; 
+        } catch (error) {
+            throw error; 
+        }
+    }
       
-    return { getEventByCategory, getEventById,addEvent ,event }; // Return the function so it can be used in components
+    return { getEventByCategory, getEventById,addEvent,updateEvent,getEvents,event }; // Return the function so it can be used in components
 });

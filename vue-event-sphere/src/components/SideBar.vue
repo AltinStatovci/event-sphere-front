@@ -54,6 +54,11 @@ const handleLogout = () => {
         <span class="text">Manage Account</span>
       </router-link>
 
+      <router-link to="/manageEvent" class="button">
+        <span class="material-icons">stadium</span>
+        <span class="text">Manage Events</span>
+      </router-link>
+
       <router-link to="/payment" class="button">
         <span class="material-icons">wallet</span>
         <span class="text">Payments</span>
@@ -114,6 +119,7 @@ aside {
   .logo {
     margin-bottom: 1rem;
   }
+
   button {
     cursor: pointer;
     appearance: none;
