@@ -20,6 +20,7 @@ import axios from 'axios';
 import { useAuthStore } from "@/store/authStore.js";
 import { useTicketStore } from "@/store/ticketStore.js";
 import { usePaymentStore } from '@/store/paymentStore';
+import Swal from "sweetalert2";
 
 const cardHolderName = ref('');
 const stripe = ref(null);
@@ -110,8 +111,8 @@ const processPayment = async (stripeToken) => {
 
     if (response.status === 204 || response.status === 201 || response.status === 200) {
       await Swal.fire({
-        title: "Payment successfull!",
-        text: "!",
+        title: "Payment successful!",
+        text: "Thank you for your purchase!",
         icon: "success"
       });
     } else {
