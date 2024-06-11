@@ -36,21 +36,24 @@ export const useAuthStore = defineStore('auth', () =>{
         const loggedInUser = computed(() => {
             // nese ka token dekodoje
             return token.value ? jwtDecode(token.value) : null;
+
+
         })
-    
+
         const isAdmin = computed(() => {
-            return loggedInUser.value.role === 'admin';
+            return loggedInUser.value.role === 1;
         })
-    
+
         const id = computed(() => {
             return loggedInUser.value.ID;
         })
-    
+
+
         const email = computed(() => {
             return loggedInUser.value.email;
         })
-    
-    
+
+
         const isLoggedIn = computed(() => {
                 return !!token.value;
             })
@@ -58,6 +61,6 @@ export const useAuthStore = defineStore('auth', () =>{
     
     
     
-    
         return { logIn, signUp, logOut , isLoggedIn , loggedInUser , id , email , isAdmin}
+
 })

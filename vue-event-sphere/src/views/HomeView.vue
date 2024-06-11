@@ -10,6 +10,7 @@ const eventStore = useEventStore();
 const categoryNames = ref([]);
 const eventsByCategoryId = ref({});
 
+
 onMounted(async () => {
   const categories = await categoryStore.getAllCategories();
   categoryNames.value = categories.map(category => category.categoryName);
@@ -23,9 +24,6 @@ onMounted(async () => {
   results.forEach(({ categoryId, categoryName, events }) => {
     eventsByCategoryId.value[categoryId] = { categoryName, events };
   });
-
-  console.log(eventsByCategoryId.value);
-  console.log(categories);
 });
 
 const filteredCategories = computed(() => {

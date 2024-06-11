@@ -13,7 +13,8 @@ const route = useRoute();
 <template>
   <div id="app" class="d-flex flex-column min-vh-100">
     <nav>
-      <Header v-if="authStore.isLoggedIn && route.name !== 'dashboard' && route.name !== 'profile' && route.name !== 'payment' && route.name !== 'report'" />
+      <Header
+        v-if="authStore.isLoggedIn && route.name !== 'dashboard' && route.name !== 'profile' && route.name !== 'payment' && route.name !== 'report' && route.name !== 'manageEvent'" />
     </nav>
 
     <div class="app">
@@ -24,7 +25,8 @@ const route = useRoute();
     </div>
 
     <footer>
-      <Footer v-if="authStore.isLoggedIn && route.name !== 'dashboard' && route.name !== 'profile' && route.name !== 'payment' && route.name !== 'report'" />
+      <Footer
+        v-if="authStore.isLoggedIn && route.name !== 'dashboard' && route.name !== 'profile' && route.name !== 'payment' && route.name !== 'report' && route.name !== 'manageEvent'" />
     </footer>
   </div>
 </template>
@@ -35,9 +37,11 @@ const route = useRoute();
   flex-direction: column;
   min-height: 100vh;
 }
+
 main {
   flex: 1;
 }
+
 :root {
   --primary: #4ade80;
   --primary-alt: #22c55e;
@@ -47,6 +51,4 @@ main {
   --light: #f1f5f9;
   --sidebar-width: 300px;
 }
-
 </style>
-
