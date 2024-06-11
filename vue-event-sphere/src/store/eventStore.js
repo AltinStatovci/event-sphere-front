@@ -22,7 +22,7 @@ export const useEventStore = defineStore('event', () => {
                 category: event.categoryId
             }));
 
-            events.value = allEvents; // Store the events in the state
+            events.value = allEvents;
             console.log(allEvents);
             return allEvents;
         } catch (err) {
@@ -45,7 +45,7 @@ export const useEventStore = defineStore('event', () => {
                 image: eventData.image,
                 organizer: eventData.organizer,
                 maxAttendance: eventData.maxAttendance,
-                availableTickets: eventData.availableTickets // Assuming there is an image field
+                availableTickets: eventData.availableTickets 
             };
 
             event.value = fetchedEvent;
@@ -57,5 +57,5 @@ export const useEventStore = defineStore('event', () => {
         }
     }
 
-    return { getEventByCategory, getEventById, event }; // Return the function so it can be used in components
+    return { getEventByCategory, getEventById, event }; 
 });

@@ -1,15 +1,30 @@
 <template>
-  <div>
-    <h2>Payment Form</h2>
-    <form @submit.prevent="submitPayment">
-      <div>
+  <div class="payment-form-container">
+    
+    <form @submit.prevent="submitPayment" class="payment-form">
+      <div class="form-group">
         <label for="card-holder-name">Card Holder Name</label>
-        <input type="text" id="card-holder-name" v-model="cardHolderName" />
+        <input type="text" id="card-holder-name" v-model="cardHolderName" required />
       </div>
-      <div id="card-element"></div>
+      <div class="form-group">
+        <label for="card-number">Card Number</label>
+        <div id="card-element" class="card-element"></div>
+      </div>
+      <div class="form-group">
+        <label for="card-expiry">Expiration Date</label>
+        <div id="card-expiry" class="card-element"></div>
+      </div>
+      <div class="form-group">
+        <label for="card-cvc">CVC</label>
+        <div id="card-cvc" class="card-element"></div>
+      </div>
+      <div class="form-group">
+        <label for="zip-code">ZIP Code</label>
+        <input type="text" id="zip-code" v-model="zipCode" required />
+      </div>
       <button type="submit" :disabled="loading">Pay</button>
     </form>
-    <p v-if="error">{{ error }}</p>
+    <p v-if="error" class="error-message">{{ error }}</p>
   </div>
 </template>
 
@@ -21,16 +36,22 @@ import { useAuthStore } from "@/store/authStore.js";
 import { useTicketStore } from "@/store/ticketStore.js";
 import { usePaymentStore } from '@/store/paymentStore';
 import Swal from "sweetalert2";
+import { useRouter } from 'vue-router';
+
 
 const cardHolderName = ref('');
+const zipCode = ref('');
 const stripe = ref(null);
-const cardElement = ref(null);
+const cardNumberElement = ref(null);
+const cardExpiryElement = ref(null);
+const cardCvcElement = ref(null);
 const loading = ref(false);
 const error = ref(null);
 const authStore = useAuthStore();
 const ticketStore = useTicketStore();
 const paymentStore = usePaymentStore();
 const ticket = ref(null);
+const router = useRouter();
 
 const path = window.location.pathname;
 const segments = path.split('/');
@@ -44,7 +65,6 @@ onMounted(async () => {
     console.error('Error fetching ticket:', ticketError);
     error.value = 'Failed to fetch ticket information.';
   }
-
 
   try {
     stripe.value = await loadStripe('pk_test_51PObZ6GXr54oZKBkE9PB2WxDpNwNvkgQyn4uDCwZ0XUW1ozgyZVyquOp5IIQxN6zNlgoHnPZ5TbuGzxosNOgC3S700Ywr18il6');
@@ -66,8 +86,14 @@ onMounted(async () => {
       }
     };
 
-    cardElement.value = elements.create('card', { style });
-    cardElement.value.mount('#card-element');
+    cardNumberElement.value = elements.create('cardNumber', { style });
+    cardNumberElement.value.mount('#card-element');
+
+    cardExpiryElement.value = elements.create('cardExpiry', { style });
+    cardExpiryElement.value.mount('#card-expiry');
+
+    cardCvcElement.value = elements.create('cardCvc', { style });
+    cardCvcElement.value.mount('#card-cvc');
   } catch (stripeError) {
     console.error('Stripe initialization error:', stripeError);
     error.value = 'Failed to initialize payment form.';
@@ -79,8 +105,9 @@ const submitPayment = async () => {
   error.value = null;
 
   try {
-    const { token, error: stripeError } = await stripe.value.createToken(cardElement.value, {
+    const { token, error: stripeError } = await stripe.value.createToken(cardNumberElement.value, {
       name: cardHolderName.value,
+      address_zip: zipCode.value
     });
 
     if (stripeError) {
@@ -105,17 +132,20 @@ const processPayment = async (stripeToken) => {
       paymentDate: new Date().toISOString(),
       stripeToken: stripeToken,
       paymentStatus: true
-      });
+    });
+
     console.log(response);
-    
 
     if (response.status === 204 || response.status === 201 || response.status === 200) {
       await Swal.fire({
         title: "Payment successful!",
         text: "Thank you for your purchase!",
-        icon: "success"
-      });
-    } else {
+        icon: "success",
+        confirmButtonText: "OK"
+        }).then(() => {
+          router.push({ name: 'home' }); 
+        });
+      } else {
       console.error('Unexpected response:', response);
       error.value = 'An unexpected error occurred after processing the payment.';
     }
@@ -126,31 +156,58 @@ const processPayment = async (stripeToken) => {
 </script>
 
 <style scoped>
-#card-element {
+.payment-form-container {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 20px;
   border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.payment-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.form-group input {
+  width: 100%;
   padding: 10px;
+  border: 1px solid #ccc;
   border-radius: 4px;
-  margin: 10px 0;
+  box-sizing: border-box;
+}
+
+.card-element {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
   background-color: white;
   box-shadow: 0 1px 3px 0 #e6ebf1;
   transition: box-shadow 150ms ease;
 }
 
-#card-element.StripeElement--focus {
+.card-element.StripeElement--focus {
   box-shadow: 0 1px 3px 0 #cfd7df;
 }
 
-#card-element.StripeElement--invalid {
+.card-element.StripeElement--invalid {
   border-color: #fa755a;
 }
 
-#card-element.StripeElement--webkit-autofill {
+.card-element.StripeElement--webkit-autofill {
   background-color: #fefde5 !important;
-}
-
-button[disabled] {
-  cursor: not-allowed;
-  background-color: #ccc;
 }
 
 button {
@@ -164,5 +221,15 @@ button {
 
 button:hover {
   background-color: #218838;
+}
+
+button[disabled] {
+  cursor: not-allowed;
+  background-color: #ccc;
+}
+
+.error-message {
+  color: #ff3860;
+  margin-top: 10px;
 }
 </style>
