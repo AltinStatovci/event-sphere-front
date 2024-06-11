@@ -24,9 +24,6 @@ onMounted(async () => {
   results.forEach(({ categoryId, categoryName, events }) => {
     eventsByCategoryId.value[categoryId] = { categoryName, events };
   });
-
-  console.log(eventsByCategoryId.value);
-  console.log(categories);
 });
 
 const filteredCategories = computed(() => {
