@@ -3,13 +3,51 @@
     <side-bar />
     <div class="container-xl px-4 mt-4">
       <nav class="nav nav-borders">
-        <a class="nav-link" :class="{ active: activeTab === 'eventForm' }" @click.prevent="changeTab('eventForm')">Event
-          Form</a>
         <a class="nav-link" :class="{ active: activeTab === 'eventList' }" @click.prevent="changeTab('eventList')">Event
           List</a>
+        <a class="nav-link" :class="{ active: activeTab === 'eventForm' }" @click.prevent="changeTab('eventForm')">Event
+          Form</a>
       </nav>
       <hr class="mt-0 mb-4">
 
+      <div v-if="activeTab === 'eventList'">
+        <div class="card mb-4">
+          <div class="card-header">Event List</div>
+          <div class="card-body">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">Event Name</th>
+                  <th scope="col">Description</th>
+                  <th scope="col">Location</th>
+                  <th scope="col">Category ID</th>
+                  <th scope="col">Start Date</th>
+                  <th scope="col">End Date</th>
+                  <th scope="col">Max Attendees</th>
+                  <th scope="col">Available Tickets</th>
+                  <th scope="col">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="event in eventList" :key="event.id">
+                  <td>{{ event.eventName }}</td>
+                  <td>{{ event.description }}</td>
+                  <td>{{ event.location }}</td>
+                  <td>{{ event.categoryId }}</td>
+                  <td>{{ event.startDate }}</td>
+                  <td>{{ event.endDate }}</td>
+                  <td>{{ event.maxAttendees }}</td>
+                  <td>{{ event.availableTickets }}</td>
+                  <td>
+                    <button class="btn btn-danger btn-sm" @click="deleteEvent(event.id)">Delete</button>
+                    <button class="btn btn-primary btn-sm" @click="openEditForm(event.id)">Edit</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
       <!-- Event Form Section -->
       <div v-if="activeTab === 'eventForm'">
         <div class="row">
@@ -98,49 +136,9 @@
         </div>
       </div>
 
-      <!-- Event List Section -->
-      <div v-if="activeTab === 'eventList'">
-        <div class="card mb-4">
-          <div class="card-header">Event List</div>
-          <div class="card-body">
-            <table class="table">
-              <thead>
-                <tr>
-                  <th scope="col">Event Name</th>
-                  <th scope="col">Description</th>
-                  <th scope="col">Location</th>
-                  <th scope="col">Category ID</th>
-                  <th scope="col">Start Date</th>
-                  <th scope="col">End Date</th>
-                  <th scope="col">Max Attendees</th>
-                  <th scope="col">Available Tickets</th>
-                  <th scope="col">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="event in eventList" :key="event.id">
-                  <td>{{ event.eventName }}</td>
-                  <td>{{ event.description }}</td>
-                  <td>{{ event.location }}</td>
-                  <td>{{ event.categoryId }}</td>
-                  <td>{{ event.startDate }}</td>
-                  <td>{{ event.endDate }}</td>
-                  <td>{{ event.maxAttendees }}</td>
-                  <td>{{ event.availableTickets }}</td>
-                  <td>
-                    <button class="btn btn-danger btn-sm" @click="deleteEvent(event.id)">Delete</button>
-                    <button class="btn btn-primary btn-sm" @click="openEditForm(event.id)">Edit</button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
       <!-- Edit Event Form Section -->
       <div v-if="showEditForm">
-        <UpdateEventView  :eventId="selectedEventId" :eventById="eventById"/>
+        <UpdateEventView :eventId="selectedEventId" :eventById="eventById" />
       </div>
     </div>
   </div>
@@ -171,7 +169,7 @@ const formData = reactive({
   maxAttendees: 0,
   availableTickets: 0,
   dateCreated: new Date().toISOString(),
-  image: '', 
+  image: '',
 });
 
 const imageUrl = ref('https://t4.ftcdn.net/jpg/05/65/22/41/360_F_565224180_QNRiRQkf9Fw0dKRoZGwUknmmfk51SuSS.jpg');
@@ -181,8 +179,13 @@ const selectedEventId = ref(null);
 const handleSubmit = async () => {
   try {
     await eventStore.addEvent(formData);
-    const redirectUrl = `/`;
-    await router.push(redirectUrl);
+    Swal.fire({
+      title: "Event Added successfully!",
+      icon: "success"
+    }).then(() => {
+      const redirectUrl = `/`;
+      router.push(redirectUrl);
+    });
   } catch (e) {
     await Swal.fire({
       title: "Error!",
@@ -210,6 +213,23 @@ const fetchEvents = async () => {
 // Call fetchEvents when component is mounted
 onMounted(fetchEvents);
 
+const deleteEvent = async (eventId) => {
+  try {
+    await eventStore.deleteEvent(eventId);
+    Swal.fire({
+      title: "Event Deleted successfully!",
+      icon: "success"
+    }).then(() => {
+      location.reload();
+    });
+  } catch (err) {
+    await Swal.fire({
+      title: "Error!",
+      text: err.value,
+      icon: "error"
+    });
+  }
+}
 
 const showEditForm = ref(false);
 
@@ -219,10 +239,10 @@ const openEditForm = (eventId) => {
   showEditForm.value = true;
   selectedEventId.value = eventId;
   eventById.value = eventStore.getEventById(eventId);
- // console.log(eventById.value);
+  // console.log(eventById.value);
 };
 
-const activeTab = ref('eventForm');
+const activeTab = ref('eventList');
 
 const changeTab = (tab) => {
   activeTab.value = tab;

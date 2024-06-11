@@ -120,6 +120,15 @@ export const useEventStore = defineStore('event', () => {
             throw error; 
         }
     }
-      
-    return { getEventByCategory, getEventById,addEvent,updateEvent,getEvents,event }; // Return the function so it can be used in components
+    async function deleteEvent(eventId){
+        try {
+            await axios.delete(`${url}Event/${eventId}`);
+            }
+        catch (error) {
+            console.error('Error deleting expenses:', error);
+            throw error;
+        
+    }
+}
+    return { getEventByCategory, getEventById,addEvent,updateEvent,getEvents, deleteEvent, event }; // Return the function so it can be used in components
 });
