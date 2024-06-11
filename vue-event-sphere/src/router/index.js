@@ -8,13 +8,14 @@ import { useAuthStore } from '@/store/authStore.js';
 import TicketCard from '@/components/TicketCard.vue';
 import EventByCategoryView from "@/views/EventByCategoryView.vue";
 import AboutView from '@/views/AboutView.vue';
-import ContactView from '@/views/ContactView.vue';
+import ContactView from '@/views/NearYouView.vue';
 import Dashboard from "@/views/Dashboard.vue";
 import SideBar from "@/components/SideBar.vue";
 import Profile from "@/views/Profile.vue";
 import Payment from "@/views/Payment.vue";
 import Report from "@/views/Report.vue";
 import CreateEventView from "@/views/CreateEventView.vue";
+import NearYouView from '@/views/NearYouView.vue';
 
 
 const routes = [
@@ -67,9 +68,9 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
-    path: '/contact',
-    name: 'contact',
-    component: ContactView,
+    path: '/nearYou',
+    name: 'nearYou',
+    component: NearYouView,
     meta: { requiresAuth: true }
   },
     {

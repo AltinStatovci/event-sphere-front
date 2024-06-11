@@ -6,6 +6,7 @@ import client from "@/helpers/client.js";
 export const useEventStore = defineStore('event', () => {
     const url = 'http://localhost:5220/api/';
     const events = ref([]);
+    const eventsByLocation = ref([]);
     const event = ref(null);
 
     async function getEventByCategory(id) {
@@ -25,6 +26,29 @@ export const useEventStore = defineStore('event', () => {
             }));
 
             events.value = allEvents; // Store the events in the state
+            return allEvents;
+        } catch (err) {
+            console.error('Error fetching events:', err);
+            return [];
+        }
+    }
+    async function getEventsByLocation(location) {
+        try {
+            const response = await axios.get(`${url}Event/eventLocation/${location}`);
+            const eventData = response.data;
+            
+            const allEvents = eventData.map(event => ({
+                id: event.id,
+                eventName: event.eventName,
+                description: event.description,
+                location: event.location,
+                startDate: event.startDate,
+                endDate: event.endDate,
+                category: event.categoryId,
+                photoData: event.photoData
+            }));
+
+            eventsByLocation.value = allEvents; // Store the events in the state
             return allEvents;
         } catch (err) {
             console.error('Error fetching events:', err);
@@ -130,5 +154,5 @@ export const useEventStore = defineStore('event', () => {
         
     }
 }
-    return { getEventByCategory, getEventById,addEvent,updateEvent,getEvents, deleteEvent, event }; // Return the function so it can be used in components
+    return { getEventByCategory, getEventsByLocation, getEventById,addEvent,updateEvent,getEvents, deleteEvent, event }; // Return the function so it can be used in components
 });
