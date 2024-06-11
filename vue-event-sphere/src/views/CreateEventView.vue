@@ -129,7 +129,7 @@
                   <td>{{ event.availableTickets }}</td>
                   <td>
                     <button class="btn btn-danger btn-sm" @click="deleteEvent(event.id)">Delete</button>
-                    <button class="btn btn-primary btn-sm" @click="openEditForm(event)">Edit</button>
+                    <button class="btn btn-primary btn-sm" @click="openEditForm(event.id)">Edit</button>
                   </td>
                 </tr>
               </tbody>
@@ -140,92 +140,7 @@
 
       <!-- Edit Event Form Section -->
       <div v-if="showEditForm">
-        <div class="row">
-          <div class="col-xl-12">
-            <div class="card mb-4">
-              <div class="card-header">Edit Event</div>
-              <div class="card-body">
-                <form @submit.prevent="updateEvent">
-                  <!-- Event Details Form -->
-                  <div class="row gx-3 mb-3">
-                    <div class="col-md-6">
-                      <label class="small mb-1" for="editEventName">Event Name</label>
-                      <input class="form-control" id="editEventName" type="text" v-model.trim="selectedEvent.eventName">
-                    </div>
-                    <div class="col-md-6">
-                      <label class="small mb-1" for="editDescription">Description</label>
-                      <input class="form-control" id="editDescription" type="text"
-                        v-model.trim="selectedEvent.description">
-                    </div>
-                  </div>
-
-                  <!-- Additional Event Details -->
-                  <div class="row gx-3 mb-3">
-                    <div class="col-md-6">
-                      <label class="small mb-1" for="editLocation">Location</label>
-                      <input class="form-control" id="editLocation" type="text" v-model.trim="selectedEvent.location">
-                    </div>
-                    <div class="col-md-6">
-                      <label class="small mb-1" for="editCategoryId">Category ID</label>
-                      <input class="form-control" id="editCategoryId" type="number" v-model="selectedEvent.categoryId">
-                    </div>
-                  </div>
-
-                  <!-- Date and Attendees Details -->
-                  <div class="row gx-3 mb-3">
-                    <div class="col-md-6">
-                      <label class="small mb-1" for="editStartDate">Start Date</label>
-                      <input class="form-control" id="editStartDate" type="datetime-local"
-                        v-model="selectedEvent.startDate">
-                    </div>
-                    <div class="col-md-6">
-                      <label class="small mb-1" for="editEndDate">End Date</label>
-                      <input class="form-control" id="editEndDate" type="datetime-local"
-                        v-model="selectedEvent.endDate">
-                    </div>
-                  </div>
-
-                  <!-- Max Attendees and Tickets -->
-                  <div class="row gx-3 mb-3">
-                    <div class="col-md-6">
-                      <label class="small mb-1" for="editMaxAttendees">Max Attendees</label>
-                      <input class="form-control" id="editMaxAttendees" type="number"
-                        v-model="selectedEvent.maxAttendees">
-                    </div>
-                    <div class="col-md-6">
-                      <label class="small mb-1" for="editAvailableTickets">Available Tickets</label>
-                      <input class="form-control" id="editAvailableTickets" type="number"
-                        v-model="selectedEvent.availableTickets">
-                    </div>
-                  </div>
-
-                  <!-- Profile Picture Upload Section -->
-                  <div class="row gx-3 mb-3">
-                    <div class="col-md-12">
-                      <div class="card mb-4 mb-xl-0">
-                        <div class="card-header">Event Image</div>
-                        <div class="card-body text-center">
-                          <div class="image-container" :style="{ backgroundImage: `url(${imageUrl})` }">
-                            <div v-if="!imageUrl" class="placeholder">No Image Selected</div>
-                          </div>
-                          <div class="small font-italic text-muted mb-4">Upload your Event Image</div>
-                          <input class="form-control" id="editFile" type="file" ref="editFileInput"
-                            @change="handleEditImageUpload" style="display: none;">
-                          <button class="btn btn-primary" type="button" @click="$refs.editFileInput.click()">Upload new
-                            image</button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Submit Button -->
-                  <button class="btn btn-primary" type="submit">Update</button>
-                  <button class="btn btn-secondary" @click="closeEditForm">Cancel</button>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
+        <UpdateEventView  :eventId="selectedEventId" :eventById="eventById"/>
       </div>
     </div>
   </div>
@@ -238,10 +153,12 @@ import { useAuthStore } from "@/store/authStore.js";
 import { useRouter } from "vue-router";
 import Swal from "sweetalert2";
 import SideBar from "@/components/SideBar.vue";
+import UpdateEventView from "@/views/UpdateEventView.vue";
 
 const eventStore = useEventStore();
 const router = useRouter();
 const authStore = useAuthStore();
+const eventById = ref(null);
 
 const formData = reactive({
   eventName: '',
@@ -250,14 +167,16 @@ const formData = reactive({
   endDate: '',
   location: '',
   categoryId: 0,
-  organizerId: authStore.id, // Assuming authStore.id is the organizer's ID
+  organizerId: authStore.id,
   maxAttendees: 0,
   availableTickets: 0,
   dateCreated: new Date().toISOString(),
-  image: '', // Add image field to formData
+  image: '', 
 });
 
 const imageUrl = ref('https://t4.ftcdn.net/jpg/05/65/22/41/360_F_565224180_QNRiRQkf9Fw0dKRoZGwUknmmfk51SuSS.jpg');
+
+const selectedEventId = ref(null);
 
 const handleSubmit = async () => {
   try {
@@ -291,35 +210,16 @@ const fetchEvents = async () => {
 // Call fetchEvents when component is mounted
 onMounted(fetchEvents);
 
-const deleteEvent = async (eventId) => {
-  // Implement delete event logic here
-}
-
-const selectedEvent = ref(null);
 
 const showEditForm = ref(false);
 
-const openEditForm = (event) => {
-  selectedEvent.value = event;
+
+const openEditForm = (eventId) => {
+  // selectedEvent.value = event;
   showEditForm.value = true;
-};
-
-const updateEvent = async () => {
-  try {
-    await eventStore.updateEvent(selectedEvent.value);
-    closeEditForm();
-  } catch (e) {
-    await Swal.fire({
-      title: "Error!",
-      text: e.message,
-      icon: "error"
-    });
-  }
-};
-
-const closeEditForm = () => {
-  selectedEvent.value = null;
-  showEditForm.value = false;
+  selectedEventId.value = eventId;
+  eventById.value = eventStore.getEventById(eventId);
+ // console.log(eventById.value);
 };
 
 const activeTab = ref('eventForm');

@@ -25,7 +25,6 @@ export const useEventStore = defineStore('event', () => {
             }));
 
             events.value = allEvents; // Store the events in the state
-            console.log(allEvents);
             return allEvents;
         } catch (err) {
             console.error('Error fetching events:', err);
@@ -52,7 +51,6 @@ export const useEventStore = defineStore('event', () => {
             };
 
             event.value = fetchedEvent;
-            console.log('Fetched event:', fetchedEvent);
             return fetchedEvent;
         } catch (err) {
             console.error('Error fetching event:', err);
@@ -80,8 +78,7 @@ export const useEventStore = defineStore('event', () => {
               photoData: event.photoData, 
           }));
 
-          events.value = allEvents; // Store the events in the state
-          console.log('All Events:', allEvents);
+          events.value = allEvents; 
           return allEvents;
       } catch (err) {
           console.error('Error fetching events:', err);
@@ -95,7 +92,6 @@ export const useEventStore = defineStore('event', () => {
           for (const key in event) {
             let value = event[key];
             formData.append(key, value);
-            console.log(`Key: ${key}, Value: ${value}`);
           }
           const response = await client.post(`${url}Event`, formData, {
             headers: {
@@ -113,7 +109,6 @@ export const useEventStore = defineStore('event', () => {
             for (const key in event) {
                 let value = event[key];
                 formData.append(key, value);
-                console.log(`Key: ${key}, Value: ${value}`);
             }
             const response = await client.put(`${url}Event/${event.id}`, formData, {
                 headers: {
