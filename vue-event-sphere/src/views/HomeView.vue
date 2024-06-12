@@ -3,7 +3,9 @@ import { useCategoryStore } from '@/store/categoryStore';
 import { useEventStore } from '@/store/eventStore';
 import { onMounted, ref, computed } from 'vue';
 import EventCard from '@/components/EventCard.vue';
+import {useAuthStore} from "@/store/authStore.js";
 
+const authStore = useAuthStore();
 const categoryStore = useCategoryStore();
 const eventStore = useEventStore();
 
@@ -12,6 +14,11 @@ const eventsByCategoryId = ref({});
 
 
 onMounted(async () => {
+
+  console.log("user id : "+ authStore.id)
+  console.log("isADmin : "+authStore.isAdmin)
+  console.log("email:" + authStore.email)
+
   const categories = await categoryStore.getAllCategories();
   categoryNames.value = categories.map(category => category.categoryName);
 
