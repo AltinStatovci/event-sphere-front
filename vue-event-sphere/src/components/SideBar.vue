@@ -59,7 +59,7 @@ const handleLogout = () => {
         <span class="text">Manage Events</span>
       </router-link>
 
-      <router-link to="/payment" class="button">
+      <router-link to="/paymentDashboard" class="button">
         <span class="material-icons">wallet</span>
         <span class="text">Payments</span>
       </router-link>

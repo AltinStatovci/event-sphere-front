@@ -15,11 +15,11 @@ export const usePaymentStore = defineStore('payment', () => {
             payments.value = data.map(payment => ({
                 id: payment.id,
                 userID: payment.userID,
-                ticketId: payment.ticketId,
                 amount: payment.amount,
                 paymentMethod: payment.paymentMethod,
                 paymentStatus: payment.paymentStatus,
-                paymentDate: payment.paymentDate
+                paymentDate: payment.paymentDate,
+                ticketId: payment.ticketID,
             }));
         }catch(err){
             console.log(err);

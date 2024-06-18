@@ -113,7 +113,12 @@ const routes = [
     component:CreateEventView,
     meta: { requiresAuth: true },
   },
-
+ {
+  path: '/paymentDashboard',
+  name: 'paymentDashboard',
+  component:Payment,
+  meta: { requiresAuth: true },
+ }
 ];
 
 const router = createRouter({
