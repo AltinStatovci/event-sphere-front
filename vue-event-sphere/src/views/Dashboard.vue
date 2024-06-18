@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import SideBar from "@/components/SideBar.vue";
+import axios from 'axios';
 
 const eventCount = ref(0);
 const paymentCount = ref(0);
@@ -9,7 +10,7 @@ const isDarkMode = ref(false); // Reactive variable for dark mode
 
 const fetchEventCount = async () => {
   try {
-    const response = await fetch('http://localhost:5220/api/Event/count');
+    const response = await axios.get('http://localhost:5220/api/Event/count');
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
@@ -22,7 +23,7 @@ const fetchEventCount = async () => {
 
 const fetchPaymentCount = async () => {
   try {
-    const response = await fetch('http://localhost:5220/api/Payment/count');
+    const response = await axios.get('http://localhost:5220/api/Payment/count');
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
@@ -35,7 +36,7 @@ const fetchPaymentCount = async () => {
 
 const fetchTicketCount = async () => {
   try {
-    const response = await fetch('http://localhost:5220/api/Ticket/count');
+    const response = await axios.get('http://localhost:5220/api/Ticket/count');
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);
     }

@@ -1,12 +1,13 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import SideBar from "@/components/SideBar.vue";
+import axios from 'axios';
 
 const payments = ref([]);
 
 const fetchPayments = async () => {
     try {
-        const response = await fetch('http://localhost:5220/api/Payment');
+        const response = await axios.get('http://localhost:5220/api/Payment');
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
