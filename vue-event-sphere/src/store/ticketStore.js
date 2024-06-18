@@ -1,47 +1,61 @@
 import { defineStore } from 'pinia';
-import { ref } from 'vue';
 import axios from 'axios';
 
 export const useTicketStore = defineStore('ticket', () => {
   const url = 'http://localhost:5220/api/';
-  const tickets = ref([]);
-  const ticket = ref();
-
-  async function getTicketByEvent(eventId) {
+  
+  const getTickets = async () => {
     try {
-      const response = await axios.get(`${url}Ticket/${eventId}/event`);
-      const data = response.data;
-      tickets.value = data.map(ticket => ({
-        id: ticket.id,
-        eventName: ticket.eventName,
-        price: ticket.price,
-        ticketType: ticket.ticketType,
-        bookingReference: ticket.bookingReference,
-      }));
+      const response = await axios.get(`${url}Ticket`);
+      return response.data;
     } catch (err) {
-      console.log(err);
+      console.error('Error fetching tickets:', err);
+      return [];
     }
-  }
-  async function getTicketById(id) {
+  };
+
+  const getTicketById = async (id) => {
     try {
-        const response = await axios.get(`${url}Ticket/${id}`);
-        const ticketData = response.data;
-
-        const fetchedTicket = {
-            id: ticketData.id,
-            eventID: ticketData.eventID,
-            ticketType: ticketData.ticketType,
-            price: ticketData.price,
-            bookingReference: ticketData.bookingReference
-        };
-        
-        ticket.value = fetchedTicket;
-        return fetchedTicket;
+      const response = await axios.get(`${url}Ticket/${id}`);
+      return response.data;
     } catch (err) {
-        console.error('Error fetching event:', err);
-        return null;
+      console.error('Error fetching ticket by ID:', err);
+      return null;
     }
-}
+  };
 
-  return { tickets, getTicketByEvent, getTicketById};
+  const addTicket = async (ticketData) => {
+    try {
+      const response = await axios.post(`${url}Ticket`, ticketData);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const updateTicket = async (ticketData) => {
+    try {
+      const response = await axios.put(`${url}Ticket/${ticketData.id}`, ticketData);
+      return response.data; 
+    } catch (error) {
+      throw error; 
+    }
+  };
+
+  const deleteTicket = async (ticketId) => {
+    try {
+      await axios.delete(`${url}Ticket/${ticketId}`);
+    } catch (error) {
+      console.error('Error deleting ticket:', error);
+      throw error;
+    }
+  };
+
+  return {
+    getTickets,
+    getTicketById,
+    addTicket,
+    updateTicket,
+    deleteTicket
+  };
 });

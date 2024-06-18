@@ -14,7 +14,7 @@ const route = useRoute();
   <div id="app" class="d-flex flex-column min-vh-100">
     <nav>
       <Header
-        v-if="authStore.isLoggedIn && route.name !== 'dashboard' && route.name !== 'profile' && route.name !== 'payment' && route.name !== 'report' && route.name !== 'manageEvent'" />
+        v-if="authStore.isLoggedIn && route.name !== 'dashboard' && route.name !== 'profile' && route.name !== 'payment' && route.name !== 'report' && route.name !== 'manageEvent' && route.name !== 'manageTickets'" />
     </nav>
 
     <div class="app">
