@@ -1,41 +1,51 @@
 <script setup>
 import { useAuthStore } from '@/store/authStore';
 import Swal from 'sweetalert2';
-import { ref, reactive, watch } from 'vue';
+import { ref, reactive, watch, onMounted } from 'vue';
 import { useEventStore } from '@/store/eventStore';
-import { defineProps } from 'vue';
+import { useCategoryStore } from '@/store/categoryStore'; // Import category store
 
 const imageUrl = ref('https://t4.ftcdn.net/jpg/05/65/22/41/360_F_565224180_QNRiRQkf9Fw0dKRoZGwUknmmfk51SuSS.jpg');
 const authStore = useAuthStore();
 const eventStore = useEventStore();
-const eventById = ref(null);
-
+const categoryStore = useCategoryStore(); // Initialize category store
 
 const props = defineProps({
     eventId: Number,
     eventById: Object,
 });
-const selectedEvent = reactive({
-            id: props.eventId,
-            eventName: ``,
-            description: '',
-            startDate: '',
-            endDate: '',
-            location: '',
-            categoryId: 0,
-            organizerId: authStore.id,
-            maxAttendees: 0,
-            availableTickets: 0,
-            dateCreated: new Date().toISOString(),
-            newImage: '',
-        });
 
-watch(() => props.eventId, async (newValue) => {
-    if (newValue !== null) {
-        eventById.value = await eventStore.getEventById(newValue);
+const selectedEvent = reactive({
+    id: null,
+    eventName: '',
+    description: '',
+    startDate: '',
+    endDate: '',
+    location: '',
+    categoryId: null,
+    organizerId: authStore.id,
+    maxAttendees: 0,
+    availableTickets: 0,
+    dateCreated: new Date().toISOString(),
+    image: '',
+    newImage: '',
+});
+
+watch(() => props.eventById, (newValue) => {
+    if (newValue) {
+        selectedEvent.id = newValue.id;
+        selectedEvent.eventName = newValue.eventName;
+        selectedEvent.description = newValue.description;
+        selectedEvent.startDate = newValue.startDate;
+        selectedEvent.endDate = newValue.endDate;
+        selectedEvent.location = newValue.location;
+        selectedEvent.category = newValue.category;
+        selectedEvent.maxAttendees = newValue.maxAttendees;
+        selectedEvent.availableTickets = newValue.availableTickets;
+        selectedEvent.image = newValue.image;
+        imageUrl.value = newValue.image;
     }
 }, { immediate: true });
-
 
 const handleEditImageUpload = (event) => {
     const file = event.target.files[0];
@@ -51,6 +61,8 @@ const updateEvent = async () => {
         await Swal.fire({
             title: "Event updated successfully!",
             icon: "success"
+        }).then(() => {
+            location.reload();
         });
     } catch (e) {
         await Swal.fire({
@@ -60,7 +72,15 @@ const updateEvent = async () => {
         });
     }
 };
+
+const categories = ref([]);
+
+// Fetch categories on component mount
+onMounted(async () => {
+    categories.value = await categoryStore.getAllCategories();
+});
 </script>
+
 
 <template>
     <div class="row">
@@ -84,14 +104,39 @@ const updateEvent = async () => {
                         <div class="row gx-3 mb-3">
                             <div class="col-md-6">
                                 <label class="small mb-1" for="editLocation">Location</label>
-                                <input class="form-control" id="editLocation" type="text"
-                                    v-model.trim="selectedEvent.location">
+                                <select class="form-control" id="editLocation" v-model.trim="selectedEvent.location">
+                                    <option value="" disabled selected>Select a location</option>
+                                    <option value="Kosovë, Prishtinë">Kosovë, Prishtinë</option>
+                                    <option value="Kosovë, Pejë">Kosovë, Pejë</option>
+                                    <option value="Kosovë, Mitrovicë">Kosovë, Mitrovicë</option>
+                                    <option value="Kosovë, Vushtrri">Kosovë, Vushtrri</option>
+                                    <option value="Kosovë, Suharekë">Kosovë, Suharekë</option>
+                                    <option value="Kosovë, Rahovec">Kosovë, Rahovec</option>
+                                    <option value="Kosovë, Istog">Kosovë, Istog</option>
+                                    <option value="Kosovë, Deçan">Kosovë, Deçan</option>
+                                    <option value="Kosovë, Malishevë">Kosovë, Malishevë</option>
+                                    <option value="Kosovë, Shtime">Kosovë, Shtime</option>
+                                    <option value="Kosovë, Kaçanik">Kosovë, Kaçanik</option>
+                                    <option value="Kosovë, Kamenicë">Kosovë, Kamenicë</option>
+                                    <option value="Kosovë, Fushë Kosovë">Kosovë, Fushë Kosovë</option>
+                                    <option value="Kosovë, Obiliq">Kosovë, Obiliq</option>
+                                    <option value="Kosovë, Skenderaj">Kosovë, Skenderaj</option>
+                                    <option value="Kosovë, Klinë">Kosovë, Klinë</option>
+                                    <option value="Kosovë, Hani i Elezit">Kosovë, Hani i Elezit</option>
+                                    <option value="Kosovë, Junik">Kosovë, Junik</option>
+                                    <option value="Kosovë, Mamusha">Kosovë, Mamushë</option>
+                                </select>
                             </div>
                             <div class="col-md-6">
-                                <label class="small mb-1" for="editCategoryId">Category ID</label>
-                                <input class="form-control" id="editCategoryId" type="number"
-                                    v-model="selectedEvent.categoryId">
+                                <label class="small mb-1" for="editCategoryId">Category</label>
+                                <select class="form-control" id="editCategoryId" v-model="selectedEvent.categoryId">
+                                    <option :value="null" disabled>Select a category</option>
+                                    <option v-for="category in categories" :key="category.id" :value="category.id">
+                                        {{ category.categoryName }}
+                                    </option>
+                                </select>
                             </div>
+
                         </div>
                         <div class="row gx-3 mb-3">
                             <div class="col-md-6">
@@ -128,20 +173,18 @@ const updateEvent = async () => {
                                         <div class="small font-italic text-muted mb-4">Upload your Event Image</div>
                                         <input class="form-control" id="editFile" type="file" ref="editFileInput"
                                             @change="handleEditImageUpload" style="display: none;">
-                                        <button class="btn btn-primary" type="button"
-                                            @click="$refs.editFileInput.click()">Upload new
-                                            image</button>
+                                        <button class="btn btn-warning" type="button"
+                                            @click="$refs.editFileInput.click()">Upload new image</button>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <button class="btn btn-primary" type="submit">Update</button>
+                        <button class="btn btn-warning" type="submit">Update</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
-
 </template>
 
 <style scoped>

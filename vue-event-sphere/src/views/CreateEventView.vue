@@ -10,7 +10,7 @@
       </nav>
       <hr class="mt-0 mb-4">
 
-      <div v-if="activeTab === 'eventList'">
+      <div v-if="activeTab === 'eventList' && !showEditForm">
         <div class="card mb-4">
           <div class="card-header">Event List</div>
           <div class="card-body">
@@ -20,7 +20,7 @@
                   <th scope="col">Event Name</th>
                   <th scope="col">Description</th>
                   <th scope="col">Location</th>
-                  <th scope="col">Category ID</th>
+                  <th scope="col">Category</th>
                   <th scope="col">Start Date</th>
                   <th scope="col">End Date</th>
                   <th scope="col">Max Attendees</th>
@@ -33,7 +33,7 @@
                   <td>{{ event.eventName }}</td>
                   <td>{{ event.description }}</td>
                   <td>{{ event.location }}</td>
-                  <td>{{ event.categoryId }}</td>
+                  <td>{{ }}</td>
                   <td>{{ event.startDate }}</td>
                   <td>{{ event.endDate }}</td>
                   <td>{{ event.maxAttendees }}</td>
@@ -48,8 +48,9 @@
           </div>
         </div>
       </div>
+
       <!-- Event Form Section -->
-      <div v-if="activeTab === 'eventForm'">
+      <div v-if="activeTab === 'eventForm' && !showEditForm">
         <div class="row">
           <div class="col-xl-12">
             <div class="card mb-4">
@@ -74,13 +75,40 @@
                   <div class="row gx-3 mb-3">
                     <div class="col-md-6">
                       <label class="small mb-1" for="location">Location</label>
-                      <input class="form-control" id="location" type="text" placeholder="Enter location"
-                        v-model.trim="formData.location">
+                      <select class="form-control" id="location" v-model.trim="formData.location">
+                        <option value="" disabled selected>Select a location</option>
+                        <option value="Kosovë, Prishtinë">Kosovë, Prishtinë</option>
+                        <option value="Kosovë, Pejë">Kosovë, Pejë</option>
+                        <option value="Kosovë, Mitrovicë">Kosovë, Mitrovicë</option>
+                        <option value="Kosovë, Vushtrri">Kosovë, Vushtrri</option>
+                        <option value="Kosovë, Suharekë">Kosovë, Suharekë</option>
+                        <option value="Kosovë, Rahovec">Kosovë, Rahovec</option>
+                        <option value="Kosovë, Istog">Kosovë, Istog</option>
+                        <option value="Kosovë, Deçan">Kosovë, Deçan</option>
+                        <option value="Kosovë, Malishevë">Kosovë, Malishevë</option>
+                        <option value="Kosovë, Shtime">Kosovë, Shtime</option>
+                        <option value="Kosovë, Kaçanik">Kosovë, Kaçanik</option>
+                        <option value="Kosovë, Kamenicë">Kosovë, Kamenicë</option>
+                        <option value="Kosovë, Fushë Kosovë">Kosovë, Fushë Kosovë</option>
+                        <option value="Kosovë, Obiliq">Kosovë, Obiliq</option>
+                        <option value="Kosovë, Skenderaj">Kosovë, Skenderaj</option>
+                        <option value="Kosovë, Klinë">Kosovë, Klinë</option>
+                        <option value="Kosovë, Hani i Elezit">Kosovë, Hani i Elezit</option>
+                        <option value="Kosovë, Junik">Kosovë, Junik</option>
+                        <option value="Kosovë, Mamusha">Kosovë, Mamushë</option>
+                      </select>
                     </div>
+
                     <div class="col-md-6">
-                      <label class="small mb-1" for="categoryId">Category ID</label>
-                      <input class="form-control" id="categoryId" type="number" v-model="formData.categoryId">
+                      <label class="small mb-1" for="categoryId">Category</label>
+                      <select class="form-control" id="categoryId" v-model.number="formData.categoryId">
+                        <option :value="null" disabled>Select a category</option>
+                        <option v-for="category in categories" :key="category.id" :value="category.id">
+                          {{ category.categoryName }}
+                        </option>
+                      </select>
                     </div>
+
                   </div>
 
                   <!-- Date and Attendees Details -->
@@ -147,6 +175,7 @@
 <script setup>
 import { ref, reactive, onMounted } from "vue";
 import { useEventStore } from "@/store/eventStore.js";
+import { useCategoryStore } from "@/store/categoryStore.js"; // Import category store
 import { useAuthStore } from "@/store/authStore.js";
 import { useRouter } from "vue-router";
 import Swal from "sweetalert2";
@@ -154,9 +183,11 @@ import SideBar from "@/components/SideBar.vue";
 import UpdateEventView from "@/views/UpdateEventView.vue";
 
 const eventStore = useEventStore();
+const categoryStore = useCategoryStore(); // Initialize category store
 const router = useRouter();
 const authStore = useAuthStore();
 const eventById = ref(null);
+const categories = ref([]);
 
 const formData = reactive({
   eventName: '',
@@ -164,7 +195,7 @@ const formData = reactive({
   startDate: '',
   endDate: '',
   location: '',
-  categoryId: 0,
+  categoryId: null,
   organizerId: authStore.id,
   maxAttendees: 0,
   availableTickets: 0,
@@ -175,6 +206,8 @@ const formData = reactive({
 const imageUrl = ref('https://t4.ftcdn.net/jpg/05/65/22/41/360_F_565224180_QNRiRQkf9Fw0dKRoZGwUknmmfk51SuSS.jpg');
 
 const selectedEventId = ref(null);
+
+
 
 const handleSubmit = async () => {
   try {
@@ -208,10 +241,26 @@ const eventList = ref([]);
 
 const fetchEvents = async () => {
   eventList.value = await eventStore.getEvents();
+
 }
 
-// Call fetchEvents when component is mounted
-onMounted(fetchEvents);
+
+const fetchCategories = async () => {
+  categories.value = await categoryStore.getAllCategories();
+}
+
+const getCategoryName = (categoryId) => {
+  const category = categories.value.find(cat => cat.id === categoryId);
+  return category ? category.categoryName : 'Unknown';
+}
+
+// Call fetchEvents and fetchCategories when component is mounted
+onMounted(() => {
+  fetchEvents();
+  fetchCategories();
+  console.log(categories.value);
+  console.log(eventList.value);
+});
 
 const deleteEvent = async (eventId) => {
   try {
@@ -233,19 +282,18 @@ const deleteEvent = async (eventId) => {
 
 const showEditForm = ref(false);
 
-
-const openEditForm = (eventId) => {
-  // selectedEvent.value = event;
-  showEditForm.value = true;
+const openEditForm = async (eventId) => {
   selectedEventId.value = eventId;
-  eventById.value = eventStore.getEventById(eventId);
-  // console.log(eventById.value);
+  showEditForm.value = true;
+  activeTab.value = 'eventForm'; // Ensure the Event Form tab is active
+  eventById.value = await eventStore.getEventById(eventId);
 };
 
 const activeTab = ref('eventList');
 
 const changeTab = (tab) => {
   activeTab.value = tab;
+  showEditForm.value = false; // Ensure edit form is hidden when switching tabs
 };
 </script>
 
@@ -351,5 +399,19 @@ body {
   color: #69707a;
   font-size: 0.875rem;
   text-align: center;
+}
+
+.slide-fade-enter-active,
+.slide-fade-leave-active {
+  transition: all 0.5s ease;
+}
+
+.slide-fade-enter,
+.slide-fade-leave-to
+
+/* .slide-fade-leave-active in <2.1.8 */
+  {
+  transform: translateX(100%);
+  opacity: 0;
 }
 </style>
