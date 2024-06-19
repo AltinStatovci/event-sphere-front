@@ -90,6 +90,9 @@ const onNearYou = () => {
 
 .title {
   font-size: 1.5rem;
+  background: -webkit-linear-gradient(45deg,#0f0101, #6b6767);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
 }
 
 .custom-font-size {

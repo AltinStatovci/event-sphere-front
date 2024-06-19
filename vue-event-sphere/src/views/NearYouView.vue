@@ -1,92 +1,72 @@
 <script setup>
-import { useEventStore } from '@/store/eventStore';
+import { useLocationStore } from '@/store/locationStore';
 import { onMounted, ref } from 'vue';
 
-const loading = ref(false);
-const error = ref(null);
+const locationStore = useLocationStore();
+const locations = ref([]);
+const filterBy = ref('');  
 
-const getLocation = () => {
-  loading.value = true;
-  error.value = null;
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(showPosition, showError);
-  } else {
-    error.value = "Geolocation is not supported by this browser.";
-    loading.value = false;
-  }
-};
-
-const showPosition = (position) => {
-  console.log('Latitude: ', position.coords.latitude);
-  console.log('Longitude: ', position.coords.longitude);
-  loading.value = false;
-  var result = getCityFromCoordinates("42.467328", "21.46304");
-  console.log(result);
-};
-
-const showError = (error) => {
-  switch (error.code) {
-    case error.PERMISSION_DENIED:
-      error.value = "User denied the request for Geolocation.";
-      break;
-    case error.POSITION_UNAVAILABLE:
-      error.value = "Location information is unavailable.";
-      break;
-    case error.TIMEOUT:
-      error.value = "The request to get user location timed out.";
-      break;
-    case error.UNKNOWN_ERROR:
-      error.value = "An unknown error occurred.";
-      break;
-  }
-  loading.value = false;
-};
-const getCityFromCoordinates = async (lat, lon) => {
+const getAllLocations = async () => {
   try {
-    const apiKey = "6668455761287514129029laqde0b24"; // Replace with your geocoding service API key
-    const url = `https://geocode.maps.co/reverse?lat=${lat}&lon=${lon}&api_key=${apiKey}`;
-    const response = await fetch(url);
-    const data = await response.json();
-    console.log("Data:", data);
-    
-    const city = data.address.city;
-    location.value = city ? `City: ${city}` : "City not found";
-    console.log(city);
-    var result = await eventStore.getEventsByLocation(city);
-    console.log(result);
-  } catch (error) {
-    console.error("Error getting city from coordinates:", error);
-    location.value = "Error getting city from coordinates.";
+    const response = await locationStore.getLocations();
+    locations.value = response;
+  } catch (err) {
+    console.error(err);
   }
 };
-const eventStore = useEventStore();
 
-onMounted(async() => {
-    var result = await eventStore.getEventsByLocation()
-    console.log(result);
-})
-
-
+onMounted(async () => {
+  await getAllLocations();
+  console.log(locations.value);
+});
 </script>
-
 
 <template>
   <div class="container mt-5">
-    <h1 class="mb-4 text-center">Get Your Location</h1>
-    <div class="d-flex justify-content-center">
-      <button @click="getLocation" class="btn btn-primary">
-        Find Location
-      </button>
-    </div>
-    <div class="text-center mt-4" v-if="loading">
-      <div class="spinner-border" role="status">
-        <span class="sr-only">Loading...</span>
+    <h3 class="event-title">Discover Local Happenings: Your Personalized Event Guide!</h3>
+    <p class="lead text-center mt-2">
+      Whether you're looking for concerts, festivals, workshops, or local meetups, we've got you covered. Our platform brings you the latest and most exciting events happening in your area, tailored to your interests and location. 
+    </p>
+    <div class="location-selector d-flex">
+      <div class="mb-3 mr-3">
+        <label class="form-label" for="filterSelect">Filter By</label>
+        <select id="filterSelect" class="form-select" v-model="filterBy">
+          <option value="">Select Filter</option>
+          <option value="city">City</option>
+          <option value="country">Country</option>
+        </select>
       </div>
-      <p>Loading...</p>
+      <div class="mb-3" v-if="filterBy === 'city'">
+        <label class="form-label" for="citySelect">City</label>
+        <select id="citySelect" class="form-select">
+          <option v-for="location in locations" :key="location.id" :value="location.id">
+            {{ location.city }}
+          </option>
+        </select>
+      </div>
+      <div class="mb-3" v-if="filterBy === 'country'">
+        <label class="form-label" for="countrySelect">Country</label>
+        <select id="countrySelect" class="form-select">
+          <option v-for="location in locations" :key="location.id" :value="location.id">
+            {{ location.country }}
+          </option>
+        </select>
+      </div>
     </div>
-    <div class="alert alert-danger mt-4" v-if="error">{{ error }}</div>
   </div>
 </template>
-<style scoped>
 
+
+<style scoped>
+.event-title {
+  font-size: 2.5rem;
+  font-weight: 600;
+  background: -webkit-linear-gradient(60deg, #0f0101, #5f6877);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-align: center;
+}
+.mr-3{
+  margin-right: 1rem;  
+}
 </style>

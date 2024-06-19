@@ -211,7 +211,12 @@ const fetchEvents = async () => {
 }
 
 // Call fetchEvents when component is mounted
-onMounted(fetchEvents);
+onMounted (() => {
+  
+  (fetchEvents);
+  console.log(authStore.id);
+})
+  
 
 const deleteEvent = async (eventId) => {
   try {
