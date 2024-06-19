@@ -60,6 +60,7 @@ const handleLogout = () => {
       </router-link>
 
       <router-link to="/paymentDashboard" class="button">
+
         <span class="material-icons">wallet</span>
         <span class="text">Payments</span>
       </router-link>
