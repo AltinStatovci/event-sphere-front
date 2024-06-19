@@ -127,7 +127,12 @@ const routes = [
     component:CreateTicketView,
     meta: { requiresAuth: true },
   },
-
+ {
+  path: '/paymentDashboard',
+  name: 'paymentDashboard',
+  component:Payment,
+  meta: { requiresAuth: true },
+ }
 ];
 
 const router = createRouter({

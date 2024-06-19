@@ -59,13 +59,8 @@ const handleLogout = () => {
         <span class="text">Manage Events</span>
       </router-link>
 
-      <router-link to="/manageTickets" class="button">
-        <span class="material-icons">confirmation_number</span>
-        <span class="text">Manage Tickets</span>
-      </router-link>
+      <router-link to="/paymentDashboard" class="button">
 
-
-      <router-link to="/payment" class="button">
         <span class="material-icons">wallet</span>
         <span class="text">Payments</span>
       </router-link>
