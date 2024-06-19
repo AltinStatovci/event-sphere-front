@@ -4,7 +4,9 @@ import { useEventStore } from '@/store/eventStore';
 import { onMounted, ref, computed } from 'vue';
 import EventCard from '@/components/EventCard.vue';
 import {useAuthStore} from "@/store/authStore.js";
+import { useRouter } from 'vue-router';
 
+const router = useRouter();
 const authStore = useAuthStore();
 const categoryStore = useCategoryStore();
 const eventStore = useEventStore();
@@ -76,6 +78,10 @@ onMounted(async () => {
 const filteredCategories = computed(() => {
   return Object.values(eventsByCategoryId.value).filter(category => category.events && category.events.length > 0);
 });
+function goToTicket(id) {
+  const redirectUrl = `/Ticket/${id}/event`;
+  router.push(redirectUrl);
+}
 </script>
 
 

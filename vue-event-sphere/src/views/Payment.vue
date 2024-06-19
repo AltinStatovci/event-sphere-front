@@ -52,8 +52,8 @@ const deletePayment = (id) => {
                     <thead>
                         <tr>
                             <th class="id-col">ID</th>
-                            <th class="user-id-col">User ID</th>
-                            <th class="ticket-id-col">Ticket ID</th>
+                            <th class="user-id-col">Client's Name</th>
+                            <th class="ticket-name-col">Ticket Name</th>
                             <th class="amount-col">Amount</th>
                             <th class="payment-method-col">Payment Method</th>
                             <th class="payment-status-col">Payment Status</th>
@@ -64,8 +64,8 @@ const deletePayment = (id) => {
                     <tbody>
                         <tr v-for="payment in payments" :key="payment.id">
                             <td>{{ payment.id }}</td>
-                            <td>{{ payment.userID ? payment.userID : 'N/A' }}</td>
-                            <td>{{ payment.ticketID ? payment.ticketID : 'N/A' }}</td>
+                            <td>{{ payment.userName ? payment.userName : 'N/A' }}</td>
+                            <td>{{ payment.ticketName ? payment.ticketName : 'N/A' }}</td>
                             <td>{{ payment.amount }}</td>
                             <td>{{ payment.paymentMethod }}</td>
                             <td>{{ payment.paymentStatus }}</td>
