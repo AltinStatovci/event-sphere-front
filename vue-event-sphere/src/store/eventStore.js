@@ -25,30 +25,12 @@ export const useEventStore = defineStore('event', () => {
                 photoData: event.photoData
             }));
 
-            events.value = allEvents; // Store the events in the state
-            return allEvents;
-        } catch (err) {
-            console.error('Error fetching events:', err);
-            return [];
-        }
-    }
-    async function getEventsByLocation(location) {
-        try {
-            const response = await axios.get(`${url}Event/eventLocation/${location}`);
-            const eventData = response.data;
-            
-            const allEvents = eventData.map(event => ({
-                id: event.id,
-                eventName: event.eventName,
-                description: event.description,
-                location: event.location,
-                startDate: event.startDate,
-                endDate: event.endDate,
-                category: event.categoryId,
-                photoData: event.photoData
-            }));
 
-            eventsByLocation.value = allEvents; // Store the events in the state
+            events.value = allEvents;
+            console.log(allEvents);
+
+            events.value = allEvents; // Store the events in the state
+
             return allEvents;
         } catch (err) {
             console.error('Error fetching events:', err);
@@ -72,6 +54,7 @@ export const useEventStore = defineStore('event', () => {
                 maxAttendance: eventData.maxAttendance,
                 availableTickets: eventData.availableTickets,
                 photoData: eventData.photoData, 
+
             };
 
             event.value = fetchedEvent;
@@ -101,6 +84,9 @@ export const useEventStore = defineStore('event', () => {
               availableTickets: event.availableTickets,
               photoData: event.photoData, 
           }));
+
+
+  
 
           events.value = allEvents; 
           return allEvents;
@@ -154,5 +140,6 @@ export const useEventStore = defineStore('event', () => {
         
     }
 }
-    return { getEventByCategory, getEventsByLocation, getEventById,addEvent,updateEvent,getEvents, deleteEvent, event }; // Return the function so it can be used in components
+    return { getEventByCategory, getEventById,addEvent,updateEvent,getEvents, deleteEvent, event }; // Return the function so it can be used in components
+
 });
