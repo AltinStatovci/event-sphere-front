@@ -18,7 +18,8 @@ export const useEventStore = defineStore('event', () => {
                 id: event.id,
                 eventName: event.eventName,
                 description: event.description,
-                location: event.location,
+                address: event.address,
+                locationId: event.locationId,
                 startDate: event.startDate,
                 endDate: event.endDate,
                 category: event.categoryId,
@@ -46,11 +47,12 @@ export const useEventStore = defineStore('event', () => {
                 id: eventData.id,
                 eventName: eventData.eventName,
                 description: eventData.description,
-                location: eventData.location,
+                address: eventData.address,
+                locationId: eventData.locationId,
                 startDate: eventData.startDate,
                 endDate: eventData.endDate,
                 image: eventData.image,
-                organizer: eventData.organizer,
+                organizerName: eventData.organizerName,
                 maxAttendance: eventData.maxAttendance,
                 availableTickets: eventData.availableTickets,
                 photoData: eventData.photoData, 
@@ -58,6 +60,7 @@ export const useEventStore = defineStore('event', () => {
             };
 
             event.value = fetchedEvent;
+
             return fetchedEvent;
         } catch (err) {
             console.error('Error fetching event:', err);
@@ -75,7 +78,8 @@ export const useEventStore = defineStore('event', () => {
               id: event.id,
               eventName: event.eventName,
               description: event.description,
-              location: event.location,
+              address: event.address,
+              locationId: event.locationId,
               startDate: event.startDate,
               endDate: event.endDate,
               image: event.image,

@@ -2,22 +2,25 @@
 import { onMounted, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { useEventStore } from '@/store/eventStore';
-import EventDetailsCard from '@/components/EventDetailsCard.vue'; // Update with the correct path
+import EventDetailsCard from '@/components/EventDetailsCard.vue'; 
 
 const route = useRoute();
-const eventId = route.params.id; // Assuming the route has a param named 'id'
+const eventId = route.params.id; 
 
 const eventStore = useEventStore();
+
+let eventDetails = computed(() => eventStore.event);
 
 onMounted(async () => {
   await eventStore.getEventById(eventId);
 });
 
-const eventDetails = computed(() => eventStore.event);
 </script>
 
 <template>
-  <EventDetailsCard :event="eventDetails" />
+  <div v-if="eventDetails">
+    <EventDetailsCard :event="eventDetails"/>
+  </div>
 </template>
 
 <style scoped></style>
