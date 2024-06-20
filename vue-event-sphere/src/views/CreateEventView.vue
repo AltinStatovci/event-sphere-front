@@ -20,7 +20,7 @@
                   <th scope="col">Event Name</th>
                   <th scope="col">Description</th>
                   <th scope="col">Location</th>
-                  <th scope="col">Category ID</th>
+                  <th scope="col">Category Name</th>
                   <th scope="col">Start Date</th>
                   <th scope="col">End Date</th>
                   <th scope="col">Max Attendees</th>
@@ -32,11 +32,11 @@
                 <tr v-for="event in eventList" :key="event.id">
                   <td>{{ event.eventName }}</td>
                   <td>{{ event.description }}</td>
-                  <td>{{ event.location }}</td>
-                  <td>{{ event.categoryId }}</td>
+                  <td>{{ event.address }}</td>
+                  <td>{{ event.categoryName }}</td>
                   <td>{{ event.startDate }}</td>
                   <td>{{ event.endDate }}</td>
-                  <td>{{ event.maxAttendees }}</td>
+                  <td>{{ event.maxAttendance }}</td>
                   <td>{{ event.availableTickets }}</td>
                   <td>
                     <button class="btn btn-danger btn-sm" @click="deleteEvent(event.id)">Delete</button>
@@ -73,10 +73,21 @@
                   <!-- Additional Event Details -->
                   <div class="row gx-3 mb-3">
                     <div class="col-md-6">
-                      <label class="small mb-1" for="location">Location</label>
+                      <label class="small mb-1" for="location">Address</label>
                       <input class="form-control" id="location" type="text" placeholder="Enter location"
-                        v-model.trim="formData.location">
+                        v-model.trim="formData.address">
                     </div>
+                    <div class="col-md-6">
+                      <label class="form-label" for="citySelect">Location</label>
+                      <select id="citySelect" class="form-select" v-model.trim="formData.locationId">
+                        <option value="" disabled>Select a city</option>
+                        <option v-for="location in locations" :key="location.id" :value="location.id">
+                          {{ location.city }}, {{ location.country }}
+                        </option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="row gx-3 mb-3">
                     <div class="col-md-6">
                       <label class="small mb-1" for="categoryId">Category ID</label>
                       <input class="form-control" id="categoryId" type="number" v-model="formData.categoryId">
@@ -99,7 +110,7 @@
                   <div class="row gx-3 mb-3">
                     <div class="col-md-6">
                       <label class="small mb-1" for="maxAttendees">Max Attendees</label>
-                      <input class="form-control" id="maxAttendees" type="number" v-model="formData.maxAttendees">
+                      <input class="form-control" id="maxAttendees" type="number" v-model="formData.maxAttendance">
                     </div>
                     <div class="col-md-6">
                       <label class="small mb-1" for="availableTickets">Available Tickets</label>
@@ -107,7 +118,6 @@
                         v-model="formData.availableTickets">
                     </div>
                   </div>
-
                   <!-- Profile Picture Upload Section -->
                   <div class="row gx-3 mb-3">
                     <div class="col-md-12">
@@ -126,7 +136,6 @@
                       </div>
                     </div>
                   </div>
-
                   <!-- Submit Button -->
                   <button class="btn btn-primary" type="submit">Submit</button>
                 </form>
@@ -137,7 +146,7 @@
       </div>
 
       <!-- Edit Event Form Section -->
-      <div v-if="showEditForm">
+      <div v-if="showEditForm && activeTab === 'eventList'">
         <UpdateEventView :eventId="selectedEventId" :eventById="eventById" />
       </div>
     </div>
@@ -152,18 +161,22 @@ import { useRouter } from "vue-router";
 import Swal from "sweetalert2";
 import SideBar from "@/components/SideBar.vue";
 import UpdateEventView from "@/views/UpdateEventView.vue";
+import { useLocationStore } from '@/store/locationStore';
 
 const eventStore = useEventStore();
 const router = useRouter();
 const authStore = useAuthStore();
 const eventById = ref(null);
+const locationStore = useLocationStore();
+const locations = ref([]);
 
 const formData = reactive({
   eventName: '',
   description: '',
   startDate: '',
   endDate: '',
-  location: '',
+  address: '',
+  locationId: '',
   categoryId: 0,
   organizerId: authStore.id,
   maxAttendees: 0,
@@ -203,20 +216,26 @@ const handleImageUpload = (event) => {
   }
 };
 
-// Fetch event data dynamically
 const eventList = ref([]);
 
 const fetchEvents = async () => {
   eventList.value = await eventStore.getEvents();
+  console.log(eventList.value);
 }
-
-// Call fetchEvents when component is mounted
-onMounted (() => {
-  
-  (fetchEvents);
-  console.log(authStore.id);
+const getAllLocations = async () => {
+  try {
+    const response = await locationStore.getLocations();
+    locations.value = response;
+    console.log("Locations", locations.value);
+  } catch (err) {
+    console.error(err);
+  }
+};
+onMounted(() => {
+  fetchEvents();
+  getAllLocations();
 })
-  
+
 
 const deleteEvent = async (eventId) => {
   try {

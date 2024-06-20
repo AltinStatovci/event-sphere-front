@@ -16,19 +16,20 @@ const props = defineProps({
     eventById: Object,
 });
 const selectedEvent = reactive({
-            id: props.eventId,
-            eventName: ``,
-            description: '',
-            startDate: '',
-            endDate: '',
-            location: '',
-            categoryId: 0,
-            organizerId: authStore.id,
-            maxAttendees: 0,
-            availableTickets: 0,
-            dateCreated: new Date().toISOString(),
-            newImage: '',
-        });
+    id: props.eventId,
+    eventName: ``,
+    description: '',
+    startDate: '',
+    endDate: '',
+    address: '',
+    locationId: '',
+    categoryId: 0,
+    organizerId: authStore.id,
+    maxAttendance: 0,
+    availableTickets: 0,
+    dateCreated: new Date().toISOString(),
+    newImage: '',
+});
 
 watch(() => props.eventId, async (newValue) => {
     if (newValue !== null) {
@@ -83,14 +84,20 @@ const updateEvent = async () => {
                         </div>
                         <div class="row gx-3 mb-3">
                             <div class="col-md-6">
-                                <label class="small mb-1" for="editLocation">Location</label>
-                                <input class="form-control" id="editLocation" type="text"
-                                    v-model.trim="selectedEvent.location">
+                                <label class="small mb-1" for="location">Address</label>
+                                <input class="form-control" id="location" type="text" placeholder="Enter location"
+                                    v-model.trim="selectedEvent.address">
                             </div>
                             <div class="col-md-6">
-                                <label class="small mb-1" for="editCategoryId">Category ID</label>
-                                <input class="form-control" id="editCategoryId" type="number"
-                                    v-model="selectedEvent.categoryId">
+                                <label class="small mb-1" for="location">LocationId</label>
+                                <input class="form-control" id="location" type="text" placeholder="Enter location"
+                                    v-model.trim="selectedEvent.locationId">
+                            </div>
+                        </div>
+                        <div class="row gx-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="small mb-1" for="categoryId">Category ID</label>
+                                <input class="form-control" id="categoryId" type="number" v-model="selectedEvent.categoryId">
                             </div>
                         </div>
                         <div class="row gx-3 mb-3">
@@ -109,7 +116,7 @@ const updateEvent = async () => {
                             <div class="col-md-6">
                                 <label class="small mb-1" for="editMaxAttendees">Max Attendees</label>
                                 <input class="form-control" id="editMaxAttendees" type="number"
-                                    v-model="selectedEvent.maxAttendees">
+                                    v-model="selectedEvent.maxAttendance">
                             </div>
                             <div class="col-md-6">
                                 <label class="small mb-1" for="editAvailableTickets">Available Tickets</label>

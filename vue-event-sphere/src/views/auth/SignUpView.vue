@@ -147,5 +147,8 @@ async function handleSubmit(){
 </template>
 
 <style scoped>
-
+#form1Example13, #form1Example23{
+  width: 520px;
+  border: 1px solid rgb(209, 207, 207);
+}
 </style>
