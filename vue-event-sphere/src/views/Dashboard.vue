@@ -1,7 +1,11 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import SideBar from "@/components/SideBar.vue";
+import {useUserStore} from "@/store/userStore.js";
 
+const userStore = useUserStore();
+
+const userCount = ref(0)
 const eventCount = ref(0);
 const paymentCount = ref(0);
 const ticketCount = ref(0);
@@ -50,7 +54,17 @@ const toggleDarkMode = () => {
   isDarkMode.value = !isDarkMode.value;
 };
 
+const fetchUserCount = async () => {
+  try {
+       const count = await userStore.getUserCount();
+    userCount.value = count;
+    } catch (error) {
+    console.error('Error fetching user count:', error);
+  }
+}
+
 onMounted(() => {
+  fetchUserCount()
   fetchEventCount();
   fetchPaymentCount();
   fetchTicketCount();
@@ -80,7 +94,7 @@ onMounted(() => {
         <span class="material-symbols-outlined icon">
           groups
         </span>
-        <p class="count-text">There are Users</p>
+        <p class="count-text">There are {{userCount}} Users</p>
       </div>
       <div class="event-count-box">
         <span class="material-symbols-outlined icon">

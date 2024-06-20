@@ -52,30 +52,25 @@ const deletePayment = (id) => {
                     <thead>
                         <tr>
                             <th class="id-col">ID</th>
-                            <th class="user-id-col">User ID</th>
-                            <th class="event-id-col">Event ID</th>
-                            <th class="ticket-id-col">Ticket ID</th>
+                            <th class="user-id-col">Client's Name</th>
+                            <th class="ticket-name-col">Ticket Name</th>
                             <th class="amount-col">Amount</th>
                             <th class="payment-method-col">Payment Method</th>
                             <th class="payment-status-col">Payment Status</th>
                             <th class="payment-date-col">Payment Date</th>
-                            <th class="action-col">Actions</th>
+                            
                         </tr>
                     </thead>
                     <tbody>
                         <tr v-for="payment in payments" :key="payment.id">
                             <td>{{ payment.id }}</td>
-                            <td>{{ payment.user ? payment.user.id : 'N/A' }}</td>
-                            <td>{{ payment.event ? payment.event.id : 'N/A' }}</td>
-                            <td>{{ payment.ticket ? payment.ticket.id : 'N/A' }}</td>
+                            <td>{{ payment.userName ? payment.userName : 'N/A' }}</td>
+                            <td>{{ payment.ticketName ? payment.ticketName : 'N/A' }}</td>
                             <td>{{ payment.amount }}</td>
                             <td>{{ payment.paymentMethod }}</td>
                             <td>{{ payment.paymentStatus }}</td>
                             <td>{{ payment.paymentDate }}</td>
-                            <td>
-                                <button class="action-btn edit-btn" @click="editPayment(payment.id)">Edit</button>
-                                <button class="action-btn delete-btn" @click="deletePayment(payment.id)">Delete</button>
-                            </td>
+                           
                         </tr>
                         <tr v-if="payments.length === 0">
                             <td colspan="9" class="no-data">No payments available</td>
@@ -91,7 +86,6 @@ const deletePayment = (id) => {
 <style scoped>
 .dashboard {
     display: flex;
-    background-color: #3fa387;
     height: 100vh;
     width: 100%;
 }
@@ -103,7 +97,7 @@ const deletePayment = (id) => {
     margin-top: 40px;
     margin-right: 40px;
     margin-bottom: 150px;
-    background-color: #fff;
+    background-color: rgba(33, 40, 50, 0.03);
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }

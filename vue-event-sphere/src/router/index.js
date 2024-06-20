@@ -18,6 +18,7 @@ import Report from "@/views/Report.vue";
 import PaymentPage from '@/views/PaymentPageView.vue';
 import CreateEventView from "@/views/CreateEventView.vue";
 import NearYouView from '@/views/NearYouView.vue';
+import CreateTicketView from "@/views/CreateTicketView.vue";
 
 
 
@@ -89,6 +90,13 @@ const routes = [
       meta: { requiresAuth: true },
     },
     {
+      path: '/manageTickets',
+      name: 'manageTickets',
+      component: CreateTicketView,
+      meta: { requiresAuth: true },
+    },
+    
+    {
       path: '/profile',
       name: 'profile',
       component: Profile,
@@ -113,8 +121,19 @@ const routes = [
     name: 'createEvent',
     component:CreateEventView,
     meta: { requiresAuth: true },
+  }, 
+  {
+    path: '/createTickets',
+    name: 'createTickets',
+    component:CreateTicketView,
+    meta: { requiresAuth: true },
   },
-
+ {
+  path: '/paymentDashboard',
+  name: 'paymentDashboard',
+  component:Payment,
+  meta: { requiresAuth: true },
+ }
 ];
 
 const router = createRouter({

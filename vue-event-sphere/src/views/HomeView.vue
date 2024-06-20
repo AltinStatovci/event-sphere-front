@@ -7,6 +7,7 @@ import { useAuthStore } from "@/store/authStore.js";
 import { useRouter } from 'vue-router';
 import { useLocationStore } from '@/store/locationStore';
 
+
 const router = useRouter();
 const authStore = useAuthStore();
 const categoryStore = useCategoryStore();
