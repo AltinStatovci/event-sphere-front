@@ -1,20 +1,16 @@
 <script setup>
 import { ref, watch } from 'vue';
 import { useRouter } from "vue-router";
-import { usePaymentStore } from '@/store/paymentStore'; // Import the payment store
+import { usePaymentStore } from '@/store/paymentStore';
 
 const router = useRouter();
-const paymentStore = usePaymentStore(); // Get the payment store
-
-// Initialize quantity as a ref with value 1
+const paymentStore = usePaymentStore();
 const quantity = ref(1);
 
-// Watch for changes in quantity and update paymentStore.amount
 watch(quantity, (newQuantity) => {
   paymentStore.amount = newQuantity;
 });
 
-// Define functions to increase and decrease quantity
 const increase = () => { quantity.value++; }
 const decrease = () => {
   if (quantity.value > 1) {
@@ -22,11 +18,10 @@ const decrease = () => {
   }
 }
 function goToPayment(id) {
-  const redirectUrl = `/Payment/${id}`;
-  router.push(redirectUrl);
+  paymentStore.amount = quantity.value;  // Ensure the quantity is updated in the store
+  router.push(`/Payment/${id}`);
 }
 
-// Define props
 defineProps({
   ticket: {
     type: Object,
@@ -36,37 +31,36 @@ defineProps({
 </script>
 
 <template>
-    <div class="container card my-5">
-      <div class="card-body">
-        <h5 class="card-title">Ticket type: {{ ticket.ticketType }}</h5>
-        <p class="card-text">Price: {{ ticket.price }}</p>
-        <p class="card-text">Date:</p>
-      </div>
-      <div class="mt-5">
-        <div class="card-body row">
-          <div class="d-flex justify-content-between align-items-center">
-            <div class="form-group quantity">
-              <label for="quantity">Quantity:</label>
-              <input type="number" class="form-control" v-model="quantity" min="1">
-              <button class="btn btn-primary ml-2" @click="increase">+</button>
-              <button class="btn btn-primary ml-2" @click="decrease">-</button>
-            </div>
-            <button @click="goToPayment(ticket.id)" class="btn btn-primary">Buy Ticket</button>
+  <div class="container card my-5">
+    <div class="card-body">
+      <h5 class="card-title">Ticket type: {{ ticket.ticketType }}</h5>
+      <p class="card-text">Price: {{ ticket.price }}</p>
+      <p class="card-text">Date:</p>
+    </div>
+    <div class="mt-5">
+      <div class="card-body row">
+        <div class="d-flex justify-content-between align-items-center">
+          <div class="form-group quantity">
+            <label for="quantity">Quantity:</label>
+            <input type="number" class="form-control" v-model="quantity" min="1">
+            <button class="btn btn-primary ml-2" @click="increase">+</button>
+            <button class="btn btn-primary ml-2" @click="decrease">-</button>
           </div>
+          <button @click="goToPayment(ticket.id)" class="btn btn-primary">Buy Ticket</button>
         </div>
       </div>
     </div>
-  </template>
+  </div>
+</template>
 
 <style scoped>
-  .quantity {
-    display: flex;
-    align-items: center;
-  }
-  
-  .quantity input {
-    width: 50px;
-    text-align: center;
-    margin: 0 5px;
-  }
+.quantity {
+  display: flex;
+  align-items: center;
+}
+.quantity input {
+  width: 50px;
+  text-align: center;
+  margin: 0 5px;
+}
 </style>
