@@ -1,8 +1,10 @@
 import { defineStore } from 'pinia';
 import axios from 'axios';
+import { ref } from 'vue';
 
 export const useTicketStore = defineStore('ticket', () => {
   const url = 'http://localhost:5220/api/';
+  const tickets = ref([]);
   
   const getTickets = async () => {
     try {
@@ -50,12 +52,29 @@ export const useTicketStore = defineStore('ticket', () => {
       throw error;
     }
   };
+  async function getTicketByEvent(eventId) {
+    try {
+      const response = await axios.get(`${url}Ticket/${eventId}/event`);
+      const data = response.data;
+      tickets.value = data.map(ticket => ({
+        id: ticket.id,
+        eventName: ticket.eventName,
+        price: ticket.price,
+        ticketType: ticket.ticketType,
+        bookingReference: ticket.bookingReference,
+      }));
+    } catch (err) {
+      console.log(err);
+    }
+  }
 
   return {
     getTickets,
     getTicketById,
     addTicket,
     updateTicket,
-    deleteTicket
+    deleteTicket,
+    getTicketByEvent,
+    tickets
   };
 });

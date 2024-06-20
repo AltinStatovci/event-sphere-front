@@ -80,19 +80,17 @@ export const useEventStore = defineStore('event', () => {
               description: event.description,
               address: event.address,
               locationId: event.locationId,
+              categoryName: event.categoryName,
               startDate: event.startDate,
               endDate: event.endDate,
               image: event.image,
-              organizer: event.organizer,
+              organizerName: event.organizerName,
               maxAttendance: event.maxAttendance,
               availableTickets: event.availableTickets,
               photoData: event.photoData, 
           }));
-
-
-  
-
           events.value = allEvents; 
+          console.log(events.value);
           return allEvents;
       } catch (err) {
           console.error('Error fetching events:', err);
