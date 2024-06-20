@@ -60,7 +60,7 @@ const id = segments[segments.length - 1];
 onMounted(async () => {
   try {
     ticket.value = await ticketStore.getTicketById(id);
-    console.log(ticket.value.id);
+
   } catch (ticketError) {
     console.error('Error fetching ticket:', ticketError);
     error.value = 'Failed to fetch ticket information.';
@@ -124,17 +124,17 @@ const submitPayment = async () => {
 
 const processPayment = async (stripeToken) => {
   try {
+    const totalAmount = paymentStore.amount * ticket.value.price; // Calculate the total price
     const response = await axios.post('http://localhost:5220/api/Payment', {
       userID: authStore.id,  
       ticketID: ticket.value.id,  
-      amount: paymentStore.amount,  
+      amount: paymentStore.amount,  // Send the quantity
+      price: totalAmount,
       paymentMethod: 'Stripe',
       paymentDate: new Date().toISOString(),
       stripeToken: stripeToken,
       paymentStatus: true
     });
-
-    console.log(response);
 
     if (response.status === 204 || response.status === 201 || response.status === 200) {
       await Swal.fire({
@@ -142,10 +142,10 @@ const processPayment = async (stripeToken) => {
         text: "Thank you for your purchase!",
         icon: "success",
         confirmButtonText: "OK"
-        }).then(() => {
-          router.push({ name: 'home' }); 
-        });
-      } else {
+      }).then(() => {
+        router.push({ name: 'home' }); 
+      });
+    } else {
       console.error('Unexpected response:', response);
       error.value = 'An unexpected error occurred after processing the payment.';
     }
@@ -153,6 +153,7 @@ const processPayment = async (stripeToken) => {
     error.value = 'An error occurred while processing your payment.';
   }
 };
+
 </script>
 
 <style scoped>
