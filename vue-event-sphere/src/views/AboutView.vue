@@ -20,7 +20,8 @@
                         user-friendly websites that enhance online experiences and drive success.</h5>
                     <p>We are all very different. We were born in different cities, at different times, we love
                         different music, food, movies. But we have something that unites us all. It is our company.</p>
-                    <button class="btn btn-outline-light btn-lg m-2" @click="onContact()">Contact Us</button>
+                    <button class="btn btn-outline-light btn-lg m-2"><a href="https://github.com/erinesl"
+                            target="_blank">View our GitHub</a></button>
                 </div>
             </div>
         </div>
@@ -101,6 +102,9 @@
                                 <h6>Team Lead</h6>
                                 <p>Empowering my team to overcome challenges, celebrate victories, and constantly grow
                                     together on the journey of building remarkable digital experiences.</p>
+                                <a class="github-link" href="https://github.com/erinesl" target="_blank">Check out my
+                                    GitHub:<br>
+                                    <i class="github-icon bi bi-github"></i></a>
                             </div>
                         </div>
                     </div>
@@ -109,14 +113,17 @@
                     <div class="media-container-row">
                         <div class="col-md-12">
                             <div class="wrap-img">
-                                <img src="../staff/altini.jpg"
-                                    class="img-responsive clients-img" media-simple="true" alt="Slide 1">
+                                <img src="../staff/altini.jpg" class="img-responsive clients-img" media-simple="true"
+                                    alt="Slide 1">
                             </div>
                             <div class="text-center">
                                 <h4 class="my-1">Altin Statovci</h4>
                                 <h6>Full Stack Dev</h6>
                                 <p>Coding is the ultimate form of expression in the digital age, where ideas become
                                     interactive, and innovation thrives in the dance of algorithms.</p>
+                                <a class="github-link" href="https://github.com/AltinStatovci" target="_blank">Check out
+                                    my GitHub:<br>
+                                    <i class="github-icon bi bi-github"></i></a>
                             </div>
                         </div>
                     </div>
@@ -133,6 +140,9 @@
                                 <h6>Full Stack Dev</h6>
                                 <p>Behind every great software, there's a coder who dared to dream, to challenge, and to
                                     bring imagination to life, one line at a time.</p>
+                                <a class="github-link" href="https://github.com/BesnikBegunca" target="_blank">Check out
+                                    my GitHub:<br>
+                                    <i class="github-icon bi bi-github"></i></a>
                             </div>
                         </div>
                     </div>
@@ -149,6 +159,9 @@
                                 <h6>Full Stack Dev</h6>
                                 <p>Committed to delivering excellence in every line of code. A problem solver at heart,
                                     always seeking elegant solutions.</p>
+                                <a class="github-link" href="https://github.com/BlendiMiftari1" target="_blank">Check
+                                    out my GitHub:<br>
+                                    <i class="github-icon bi bi-github"></i></a>
                             </div>
                         </div>
                     </div>
@@ -165,6 +178,9 @@
                                 <h6>Full Stack Dev</h6>
                                 <p>Transforming visions into functional and visually stunning websites. Committed to
                                     clean, efficient, and maintainable code.</p>
+                                <a class="github-link" href="https://github.com/drinkrasniqi1" target="_blank">Check out
+                                    my GitHub:<br>
+                                    <i class="github-icon bi bi-github"></i></a>
                             </div>
                         </div>
                     </div>
@@ -181,6 +197,9 @@
                                 <h6>Full Stack Dev</h6>
                                 <p>Empowering businesses with intuitive and user-friendly web solutions. Embracing
                                     challenges as opportunities for growth and innovation.</p>
+                                <a class="github-link" href="https://github.com/lizableta" target="_blank">Check out my
+                                    GitHub:<br>
+                                    <i class="github-icon bi bi-github"></i></a>
                             </div>
                         </div>
                     </div>
@@ -197,6 +216,9 @@
                                 <h6>Full Stack Dev</h6>
                                 <p>Striving to make the web a more beautiful, functional, and user-friendly place for
                                     all.</p>
+                                <a class="github-link" href="https://github.com/elsarrustemi" target="_blank">Check out
+                                    my GitHub:<br>
+                                    <i class="github-icon bi bi-github"></i></a>
                             </div>
                         </div>
                     </div>
@@ -212,6 +234,9 @@
                                 <h4 class="my-1">Muhamed Hyseni</h4>
                                 <h6>Full Stack Dev</h6>
                                 <p>Committed to writing code that not only works flawlessly but also tells a story.</p>
+                                <a class="github-link" href="https://github.com/HMuhamed" target="_blank">Check out my
+                                    GitHub:<br>
+                                    <i class="github-icon bi bi-github"></i></a>
                             </div>
                         </div>
                     </div>
@@ -274,6 +299,23 @@ svg {
 .carousel-control-prev,
 .carousel-control-next {
     width: 30px;
+}
+
+a {
+    text-decoration: none;
+    color: white;
+}
+
+a:hover {
+    color: black;
+}
+
+.github-link {
+    color: black;
+}
+
+.github-icon {
+    font-size: 30px;
 }
 </style>
 

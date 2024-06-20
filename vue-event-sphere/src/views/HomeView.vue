@@ -3,13 +3,16 @@ import { useCategoryStore } from '@/store/categoryStore';
 import { useEventStore } from '@/store/eventStore';
 import { onMounted, ref, computed } from 'vue';
 import EventCard from '@/components/EventCard.vue';
-import {useAuthStore} from "@/store/authStore.js";
+import { useAuthStore } from "@/store/authStore.js";
 import { useRouter } from 'vue-router';
+import { useLocationStore } from '@/store/locationStore';
+
 
 const router = useRouter();
 const authStore = useAuthStore();
 const categoryStore = useCategoryStore();
 const eventStore = useEventStore();
+const locationStore = useLocationStore();
 
 const categoryNames = ref([]);
 const eventsByCategoryId = ref({});
@@ -46,12 +49,17 @@ const formatDate = (dateString) => {
   return dateString.split('T')[0]; // Splits the string at 'T' and returns the date part
 };
 
+const getLocation = async (event) => {
+  try {
+    const loc = await locationStore.getLocationById(event.locationId);
+    event.city = loc.city;
+    event.country = loc.country;
+  } catch (err) {
+    console.error(err);
+  }
+};
+
 onMounted(async () => {
-
-  console.log("user id : "+ authStore.id)
-  console.log("isADmin : "+authStore.isAdmin)
-  console.log("email:" + authStore.email)
-
   const categories = await categoryStore.getAllCategories();
   categoryNames.value = categories.map(category => category.categoryName);
 
@@ -64,13 +72,14 @@ onMounted(async () => {
   results.forEach(({ categoryId, categoryName, events }) => {
     eventsByCategoryId.value[categoryId] = { categoryName, events };
   });
-  slideshowEvents.value = results.flatMap(result => result.events).slice(0, 5); // Adjust as needed
 
-  console.log(eventsByCategoryId.value);
-  console.log(categories);
-  console.log(slideshowEvents.value); // Log slideshow events for debugging
+  slideshowEvents.value = results.flatMap(result => result.events).slice(0, 5); 
 
-   setInterval(() => {
+  for (const event of slideshowEvents.value) {
+    await getLocation(event);
+  }
+
+  setInterval(() => {
     nextSlide();
   }, 14000);
 });
@@ -78,11 +87,13 @@ onMounted(async () => {
 const filteredCategories = computed(() => {
   return Object.values(eventsByCategoryId.value).filter(category => category.events && category.events.length > 0);
 });
+
 function goToTicket(id) {
   const redirectUrl = `/Ticket/${id}/event`;
   router.push(redirectUrl);
 }
 </script>
+
 
 
 <template>
@@ -96,7 +107,7 @@ function goToTicket(id) {
             <p class="small">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="icon">
                 <path d="M12 2C8.1 2 5 5.1 5 9c0 4.4 5.1 11.2 6.1 12.3.3.4.9.4 1.2 0 1-1.1 6.1-7.9 6.1-12.3 0-3.9-3.1-7-7-7zm0 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/>
-              </svg>Event location: {{ event.location }}</p>
+              </svg>Event location: {{ event.city }}</p>
             <p class="small"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="icon">
                 <path d="M5 2v2H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1V2h-2v2H7V2H5zm0 4h14v14H5V6zm2 4v2h2v-2H7zm4 0v2h2v-2h-2zm4 0v2h2v-2h-2z"/>
               </svg> Event start date: {{ formatDate(event.startDate) }}</p>
@@ -225,6 +236,13 @@ function goToTicket(id) {
   height: 18px;
   vertical-align: middle;
   margin-right: 5px;
+}
+.btn{
+  background-color: transparent;
+  border-color: white;
+  --mdb-btn-box-shadow:  0 4px 9px -4px #e1eafa;
+  text-transform: none;
+  
 }
 </style>
 

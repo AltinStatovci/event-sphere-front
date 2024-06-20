@@ -25,8 +25,8 @@ const onHome = () => {
 const onAboutUs = () => {
   router.push({ path: '/about' });
 }
-const onContact = () => {
-  router.push({ path: '/contact' });
+const onNearYou = () => {
+  router.push({ path: '/nearYou' });
 }
 </script>
 
@@ -51,7 +51,7 @@ const onContact = () => {
             </ul>
           </li>
           <li class="nav-item">
-            <a class="nav-link active custom-font-size" @click="onContact" role="button">Near you <Location /> </a>
+            <a class="nav-link active custom-font-size" @click="onNearYou" role="button">Near you <Location /> </a>
           </li>
           <li class="nav-item">
             <a class="nav-link active custom-font-size" @click="onAboutUs" role="button">About us</a>
@@ -90,6 +90,9 @@ const onContact = () => {
 
 .title {
   font-size: 1.5rem;
+  background: -webkit-linear-gradient(45deg,#0f0101, #6b6767);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
 }
 
 .custom-font-size {
