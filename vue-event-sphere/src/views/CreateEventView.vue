@@ -92,7 +92,7 @@
                   <!-- Category Selection -->
                   <div class="col-md-12 mb-3">
                     <label class="small mb-1" for="categorySelect">Category</label>
-                    <select id="categorySelect" class="form-control" v-model.trim="formData.categoryId">
+                    <select id="categorySelect" class="form-control" v-model.trim="formData.categoryID">
                       <option value="" disabled>Select a Category</option>
                       <option v-for="category in categories" :key="category.id" :value="category.id">
                         {{ category.categoryName }}
@@ -189,9 +189,9 @@ const formData = reactive({
   endDate: '',
   address: '',
   locationId: '',
-  categoryId: '',
-  organizerId: authStore.id,
-  maxAttendees: 0,
+  categoryID: '',
+  organizerID: authStore.id,
+  maxAttendance: 0,
   availableTickets: 0,
   dateCreated: new Date().toISOString(),
   image: '',
@@ -306,21 +306,20 @@ const openEditForm = async (eventId) => {
 
   console.log("Event data retrieved:", eventById.value);
 
-  // Populate formData with selected event's data
-  formData.id = eventById.value.id;  // Ensure the ID is set in formData
+  formData.id = eventById.value.id; 
   formData.eventName = eventById.value.eventName;
   formData.description = eventById.value.description;
   formData.startDate = eventById.value.startDate;
   formData.endDate = eventById.value.endDate;
   formData.address = eventById.value.address;
   formData.locationId = eventById.value.locationId;
-  formData.categoryId = eventById.value.categoryId;
-  formData.maxAttendees = eventById.value.maxAttendees;
+  formData.categoryID = eventById.value.categoryID;
+  formData.maxAttendance = eventById.value.maxAttendance;
   formData.availableTickets = eventById.value.availableTickets;
+  formData.image= eventById.value.image;
 
   console.log("Updated formData:", formData);
 
-  // Switch to the event form tab
   changeTab('eventForm');
 };
 
@@ -343,8 +342,8 @@ const resetForm = () => {
   formData.endDate = '';
   formData.address = '';
   formData.locationId = '';
-  formData.categoryId = '';
-  formData.maxAttendees = 0;
+  formData.categoryID = '';
+  formData.maxAttendance = 0;
   formData.availableTickets = 0;
   formData.image = '';
   imageUrl.value = 'https://t4.ftcdn.net/jpg/05/65/22/41/360_F_565224180_QNRiRQkf9Fw0dKRoZGwUknmmfk51SuSS.jpg';

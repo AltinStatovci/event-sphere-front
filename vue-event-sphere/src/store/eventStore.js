@@ -22,7 +22,7 @@ export const useEventStore = defineStore('event', () => {
                 locationId: event.locationId,
                 startDate: event.startDate,
                 endDate: event.endDate,
-                category: event.categoryId,
+                category: event.categoryID,
                 photoData: event.photoData
             }));
 
@@ -49,6 +49,7 @@ export const useEventStore = defineStore('event', () => {
                 description: eventData.description,
                 address: eventData.address,
                 locationId: eventData.locationId,
+                categoryID: eventData.categoryID,
                 startDate: eventData.startDate,
                 endDate: eventData.endDate,
                 image: eventData.image,

@@ -84,7 +84,7 @@ const updateEvent = async () => {
                         </div>
                         <div class="row gx-3 mb-3">
                             <div class="col-md-6">
-                                <label class="small mb-1" for="location">Address</label>
+                                <label class="small mb-1" for="location">Address2222</label>
                                 <input class="form-control" id="location" type="text" placeholder="Enter location"
                                     v-model.trim="selectedEvent.address">
                             </div>
