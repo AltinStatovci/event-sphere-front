@@ -22,7 +22,7 @@ export const useEventStore = defineStore('event', () => {
                 locationId: event.locationId,
                 startDate: event.startDate,
                 endDate: event.endDate,
-                category: event.categoryId,
+                category: event.categoryID,
                 photoData: event.photoData
             }));
 
@@ -49,6 +49,7 @@ export const useEventStore = defineStore('event', () => {
                 description: eventData.description,
                 address: eventData.address,
                 locationId: eventData.locationId,
+                categoryID: eventData.categoryID,
                 startDate: eventData.startDate,
                 endDate: eventData.endDate,
                 image: eventData.image,
@@ -115,23 +116,39 @@ export const useEventStore = defineStore('event', () => {
           throw error; 
         }
       }
-      async function updateEvent(event) {
+    async function updateEvent(event) {
         try {
             const formData = new FormData();
-            for (const key in event) {
-                let value = event[key];
-                formData.append(key, value);
+            formData.append('EventName', event.eventName);
+            formData.append('Description', event.description);
+            formData.append('Address', event.address);
+            formData.append('LocationId', event.locationId);
+            formData.append('StartDate', event.startDate);
+            formData.append('EndDate', event.endDate);
+            formData.append('CategoryID', event.categoryID);
+            formData.append('OrganizerID', event.organizerID);
+            formData.append('MaxAttendance', event.maxAttendance);
+            formData.append('AvailableTickets', event.availableTickets);
+            formData.append('DateCreated', event.dateCreated);
+
+            if (event.image) {
+                formData.append('newImage', event.image);
             }
-            const response = await client.put(`${url}Event/${event.id}`, formData, {
+
+            const response = await axios.put(`${url}Event/${event.id}`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
             });
-            return response.data; 
+
+            return response.data;
         } catch (error) {
-            throw error; 
+            throw error;
         }
     }
+
+
+
     async function deleteEvent(eventId){
         try {
             await axios.delete(`${url}Event/${eventId}`);

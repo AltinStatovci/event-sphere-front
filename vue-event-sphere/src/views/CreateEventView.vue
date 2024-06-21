@@ -30,6 +30,7 @@
               </thead>
               <tbody>
                 <tr v-for="event in eventList" :key="event.id">
+                  <td>{{ event.id }}</td>
                   <td>{{ event.eventName }}</td>
                   <td>{{ event.description }}</td>
                   <td>{{ event.address }}</td>
@@ -48,13 +49,15 @@
           </div>
         </div>
       </div>
+
       <!-- Event Form Section -->
       <div v-if="activeTab === 'eventForm'">
         <div class="row">
           <div class="col-xl-12">
             <div class="card mb-4">
-              <div class="card-header">Event Details</div>
+              <div class="card-header">{{ isEditMode ? 'Edit Event' : 'Create Event' }}</div>
               <div class="card-body">
+
                 <form @submit.prevent="handleSubmit">
                   <!-- Event Details Form -->
                   <div class="row gx-3 mb-3">
@@ -73,13 +76,13 @@
                   <!-- Additional Event Details -->
                   <div class="row gx-3 mb-3">
                     <div class="col-md-6">
-                      <label class="small mb-1" for="location">Address</label>
-                      <input class="form-control" id="location" type="text" placeholder="Enter location"
+                      <label class="small mb-1" for="address">Address</label>
+                      <input class="form-control" id="address" type="text" placeholder="Enter address"
                         v-model.trim="formData.address">
                     </div>
                     <div class="col-md-6">
-                      <label class="form-label" for="citySelect">Location</label>
-                      <select id="citySelect" class="form-select" v-model.trim="formData.locationId">
+                      <label class="small mb-1" for="citySelect">Location</label>
+                      <select id="citySelect" class="form-control" v-model.trim="formData.locationId">
                         <option value="" disabled>Select a city</option>
                         <option v-for="location in locations" :key="location.id" :value="location.id">
                           {{ location.city }}, {{ location.country }}
@@ -87,11 +90,16 @@
                       </select>
                     </div>
                   </div>
-                  <div class="row gx-3 mb-3">
-                    <div class="col-md-6">
-                      <label class="small mb-1" for="categoryId">Category ID</label>
-                      <input class="form-control" id="categoryId" type="number" v-model="formData.categoryId">
-                    </div>
+
+                  <!-- Category Selection -->
+                  <div class="col-md-12 mb-3">
+                    <label class="small mb-1" for="categorySelect">Category</label>
+                    <select id="categorySelect" class="form-control" v-model.trim="formData.categoryID">
+                      <option value="" disabled>Select a Category</option>
+                      <option v-for="category in categories" :key="category.id" :value="category.id">
+                        {{ category.categoryName }}
+                      </option>
+                    </select>
                   </div>
 
                   <!-- Date and Attendees Details -->
@@ -118,16 +126,17 @@
                         v-model="formData.availableTickets">
                     </div>
                   </div>
+
                   <!-- Profile Picture Upload Section -->
                   <div class="row gx-3 mb-3">
                     <div class="col-md-12">
                       <div class="card mb-4 mb-xl-0">
                         <div class="card-header">Event Image</div>
-                        <div class="card-body text-center">
+                        <div class="card-body text-center" style="align-self: center;">
                           <div class="image-container" :style="{ backgroundImage: `url(${imageUrl})` }">
                             <div v-if="!imageUrl" class="placeholder">No Image Selected</div>
                           </div>
-                          <div class="small font-italic text-muted mb-4">Upload your Event Image</div>
+                          <div class="small font-italic text-muted mb-4">Upload your EventImage</div>
                           <input class="form-control" id="file" type="file" ref="fileInput" @change="handleImageUpload"
                             style="display: none;">
                           <button class="btn btn-primary" type="button" @click="$refs.fileInput.click()">Upload new
@@ -136,8 +145,9 @@
                       </div>
                     </div>
                   </div>
+
                   <!-- Submit Button -->
-                  <button class="btn btn-primary" type="submit">Submit</button>
+                  <button class="btn btn-primary" type="submit">{{ isEditMode ? 'Update' : 'Submit' }}</button>
                 </form>
               </div>
             </div>
@@ -145,10 +155,7 @@
         </div>
       </div>
 
-      <!-- Edit Event Form Section -->
-      <div v-if="showEditForm && activeTab === 'eventList'">
-        <UpdateEventView :eventId="selectedEventId" :eventById="eventById" />
-      </div>
+
     </div>
   </div>
 </template>
@@ -160,45 +167,62 @@ import { useAuthStore } from "@/store/authStore.js";
 import { useRouter } from "vue-router";
 import Swal from "sweetalert2";
 import SideBar from "@/components/SideBar.vue";
-import UpdateEventView from "@/views/UpdateEventView.vue";
 import { useLocationStore } from '@/store/locationStore';
+import { useCategoryStore } from "@/store/categoryStore";
 
 const eventStore = useEventStore();
 const router = useRouter();
 const authStore = useAuthStore();
 const eventById = ref(null);
 const locationStore = useLocationStore();
+const categoryStore = useCategoryStore();
 const locations = ref([]);
+const categories = ref([]);
 
 const formData = reactive({
+  id: '',
   eventName: '',
   description: '',
   startDate: '',
   endDate: '',
   address: '',
   locationId: '',
-  categoryId: 0,
-  organizerId: authStore.id,
-  maxAttendees: 0,
+  categoryID: '',
+  organizerID: authStore.id,
+  maxAttendance: 0,
   availableTickets: 0,
   dateCreated: new Date().toISOString(),
   image: '',
 });
 
+
+
 const imageUrl = ref('https://t4.ftcdn.net/jpg/05/65/22/41/360_F_565224180_QNRiRQkf9Fw0dKRoZGwUknmmfk51SuSS.jpg');
 
 const selectedEventId = ref(null);
+const isEditMode = ref(false);
 
 const handleSubmit = async () => {
   try {
-    await eventStore.addEvent(formData);
-    Swal.fire({
-      title: "Event Added successfully!",
-      icon: "success"
-    }).then(() => {
-      const redirectUrl = `/`;
-      router.push(redirectUrl);
-    });
+    if (isEditMode.value) {
+      await eventStore.updateEvent(formData);
+      Swal.fire({
+        title: "Event Updated successfully!",
+        icon: "success"
+      }).then(() => {
+        const redirectUrl = `/`;
+        router.push(redirectUrl);
+      });
+    } else {
+      await eventStore.addEvent(formData);
+      Swal.fire({
+        title: "Event Added successfully!",
+        icon: "success"
+      }).then(() => {
+        const redirectUrl = `/`;
+        router.push(redirectUrl);
+      });
+    }
   } catch (e) {
     await Swal.fire({
       title: "Error!",
@@ -206,7 +230,8 @@ const handleSubmit = async () => {
       icon: "error"
     });
   }
-}
+};
+
 
 const handleImageUpload = (event) => {
   const file = event.target.files[0];
@@ -222,6 +247,7 @@ const fetchEvents = async () => {
   eventList.value = await eventStore.getEvents();
   console.log(eventList.value);
 }
+
 const getAllLocations = async () => {
   try {
     const response = await locationStore.getLocations();
@@ -231,11 +257,22 @@ const getAllLocations = async () => {
     console.error(err);
   }
 };
+
+const getAllCategories = async () => {
+  try {
+    const response = await categoryStore.getAllCategories();
+    categories.value = response;
+    console.log("Categories", categories.value);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
 onMounted(() => {
   fetchEvents();
   getAllLocations();
+  getAllCategories();
 })
-
 
 const deleteEvent = async (eventId) => {
   try {
@@ -257,24 +294,64 @@ const deleteEvent = async (eventId) => {
 
 const showEditForm = ref(false);
 
-
-const openEditForm = (eventId) => {
-  // selectedEvent.value = event;
+const openEditForm = async (eventId) => {
+  console.log("Opening edit form for event ID:", eventId);
+  selectedEventId.value = eventId; // Ensure the selectedEventId is set
+  isEditMode.value = true;
   showEditForm.value = true;
-  selectedEventId.value = eventId;
-  eventById.value = eventStore.getEventById(eventId);
-  // console.log(eventById.value);
+
+  eventById.value = await eventStore.getEventById(eventId);
+
+  console.log("Event data retrieved:", eventById.value);
+
+  formData.id = eventById.value.id; 
+  formData.eventName = eventById.value.eventName;
+  formData.description = eventById.value.description;
+  formData.startDate = eventById.value.startDate;
+  formData.endDate = eventById.value.endDate;
+  formData.address = eventById.value.address;
+  formData.locationId = eventById.value.locationId;
+  formData.categoryID = eventById.value.categoryID;
+  formData.maxAttendance = eventById.value.maxAttendance;
+  formData.availableTickets = eventById.value.availableTickets;
+  formData.image= eventById.value.image;
+
+  console.log("Updated formData:", formData);
+
+  changeTab('eventForm');
 };
+
+
+
 
 const activeTab = ref('eventList');
 
 const changeTab = (tab) => {
   activeTab.value = tab;
+  if (tab === 'eventForm' && !isEditMode.value) {
+    resetForm();
+  }
+};
+
+const resetForm = () => {
+  formData.eventName = '';
+  formData.description = '';
+  formData.startDate = '';
+  formData.endDate = '';
+  formData.address = '';
+  formData.locationId = '';
+  formData.categoryID = '';
+  formData.maxAttendance = 0;
+  formData.availableTickets = 0;
+  formData.image = '';
+  imageUrl.value = 'https://t4.ftcdn.net/jpg/05/65/22/41/360_F_565224180_QNRiRQkf9Fw0dKRoZGwUknmmfk51SuSS.jpg';
+  isEditMode.value = false;
+  selectedEventId.value = null;
 };
 </script>
 
+
 <style scoped>
-/* Your scoped styles here */
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');
 
 body {
@@ -311,7 +388,8 @@ body {
 }
 
 .form-control,
-.dataTable-input {
+.dataTable-input,
+.form-select {
   display: block;
   width: 100%;
   padding: 0.875rem 1.125rem;
@@ -362,7 +440,6 @@ body {
   height: 10rem;
   border: 1px solid #c5ccd6;
   border-radius: 0.35rem;
-  /* changed from 50% to 0.35rem for square shape */
   background-size: cover;
   background-position: center;
   display: flex;
