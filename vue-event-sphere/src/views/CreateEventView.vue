@@ -30,6 +30,7 @@
               </thead>
               <tbody>
                 <tr v-for="event in eventList" :key="event.id">
+                  <td>{{ event.id }}</td>
                   <td>{{ event.eventName }}</td>
                   <td>{{ event.description }}</td>
                   <td>{{ event.address }}</td>
@@ -56,6 +57,7 @@
             <div class="card mb-4">
               <div class="card-header">{{ isEditMode ? 'Edit Event' : 'Create Event' }}</div>
               <div class="card-body">
+
                 <form @submit.prevent="handleSubmit">
                   <!-- Event Details Form -->
                   <div class="row gx-3 mb-3">
@@ -153,10 +155,7 @@
         </div>
       </div>
 
-      <!-- Edit Event Form Section -->
-      <div v-if="showEditForm && activeTab === 'eventList'">
-        <UpdateEventView :eventId="selectedEventId" :eventById="eventById" />
-      </div>
+
     </div>
   </div>
 </template>
@@ -168,7 +167,6 @@ import { useAuthStore } from "@/store/authStore.js";
 import { useRouter } from "vue-router";
 import Swal from "sweetalert2";
 import SideBar from "@/components/SideBar.vue";
-import UpdateEventView from "@/views/UpdateEventView.vue";
 import { useLocationStore } from '@/store/locationStore';
 import { useCategoryStore } from "@/store/categoryStore";
 
