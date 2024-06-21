@@ -18,21 +18,21 @@
               <thead>
                 <tr>
                   <th scope="col">Event Name</th>
-                  <th scope="col">Description</th>
+
                   <th scope="col">Location</th>
                   <th scope="col">Category Name</th>
                   <th scope="col">Start Date</th>
                   <th scope="col">End Date</th>
                   <th scope="col">Max Attendees</th>
                   <th scope="col">Available Tickets</th>
-                  <th scope="col">Actions</th>
+                  <th scope="col"></th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="event in eventList" :key="event.id">
-                  <td>{{ event.id }}</td>
+
                   <td>{{ event.eventName }}</td>
-                  <td>{{ event.description }}</td>
+
                   <td>{{ event.address }}</td>
                   <td>{{ event.categoryName }}</td>
                   <td>{{ event.startDate }}</td>
@@ -170,8 +170,10 @@ import SideBar from "@/components/SideBar.vue";
 import { useLocationStore } from '@/store/locationStore';
 import { useCategoryStore } from "@/store/categoryStore";
 
-const eventStore = useEventStore();
+
+
 const router = useRouter();
+const eventStore = useEventStore();
 const authStore = useAuthStore();
 const eventById = ref(null);
 const locationStore = useLocationStore();
@@ -244,7 +246,7 @@ const handleImageUpload = (event) => {
 const eventList = ref([]);
 
 const fetchEvents = async () => {
-  eventList.value = await eventStore.getEvents();
+  eventList.value = await eventStore.getEventByOrganizer(authStore.id);
   console.log(eventList.value);
 }
 

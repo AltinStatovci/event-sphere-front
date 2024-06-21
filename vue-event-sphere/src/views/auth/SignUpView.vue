@@ -10,7 +10,7 @@ const formData = reactive({
   lastName:'',
   email: '',
   password: '',
-  roleId: 1,
+  roleId: 3,
 })
 
 const formIsValid = ref(true);

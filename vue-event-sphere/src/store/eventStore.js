@@ -38,6 +38,43 @@ export const useEventStore = defineStore('event', () => {
             return [];
         }
     }
+
+
+    async function getEventByOrganizer(id) {
+        try {
+            const response = await axios.get(`${url}Event/${id}/organizer`);
+            const eventData = response.data;
+
+            const allEvents = eventData.map(event => ({
+                id: event.id,
+                eventName: event.eventName,
+                description: event.description,
+                address: event.address,
+                locationId: event.locationId,
+                categoryName: event.categoryName,
+                startDate: event.startDate,
+                endDate: event.endDate,
+                image: event.image,
+                organizerName: event.organizerName,
+                maxAttendance: event.maxAttendance,
+                availableTickets: event.availableTickets,
+                photoData: event.photoData,
+            }));
+
+
+            events.value = allEvents;
+            console.log(allEvents);
+
+            events.value = allEvents; // Store the events in the state
+
+            return allEvents;
+        } catch (err) {
+            console.error('Error fetching events:', err);
+            return [];
+        }
+    }
+
+
     async function getEventById(id) {
         try {
             const response = await axios.get(`${url}Event/${id}`);
@@ -159,6 +196,6 @@ export const useEventStore = defineStore('event', () => {
         
     }
 }
-    return { getEventByCategory, getEventById,addEvent,updateEvent,getEvents, deleteEvent, event }; // Return the function so it can be used in components
+    return { getEventByCategory, getEventByOrganizer ,getEventById,addEvent,updateEvent,getEvents, deleteEvent, event }; // Return the function so it can be used in components
 
 });
