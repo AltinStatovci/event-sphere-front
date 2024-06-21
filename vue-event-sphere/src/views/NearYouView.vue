@@ -1,10 +1,10 @@
 <script setup>
 import { useLocationStore } from '@/store/locationStore';
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, computed } from 'vue';
 
 const locationStore = useLocationStore();
 const locations = ref([]);
-const filterBy = ref('');  
+const filterBy = ref('');
 
 const getAllLocations = async () => {
   try {
@@ -14,6 +14,14 @@ const getAllLocations = async () => {
     console.error(err);
   }
 };
+
+const uniqueCountries = computed(() => {
+  const countrySet = new Set();
+  locations.value.forEach(location => {
+    countrySet.add(location.country);
+  });
+  return Array.from(countrySet);
+});
 
 onMounted(async () => {
   await getAllLocations();
@@ -45,13 +53,13 @@ onMounted(async () => {
         </select>
       </div>
       <div class="mb-3" v-if="filterBy === 'country'">
-        <label class="form-label" for="countrySelect">Country</label>
-        <select id="countrySelect" class="form-select">
-          <option v-for="location in locations" :key="location.id" :value="location.id">
-            {{ location.country }}
-          </option>
-        </select>
-      </div>
+    <label class="form-label" for="countrySelect">Country</label>
+    <select id="countrySelect" class="form-select">
+      <option v-for="country in uniqueCountries" :key="country" :value="country">
+        {{ country }}
+      </option>
+    </select>
+  </div>
     </div>
   </div>
 </template>
