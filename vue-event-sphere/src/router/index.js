@@ -39,25 +39,19 @@ const routes = [
     path: '/',
     name: 'home',
     component: HomeView,
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: false }
   },
   {
     path: '/:id',
     name: 'eventByCategory',
     component: EventByCategoryView,
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/about',
-    name: 'about',
-    component: () => import('@/views/AboutView.vue'),
     meta: { requiresAuth: false }
   },
   {
     path: '/eventdetails/:id',
     name: 'eventdetails',
     component: DetailsView,
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: false },
   },
   {
     path: '/Ticket/:id/event',
@@ -69,13 +63,13 @@ const routes = [
     path: '/about',
     name: 'about',
     component: AboutView,
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: false}
   },
   {
     path: '/nearYou',
     name: 'nearYou',
     component: NearYouView,
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: false}
   },
     {
       path: '/dashboard',
