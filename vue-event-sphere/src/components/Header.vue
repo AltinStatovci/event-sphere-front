@@ -28,6 +28,12 @@ const onAboutUs = () => {
 const onNearYou = () => {
   router.push({ path: '/nearYou' });
 }
+const onLogin = () => {
+  router.push({ path: '/login' });
+}
+const onSignup = () => {
+  router.push({ path: '/register' });
+}
 </script>
 
 
@@ -43,7 +49,8 @@ const onNearYou = () => {
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav align-items-center">
           <li class="nav-item dropdown">
-            <a class="nav-link active dropdown-toggle custom-font-size" href="#" role="button" data-bs-toggle="dropdown">
+            <a class="nav-link active dropdown-toggle custom-font-size" href="#" role="button"
+              data-bs-toggle="dropdown">
               Events
             </a>
             <ul class="dropdown-menu">
@@ -51,7 +58,9 @@ const onNearYou = () => {
             </ul>
           </li>
           <li class="nav-item">
-            <a class="nav-link active custom-font-size" @click="onNearYou" role="button">Near you <Location /> </a>
+            <a class="nav-link active custom-font-size" @click="onNearYou" role="button">Near you
+              <Location />
+            </a>
           </li>
           <li class="nav-item">
             <a class="nav-link active custom-font-size" @click="onAboutUs" role="button">About us</a>
@@ -66,18 +75,24 @@ const onNearYou = () => {
             <i class="fas fa-search"></i>
           </button>
         </div>
-        <ul class="navbar-nav mb-2 mb-lg-0">
-          <li class="nav-item dropdown custom-margin-right">
-            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/icons/person-circle.svg" alt="Profile"
-                class="rounded-circle" style="width: 30px; height: 30px;">
-            </a>
-            <ul class="dropdown-menu dropdown-menu-end">
-              <li><button class="dropdown-item" @click="onDashboard">Dashboard</button></li>
-              <li><button class="btn btn-outline-danger btn-sm m-lg-2" @click="onLogOut()">Log Out</button> </li>
-            </ul>
-          </li>
-        </ul>
+        <div>
+          <ul class="navbar-nav mb-2 mb-lg-0" v-if="authStore.loggedInUser">
+            <li class="nav-item dropdown custom-margin-right">
+              <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown"
+                aria-expanded="false">
+                <i class="bi bi-person-circle"></i>
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li><button class="dropdown-item" @click="onDashboard">Dashboard</button></li>
+                <li><button class="btn btn-outline-danger btn-sm m-lg-2" @click="onLogOut()">Log Out</button> </li>
+              </ul>
+            </li>
+          </ul>
+          <div v-if="!authStore.loggedInUser" class="d-flex">
+          <button class="auth-btn btn" @click="onLogin">Log in</button>
+          <button class="auth-btn btn btn-primary" @click="onSignup">Sign up</button>
+        </div>
+        </div>
       </div>
     </div>
   </nav>
@@ -90,9 +105,9 @@ const onNearYou = () => {
 
 .title {
   font-size: 1.5rem;
-  background: -webkit-linear-gradient(45deg,#0f0101, #6b6767);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+  background: -webkit-linear-gradient(45deg, #0f0101, #6b6767);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .custom-font-size {
@@ -102,9 +117,11 @@ const onNearYou = () => {
 .navbar {
   background-color: #ECECEC;
 }
-.navbar-nav{
+
+.navbar-nav {
   flex: none;
 }
+
 .form-outline {
   width: 20%;
 }
@@ -112,8 +129,18 @@ const onNearYou = () => {
 .nav-item {
   padding: 0 0.8rem;
 }
-.dropdown-item{
+
+.dropdown-item {
   padding-left: 10px;
   font-size: 18px;
+}
+.auth-btn{
+  text-transform: capitalize;
+  width: 100px;
+  margin-right: 10px;
+}
+.bi-person-circle{
+  font-size: 30px;
+  color: #1e1f22;
 }
 </style>

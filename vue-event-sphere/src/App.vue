@@ -15,7 +15,7 @@ const route = useRoute();
     <nav>
       <Header
 
-        v-if="authStore.isLoggedIn && route.name !== 'dashboard' && route.name !== 'profile' && route.name !== 'paymentDashboard' && route.name !== 'report' && route.name !== 'manageEvent'" />
+        v-if="route.name !== 'login' && route.name !== 'register' && route.name !== 'dashboard' && route.name !== 'profile' && route.name !== 'paymentDashboard' && route.name !== 'report' && route.name !== 'manageEvent' && route.name !== 'manageTickets'" />
 
     </nav>
 
@@ -28,7 +28,7 @@ const route = useRoute();
 
     <footer>
       <Footer
-        v-if="authStore.isLoggedIn && route.name !== 'dashboard' && route.name !== 'profile' && route.name !== 'paymentDashboard' && route.name !== 'report' && route.name !== 'manageEvent'" />
+        v-if="route.name !== 'login' && route.name !== 'register' &&  route.name !== 'dashboard' && route.name !== 'profile' && route.name !== 'paymentDashboard' && route.name !== 'report' && route.name !== 'manageEvent' && route.name !== 'manageTickets'" />
     </footer>
   </div>
 </template>
