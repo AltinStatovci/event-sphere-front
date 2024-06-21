@@ -122,16 +122,20 @@ export const useEventStore = defineStore('event', () => {
                 let value = event[key];
                 formData.append(key, value);
             }
-            const response = await client.put(`${url}Event/${event.id}`, formData, {
+    
+            const response = await axios.put(`${url}Event/${event.id}`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
             });
-            return response.data; 
+    
+            return response.data;
         } catch (error) {
-            throw error; 
+            throw error;
         }
     }
+    
+    
     async function deleteEvent(eventId){
         try {
             await axios.delete(`${url}Event/${eventId}`);

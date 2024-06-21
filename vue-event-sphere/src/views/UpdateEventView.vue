@@ -97,7 +97,8 @@ const updateEvent = async () => {
                         <div class="row gx-3 mb-3">
                             <div class="col-md-6">
                                 <label class="small mb-1" for="categoryId">Category ID</label>
-                                <input class="form-control" id="categoryId" type="number" v-model="selectedEvent.categoryId">
+                                <input class="form-control" id="categoryId" type="number"
+                                    v-model="selectedEvent.categoryId">
                             </div>
                         </div>
                         <div class="row gx-3 mb-3">
