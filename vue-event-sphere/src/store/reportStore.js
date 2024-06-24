@@ -46,6 +46,16 @@ export const useReportStore = defineStore('report', () => {
             console.error("Error updating report:", err);
         }
     }
+    async function deleteReport(id){
+        try {
+            await axios.delete(`${url}Report/${id}`);
+            }
+        catch (error) {
+            console.error('Error deleting expenses:', error);
+            throw error;
+        }
+        
+    }
     
-    return { reports, report, fetchReports, getReportById, submitReport, updateReport };
+    return { reports, report, fetchReports, getReportById, submitReport, updateReport,deleteReport };
 });
