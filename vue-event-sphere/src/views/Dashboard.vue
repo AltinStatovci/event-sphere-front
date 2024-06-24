@@ -76,7 +76,7 @@ onMounted(() => {
 
 
   <side-bar/>
-  <div class="dashboard" :style="{ backgroundColor: isDarkMode ? '#0f172a' : '#3fa387' }">
+  <div class="dashboard" :style="{ backgroundColor: isDarkMode ? '#0f172a' : '#ffffff' }">
 
     <div class="statistics-box">
       <span class="material-symbols-outlined icon">
@@ -162,7 +162,7 @@ onMounted(() => {
 }
 
 .event-count-box {
-  width: 230px;
+  width: 210px;
   padding: 20px;
   background-color: #fff;
   border-radius: 8px;
