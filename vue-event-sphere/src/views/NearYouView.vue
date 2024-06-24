@@ -4,12 +4,12 @@ import { useLocationStore } from '@/store/locationStore';
 import { onMounted, ref, watch, computed } from 'vue';
 import EventCard from '@/components/EventCard.vue';
 
+
 const locationStore = useLocationStore();
 const locations = ref([]);
 const filterBy = ref('');
 const selectedCity = ref('');
 const selectedCountry = ref('');
-
 const eventStore = useEventStore();
 const events = ref([]);
 

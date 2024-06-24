@@ -59,7 +59,7 @@ const handleLogout = () => {
         <span class="text">Manage Events</span>
       </router-link>
       <router-link to="/manageTickets" class="button">
-        <span class="material-icons">stadium</span>
+        <i class="bi bi-ticket-perforated-fill" style="font-size: 30px ; color: white ; margin-right: 20px"></i>
         <span class="text">Manage Tickets</span>
       </router-link>
 
