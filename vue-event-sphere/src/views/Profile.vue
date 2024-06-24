@@ -202,5 +202,7 @@ onMounted(async () => {
 <style scoped>
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');
 
-/* Styles same as provided previously */
+.img-account-profile{
+  width: 60%;
+}
 </style>

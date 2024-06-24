@@ -56,13 +56,13 @@ function formatDateString(dateString) {
         <img :src="`data:image/png;base64,${event.photoData}`" class="card-img-top" alt="Base64 Image" width="100%" height="250px">
         <div class="card-body">
           <h5 class="card-title text-center mb-4 event-title">{{ event.eventName }}</h5>
-          <p class="card-text">{{ event.description }}</p>
           <div class="d-flex">
             <p class="card-text"><i class="bi bi-calendar-event mr-3"></i>{{ formatDateString(event.startDate) }}</p>
             <span class="mx-2">-</span>
             <p class="card-text">{{ formatDateString(event.endDate) }}</p>
           </div>
           <p class="card-text address" v-if="location.city"><i class="bi bi-geo-alt-fill mr-3"></i>{{ location.city }}, {{ location.country }}</p>
+          <p class="card-text"><i class="bi bi-ticket-perforated mr-3"></i>Available tickets: {{ event.availableTickets }}</p>
           <button @click="() => goToEvent(event.id)" class="btn">Find out more</button>
         </div>
       </div>
