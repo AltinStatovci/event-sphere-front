@@ -15,12 +15,19 @@ const id = authStore.id; // Get the authenticated user's ID
 const userStore = useUserStore();
 const users = ref([]);
 
+const password = ref({
+  currentPassword: '',
+  newPassword: ''
+});
+
+const showCurrentPassword = ref(false);
+const showNewPassword = ref(false);
+
 const user = ref({
   id: id,
   name: '',
   lastName: '',
   email: '',
-  password: '',
   roleID: '',
   roleName: '',
 });
@@ -58,6 +65,37 @@ const editProfile = async () => {
   }
 };
 
+const changePassword = async () => {
+  try {
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "You are about to change the user's password.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, change it!"
+    });
+
+    if (result.isConfirmed) {
+      await userStore.updateUserPassword(id, password.value);
+      await Swal.fire({
+        title: "Password changed successfully!",
+        icon: "success"
+      }).then(() => {
+        window.location.reload();
+      });
+    }
+  } catch (error) {
+    console.error('Failed to change user password:', error);
+    await Swal.fire({
+      title: "Error!",
+      text: "Old Password incorrect.",
+      icon: "error"
+    });
+  }
+};
+
 const deleteUser = async (userId) => {
   try {
     const result = await Swal.fire({
@@ -84,7 +122,6 @@ const deleteUser = async (userId) => {
   }
 };
 
-// Open modal and set selected user
 const openModal = (user) => {
   selectedUser.value = { ...user }; // Ensure deep copy to avoid mutations
   showModal.value = true;
@@ -92,6 +129,14 @@ const openModal = (user) => {
 
 const changeTab = (tab) => {
   activeTab.value = tab;
+};
+
+const toggleCurrentPasswordVisibility = () => {
+  showCurrentPassword.value = !showCurrentPassword.value;
+};
+
+const toggleNewPasswordVisibility = () => {
+  showNewPassword.value = !showNewPassword.value;
 };
 
 onMounted(async () => {
@@ -106,6 +151,7 @@ onMounted(async () => {
     <div class="container-xl px-4 mt-4">
       <nav class="nav nav-borders">
         <a class="nav-link" :class="{ active: activeTab === 'profile' }" @click.prevent="changeTab('profile')">Profile</a>
+        <a class="nav-link" :class="{ active: activeTab === 'changePassword' }" @click.prevent="changeTab('changePassword')">Change Password</a>
         <a class="nav-link" :class="{ active: activeTab === 'Admin' }" @click.prevent="changeTab('Admin')">Admin</a>
       </nav>
       <hr class="mt-0 mb-4">
@@ -142,10 +188,7 @@ onMounted(async () => {
                   <input class="form-control" id="inputEmailAddress" type="email" placeholder="Enter your email address" v-model="user.email">
                 </div>
 
-                <div class="mb-3">
-                  <label class="small mb-1" for="inputPassword">Password</label>
-                  <input class="form-control" id="inputPassword" type="password" placeholder="Enter your password" v-model="user.password">
-                </div>
+
 
                 <div class="mb-3">
                   <label class="small mb-1" for="inputRole">Role</label>
@@ -158,6 +201,40 @@ onMounted(async () => {
           </div>
         </div>
       </div>
+
+
+      <div class="row justify-content-center" v-if="activeTab === 'changePassword'">
+        <div class="col-xl-10">
+          <div class="card mb-4">
+            <div class="card-header">Change Password</div>
+            <div class="card-body">
+              <form>
+                <div class="mb-3 position-relative">
+                  <label class="small mb-1" for="oldPassword">Old Password</label>
+                  <div class="input-group">
+                    <input class="form-control" :type="showCurrentPassword ? 'text' : 'password'" id="oldPassword" placeholder="Enter your old password" v-model="password.currentPassword">
+                    <button type="button" class="btn btn-outline-white" @click="toggleCurrentPasswordVisibility">
+                      <i class="bi" :class="showCurrentPassword ? 'bi-eye-slash text-primary' : 'bi-eye text-primary'"></i>
+                    </button>
+                  </div>
+                </div>
+                <div class="mb-3 position-relative">
+                  <label class="small mb-1" for="newPassword">New Password</label>
+                  <div class="input-group">
+                    <input class="form-control" :type="showNewPassword ? 'text' : 'password'" id="newPassword" placeholder="Enter your new Password" v-model="password.newPassword">
+                    <button type="button" class="btn btn-outline-white" @click="toggleNewPasswordVisibility">
+                      <i class="bi" :class="showNewPassword ? 'bi-eye-slash text-primary' : 'bi-eye text-primary'"></i>
+                    </button>
+                  </div>
+                </div>
+                <button class="btn btn-outline-primary btn-sm" type="button" @click="changePassword">Save</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
 
       <!-- Admin Tab -->
       <div v-if="activeTab === 'Admin'">
@@ -205,4 +282,10 @@ onMounted(async () => {
 .img-account-profile{
   width: 60%;
 }
+
+.btn{
+  text-transform: capitalize;
+}
+
+
 </style>
