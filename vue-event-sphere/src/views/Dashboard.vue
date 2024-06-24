@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue';
 import SideBar from "@/components/SideBar.vue";
 import {useUserStore} from "@/store/userStore.js";
-
+import Footer from "@/components/Footer.vue";
 const userStore = useUserStore();
 
 const userCount = ref(0)
@@ -75,14 +75,15 @@ onMounted(() => {
   <div class="d-flex">
 
 
-  <side-bar/>
-  <div class="dashboard" :style="{ backgroundColor: isDarkMode ? '#0f172a' : '#3fa387' }">
+  <side-bar class ="sidebar"/>
+  
+  <div class="dashboard" :style="{ backgroundColor: isDarkMode ? '#0f172a' : '#ffffff' }">
 
     <div class="statistics-box">
       <span class="material-symbols-outlined icon">
         query_stats
       </span>
-      <p class="count-text">Daily Statistics</p>
+      <p class="count-text">Statistics</p>
     </div>
 
     <div class="events-boxes">
@@ -122,7 +123,9 @@ onMounted(() => {
           dark_mode
         </span>
       </button>
+      
     </div>
+
   </div>
   </div>
 </template>
@@ -131,14 +134,14 @@ onMounted(() => {
 
 <style scoped>
 .dashboard {
+  display: flex; /* Add this line */
   padding: 20px;
   border-radius: 8px;
   width: 100% ;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  display: flex;
   flex-direction: column;
   align-items: center;
-  height: 100vh;
+  height: 150vh;
   transition: background-color 0.3s ease;
 }
 
@@ -162,7 +165,8 @@ onMounted(() => {
 }
 
 .event-count-box {
-  width: 230px;
+  width: 210px;
+  height: 150px;
   padding: 20px;
   background-color: #fff;
   border-radius: 8px;
@@ -183,13 +187,17 @@ onMounted(() => {
   font-size: 18px;
   margin: 0;
 }
-
 .dark-mode-button-container {
+  display: flex;
+  justify-content: center;
   margin-top: auto;
-  /* Pushes the button to the bottom */
+  width: 100%;
+  margin-top: 40px; /* Add this line to move the button down */
 }
 
+
 .dark-mode-button {
+  height:100%;
   padding: 10px 20px;
   background-color: #ffffff;
   border: none;
@@ -202,4 +210,5 @@ onMounted(() => {
   background-color: #cccccc;
   color: #ffffff;
 }
+
 </style>

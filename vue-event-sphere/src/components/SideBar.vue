@@ -108,7 +108,7 @@ aside {
 
   width: calc(3rem + 32px);
   overflow: hidden;
-  height: 100vh;
+  height: 150vh;
   padding: 1rem;
 
   transition: 0.2s ease-in-out;
