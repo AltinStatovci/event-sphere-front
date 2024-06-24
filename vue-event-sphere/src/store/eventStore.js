@@ -23,6 +23,7 @@ export const useEventStore = defineStore('event', () => {
                 startDate: event.startDate,
                 endDate: event.endDate,
                 category: event.categoryID,
+                availableTickets: event.availableTickets,
                 photoData: event.photoData
             }));
 
@@ -98,7 +99,66 @@ export const useEventStore = defineStore('event', () => {
           return [];
       }
   }
+  async function getEventsByCity(city) {
+    try {
+        const response = await axios.get(`${url}Event/${city}/city`);
+        const eventData = response.data;
+        
+        const allEvents = eventData.map(event => ({
+            id: event.id,
+            eventName: event.eventName,
+            description: event.description,
+            address: event.address,
+            locationId: event.locationId,
+            startDate: event.startDate,
+            endDate: event.endDate,
+            category: event.categoryID,
+            availableTickets: event.availableTickets,
+            photoData: event.photoData
+        }));
 
+
+        events.value = allEvents;
+        console.log(allEvents);
+
+        events.value = allEvents; 
+
+        return allEvents;
+    } catch (err) {
+        console.error('Error fetching events:', err);
+        return [];
+    }
+}
+async function getEventsByCountry(country) {
+    try {
+        const response = await axios.get(`${url}Event/${country}/country`);
+        const eventData = response.data;
+        
+        const allEvents = eventData.map(event => ({
+            id: event.id,
+            eventName: event.eventName,
+            description: event.description,
+            address: event.address,
+            locationId: event.locationId,
+            startDate: event.startDate,
+            endDate: event.endDate,
+            category: event.categoryID,
+            availableTickets: event.availableTickets,
+            photoData: event.photoData
+        }));
+
+
+        events.value = allEvents;
+        console.log(allEvents);
+
+        events.value = allEvents; 
+
+        return allEvents;
+    } catch (err) {
+        console.error('Error fetching events:', err);
+        return [];
+    }
+}
     async function addEvent(event) {
         try {
           const formData = new FormData();
@@ -159,6 +219,6 @@ export const useEventStore = defineStore('event', () => {
         
     }
 }
-    return { getEventByCategory, getEventById,addEvent,updateEvent,getEvents, deleteEvent, event }; // Return the function so it can be used in components
+    return { getEventByCategory, getEventById,addEvent,updateEvent,getEvents, deleteEvent, event, getEventsByCity, getEventsByCountry };
 
 });
