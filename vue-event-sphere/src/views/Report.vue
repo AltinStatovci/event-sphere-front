@@ -23,7 +23,7 @@
                                     <th scope="col">Report Name</th>
                                     <th scope="col">Description</th>
                                     <th scope="col">Status</th>
-                                    <th scope="col">Actions</th>
+                                    <th scope="col"></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -34,15 +34,15 @@
                                     <td>{{ report.reportName }}</td>
                                     <td>{{ report.reportDesc }}</td>
                                     <td>
-                                        <button class="btn btn-info btn-sm"
+                                        <button class="btn btn-outline-primary btn-sm"
                                             @click="openStatusModal(report.reportAnsw)">Read</button>
                                     </td>
 
                                     <td>
-                                        <button class="btn btn-danger btn-sm"
-                                            @click="deleteReport(report.reportId)">Delete</button>
-                                        <button v-if="user.roleName == 'admin'" class="btn btn-success btn-sm"
+                                        <button v-if="user.roleName == 'Admin'" class="btn btn-outline-success btn-sm"
                                             @click="openUpdateModal(report)">Respond</button>
+                                        <button class="btn btn-outline-danger btn-sm"
+                                            @click="deleteReport(report.reportId)">Delete</button>
                                     </td>
                                 </tr>
                             </tbody>
@@ -110,7 +110,7 @@
                                                 type="text" placeholder="Enter Your Report"
                                                 v-model="complaintDescription"></textarea>
                                         </div>
-                                        <div class="col-md-12" v-if="user.roleName === 'admin'">
+                                        <div class="col-md-12" v-if="user.roleName === 'Admin'">
                                             <label class="small mb-1" for="reportAnsw">Status</label>
                                             <textarea class="form-control" id="reportAnsw" type="text"
                                                 placeholder="Enter status" v-model="reportAnsw"></textarea>
@@ -167,9 +167,9 @@ onMounted(async () => {
 const fetchReports = async () => {
     try {
         let response;
-        if (user.roleName === 'admin') {
+        if (user.roleName === 'Admin') {
             response = await fetch('http://localhost:5220/api/Report');
-        } else if (user.roleName === 'user') {
+        } else if (user.roleName === 'User') {
             response = await fetch(`http://localhost:5220/api/Report/GetReportByUserId/${authstore.id}`);
         }
         if (!response.ok) throw new Error(`Failed to fetch reports: ${response.statusText}`);
@@ -198,7 +198,7 @@ const handleSubmit = async () => {
         userEmail: user.email,
         reportName: reportName.value,
         reportDesc: complaintDescription.value,
-        reportAnsw: 'Waiting for Respond'
+        reportAnsw: 'Waiting for response'
     };
 
     if (isEditMode.value) {
@@ -221,13 +221,8 @@ const handleSubmit = async () => {
         if (!response.ok) {
             throw new Error(`Failed to ${isEditMode.value ? 'update' : 'create'} report: ${response.statusText}`);
         }
-
-        // If successful, fetch updated reports and reset form
         await fetchReports();
         changeTab('reportList');
-
-
-        // Show success notification based on the mode
         if (isEditMode.value) {
             Swal.fire({
                 title: "Report Responded Successfully!",
@@ -242,8 +237,6 @@ const handleSubmit = async () => {
         }
     } catch (error) {
         console.error(`Error ${isEditMode.value ? 'updating' : 'creating'} report:`, error.message);
-
-        // Show error notification
         Swal.fire({
             title: "Error!",
             text: error.message,
@@ -253,7 +246,7 @@ const handleSubmit = async () => {
 };
 
 const openUpdateModal = (report) => {
-    isEditMode.value = true; // Set isEditMode to true
+    isEditMode.value = true; 
     if (report && report.reportId) {
         selectedReport.value = report;
         selectedReportId.value = report.reportId;
@@ -390,5 +383,8 @@ body {
     font-size: 14px;
     color: #999;
     text-align: center;
+}
+.btn{
+    text-transform: capitalize;
 }
 </style>

@@ -18,6 +18,9 @@ function onLogOut() {
 const onDashboard = () => {
   router.push({ name: 'dashboard' })
 };
+const onProfile = () => {
+  router.push({ name: 'profile' })
+};
 
 const onHome = () => {
   router.push({ path: '/' });
@@ -83,7 +86,8 @@ const onSignup = () => {
                 <i class="bi bi-person-circle"></i>
               </a>
               <ul class="dropdown-menu dropdown-menu-end">
-                <li><button class="dropdown-item" @click="onDashboard">Dashboard</button></li>
+                <li v-if="authStore.isAdmin"><button class="dropdown-item" @click="onDashboard">Dashboard</button></li>
+                <li v-else ><button class="dropdown-item" @click="onProfile">My Profile</button></li>
                 <li><button class="btn btn-outline-danger btn-sm m-lg-2" @click="onLogOut()">Log Out</button> </li>
               </ul>
             </li>

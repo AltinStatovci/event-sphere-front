@@ -28,8 +28,8 @@
                   <td>{{ ticket.price }}</td>
                   <td>{{ ticket.bookingReference }}</td>
                   <td>
-                    <button class="btn btn-danger btn-sm" @click="deleteTicket(ticket.id)">Delete</button>
-                    <button class="btn btn-primary btn-sm" @click="openEditForm(ticket.id)">Edit</button>
+                    <button class="btn btn-outline-danger btn-sm" @click="deleteTicket(ticket.id)">Delete</button>
+                    <button class="btn btn-outline-primary btn-sm" @click="openEditForm(ticket.id)">Edit</button>
                   </td>
                 </tr>
               </tbody>
@@ -261,5 +261,8 @@ body {
   color: #69707a;
   font-size: 0.875rem;
   text-align: center;
+}
+.btn{
+  text-transform: capitalize;
 }
 </style>

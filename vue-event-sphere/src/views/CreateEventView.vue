@@ -40,8 +40,8 @@
                   <td>{{ event.maxAttendance }}</td>
                   <td>{{ event.availableTickets }}</td>
                   <td>
-                    <button class="btn btn-danger btn-sm" @click="deleteEvent(event.id)">Delete</button>
-                    <button class="btn btn-primary btn-sm" @click="openEditForm(event.id)">Edit</button>
+                    <button class="btn btn-outline-danger btn-sm" @click="deleteEvent(event.id)">Delete</button>
+                    <button class="btn btn-outline-primary btn-sm" @click="openEditForm(event.id)">Edit</button>
                   </td>
                 </tr>
               </tbody>
@@ -60,39 +60,14 @@
 
                 <form @submit.prevent="handleSubmit">
                   <!-- Event Details Form -->
-                  <div class="row gx-3 mb-3">
-                    <div class="col-md-6">
+                  <div class="row gx-4 mb-4">
+                    <div class="col-md-4">
                       <label class="small mb-1" for="eventName">Event Name</label>
                       <input class="form-control" id="eventName" type="text" placeholder="Enter event name"
                         v-model.trim="formData.eventName">
                     </div>
-                    <div class="col-md-6">
-                      <label class="small mb-1" for="description">Description</label>
-                      <input class="form-control" id="description" type="text" placeholder="Enter description"
-                        v-model.trim="formData.description">
-                    </div>
-                  </div>
-
-                  <!-- Additional Event Details -->
-                  <div class="row gx-3 mb-3">
-                    <div class="col-md-6">
-                      <label class="small mb-1" for="address">Address</label>
-                      <input class="form-control" id="address" type="text" placeholder="Enter address"
-                        v-model.trim="formData.address">
-                    </div>
-                    <div class="col-md-6">
-                      <label class="small mb-1" for="citySelect">Location</label>
-                      <select id="citySelect" class="form-control" v-model.trim="formData.locationId">
-                        <option value="" disabled>Select a city</option>
-                        <option v-for="location in locations" :key="location.id" :value="location.id">
-                          {{ location.city }}, {{ location.country }}
-                        </option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <!-- Category Selection -->
-                  <div class="col-md-12 mb-3">
+                    
+                  <div class="col-md-4">
                     <label class="small mb-1" for="categorySelect">Category</label>
                     <select id="categorySelect" class="form-control" v-model.trim="formData.categoryID">
                       <option value="" disabled>Select a Category</option>
@@ -101,33 +76,48 @@
                       </option>
                     </select>
                   </div>
-
-                  <!-- Date and Attendees Details -->
-                  <div class="row gx-3 mb-3">
-                    <div class="col-md-6">
+  
+                    <div class="col-md-4 ">
+                      <label class="small mb-1" for="address">Address</label>
+                      <input class="form-control" id="address" type="text" placeholder="Enter address"
+                        v-model.trim="formData.address">
+                    </div>
+                    <div class="col-md-4">
+                      <label class="small mb-1" for="citySelect">Location</label>
+                      <select id="citySelect" class="form-control" v-model.trim="formData.locationId">
+                        <option value="" disabled>Select a city</option>
+                        <option v-for="location in locations" :key="location.id" :value="location.id">
+                          {{ location.city }}, {{ location.country }}
+                        </option>
+                      </select>
+                    </div>
+                    </div>
+                  
+                    <div class="col-md-4 w-25">
                       <label class="small mb-1" for="startDate">Start Date</label>
                       <input class="form-control" id="startDate" type="datetime-local" v-model="formData.startDate">
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4 w-25">
                       <label class="small mb-1" for="endDate">End Date</label>
                       <input class="form-control" id="endDate" type="datetime-local" v-model="formData.endDate">
                     </div>
-                  </div>
-
-                  <!-- Max Attendees and Tickets -->
+         
                   <div class="row gx-3 mb-3">
-                    <div class="col-md-6">
+                    <div class="col-md-6 w-25">
                       <label class="small mb-1" for="maxAttendees">Max Attendees</label>
                       <input class="form-control" id="maxAttendees" type="number" v-model="formData.maxAttendance">
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-6 w-25">
                       <label class="small mb-1" for="availableTickets">Available Tickets</label>
                       <input class="form-control" id="availableTickets" type="number"
                         v-model="formData.availableTickets">
                     </div>
+                    <div class="col-md-6 w-50">
+                      <label class="small mb-1" for="description">Description</label>
+                      <input class="form-control" id="description" type="text" placeholder="Enter description"
+                        v-model.trim="formData.description">
+                    </div>
                   </div>
-
-                  <!-- Profile Picture Upload Section -->
                   <div class="row gx-3 mb-3">
                     <div class="col-md-12">
                       <div class="card mb-4 mb-xl-0">
@@ -139,7 +129,7 @@
                           <div class="small font-italic text-muted mb-4">Upload your EventImage</div>
                           <input class="form-control" id="file" type="file" ref="fileInput" @change="handleImageUpload"
                             style="display: none;">
-                          <button class="btn btn-primary" type="button" @click="$refs.fileInput.click()">Upload new
+                          <button class="btn btn-outline-primary" type="button" @click="$refs.fileInput.click()">Upload new
                             image</button>
                         </div>
                       </div>
@@ -454,5 +444,8 @@ body {
   color: #69707a;
   font-size: 0.875rem;
   text-align: center;
+}
+.btn{
+  text-transform: capitalize;
 }
 </style>
