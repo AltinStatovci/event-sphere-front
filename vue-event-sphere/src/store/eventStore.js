@@ -243,7 +243,8 @@ export const useEventStore = defineStore("event", () => {
       console.error("Error deleting expenses:", error);
       throw error;
     }
-    async function getEventsByName() {
+}
+    async function getEventsByName(name) {
       try {
         const response = await axios.get(`${url}Event/getEventsByName`, {
           params: { name: name },
@@ -272,7 +273,7 @@ export const useEventStore = defineStore("event", () => {
         return [];
       }
     }
-  }
+  
   return {
     getEventByCategory,
     getEventByOrganizer,
@@ -284,5 +285,6 @@ export const useEventStore = defineStore("event", () => {
     event,
     getEventsByCity,
     getEventsByCountry,
+    getEventsByName
   };
 });
