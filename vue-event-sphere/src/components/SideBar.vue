@@ -22,11 +22,6 @@ function onLogOut() {
   router.push({ name: 'login' });
 }
 
-const handleLogout = () => {
-  // Implement your logout logic here
-  console.log('User logged out')
-  // Add your logout functionality here, e.g., clearing tokens, redirecting to login page, etc.
-}
 </script>
 
 
@@ -44,25 +39,28 @@ const handleLogout = () => {
 
     <h3>Menu</h3>
     <div class="menu">
-      <router-link to="/dashboard" class="button">
-        <span class="material-icons">menu</span>
-        <span class="text">Dashboard</span>
-      </router-link>
-
+      <div v-if="authStore.isAdmin || authStore.isOrganizer">
+        <router-link to="/dashboard" class="button">
+          <span class="material-icons">menu</span>
+          <span class="text">Dashboard</span>
+        </router-link>
+      </div>
       <router-link to="/profile" class="button">
         <span class="material-icons">manage_accounts</span>
         <span class="text">Manage Account</span>
       </router-link>
-
-      <router-link to="/manageEvent" class="button">
-        <span class="material-icons">stadium</span>
-        <span class="text">Manage Events</span>
-      </router-link>
-      <router-link to="/manageTickets" class="button">
-        <i class="bi bi-ticket-perforated-fill" style="font-size: 30px ; color: white ; margin-right: 20px"></i>
-        <span class="text">Manage Tickets</span>
-      </router-link>
-
+      <div v-if="authStore.isAdmin || authStore.isOrganizer">
+        <router-link to="/manageEvent" class="button">
+          <span class="material-icons">stadium</span>
+          <span class="text">Manage Events</span>
+        </router-link>
+      </div>
+      <div v-if="authStore.isAdmin || authStore.isOrganizer">
+        <router-link to="/manageTickets" class="button">
+          <i class="bi bi-ticket-perforated-fill" style="font-size: 30px ; color: white ; margin-right: 20px"></i>
+          <span class="text">Manage Tickets</span>
+        </router-link>
+      </div>
       <router-link to="/paymentDashboard" class="button">
 
         <span class="material-icons">wallet</span>

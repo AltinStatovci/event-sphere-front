@@ -169,7 +169,7 @@ onMounted(async () => {
       <nav class="nav nav-borders">
         <a class="nav-link" :class="{ active: activeTab === 'profile' }" @click.prevent="changeTab('profile')">Profile</a>
         <a class="nav-link" :class="{ active: activeTab === 'changePassword' }" @click.prevent="changeTab('changePassword')">Change Password</a>
-        <a class="nav-link" :class="{ active: activeTab === 'Admin' }" @click.prevent="changeTab('Admin')">Admin</a>
+        <a v-if="authStore.isAdmin" class="nav-link" :class="{ active: activeTab === 'Admin' }" @click.prevent="changeTab('Admin')">Admin</a>
       </nav>
       <hr class="mt-0 mb-4">
 
@@ -181,7 +181,7 @@ onMounted(async () => {
             <div class="card-body text-center">
               <img class="img-account-profile rounded-circle mb-2" src="http://bootdey.com/img/Content/avatar/avatar1.png" alt="">
               <div class="small font-italic text-muted mb-4">{{user.name}} {{user.lastName}}</div>
-              <button class="btn btn-primary" type="button">Upload new image</button>
+              <button class="btn btn-outline-primary" type="button">Upload new image</button>
             </div>
           </div>
         </div>
@@ -212,7 +212,7 @@ onMounted(async () => {
                   <input class="form-control" id="inputRole" type="text" :disabled="true" v-model="user.roleName">
                 </div>
 
-                <button class="btn btn-primary" type="button" @click="editProfile">Save changes</button>
+                <button class="btn btn-outline-primary" type="button" @click="editProfile">Save changes</button>
               </form>
             </div>
           </div>
@@ -287,7 +287,7 @@ onMounted(async () => {
                 <td>{{ user.roleName }}</td>
                 <td class="text-end">
                   <button class="btn btn-outline-danger btn-sm m-2" :disabled="user.id == id" @click="deleteUser(user.id)">Delete</button>
-                  <button class="btn btn-primary btn-sm" :disabled="user.id == id" @click="openModal(user)">
+                  <button class="btn btn-outline-primary btn-sm" :disabled="user.id == id" @click="openModal(user)">
                     Update User Role
                   </button>
                 </td>

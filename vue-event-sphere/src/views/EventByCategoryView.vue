@@ -23,7 +23,6 @@ onMounted(async () => {
   await getData(categoryId.value);
 });
 
-// Watch for changes in the route parameters
 watch(
     () => route.params.id,
     async (newId) => {

@@ -40,6 +40,10 @@ export const useAuthStore = defineStore('auth', () =>{
 
         return loggedInUser.value.Role === '1'
     });
+    const isOrganizer = computed(() => {
+
+        return loggedInUser.value.Role === '2'
+    });
 
     const id = computed(() => {
         return loggedInUser.value.ID;
@@ -53,5 +57,5 @@ export const useAuthStore = defineStore('auth', () =>{
         return !!token.value;
     });
 
-    return { logIn, signUp, logOut , isLoggedIn , loggedInUser , id , email , isAdmin, token};
+    return { logIn, signUp, logOut , isLoggedIn , loggedInUser , id , email , isAdmin, isOrganizer, token};
 });
