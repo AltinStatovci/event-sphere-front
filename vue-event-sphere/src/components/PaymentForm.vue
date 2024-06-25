@@ -1,6 +1,5 @@
 <template>
   <div class="payment-form-container">
-    
     <form @submit.prevent="submitPayment" class="payment-form">
       <div class="form-group">
         <label for="card-holder-name">Card Holder Name</label>
@@ -38,7 +37,6 @@ import { usePaymentStore } from '@/store/paymentStore';
 import Swal from "sweetalert2";
 import { useRouter } from 'vue-router';
 
-
 const cardHolderName = ref('');
 const zipCode = ref('');
 const stripe = ref(null);
@@ -60,7 +58,6 @@ const id = segments[segments.length - 1];
 onMounted(async () => {
   try {
     ticket.value = await ticketStore.getTicketById(id);
-
   } catch (ticketError) {
     console.error('Error fetching ticket:', ticketError);
     error.value = 'Failed to fetch ticket information.';
@@ -124,11 +121,11 @@ const submitPayment = async () => {
 
 const processPayment = async (stripeToken) => {
   try {
-    const totalAmount = paymentStore.amount * ticket.value.price; // Calculate the total price
+    const totalAmount = paymentStore.amount * ticket.value.price; 
     const response = await axios.post('http://localhost:5220/api/Payment', {
       userID: authStore.id,  
       ticketID: ticket.value.id,  
-      amount: paymentStore.amount,  // Send the quantity
+      amount: paymentStore.amount,  
       price: totalAmount,
       paymentMethod: 'Stripe',
       paymentDate: new Date().toISOString(),
@@ -150,10 +147,18 @@ const processPayment = async (stripeToken) => {
       error.value = 'An unexpected error occurred after processing the payment.';
     }
   } catch (err) {
-    error.value = 'An error occurred while processing your payment.';
+    if (err.response && err.response.data && err.response.data.message === 'There are not enough tickets available') {
+      await Swal.fire({
+        title: "Purchase failed",
+        text: "There are not enough tickets available.",
+        icon: "error",
+        confirmButtonText: "OK"
+      });
+    } else {
+      error.value = 'An error occurred while processing your payment.';
+    }
   }
 };
-
 </script>
 
 <style scoped>
