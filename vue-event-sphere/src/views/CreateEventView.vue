@@ -178,8 +178,8 @@ const resetForm = () => {
 
 const getTickets = async (id) => {
   showTicketsForEventId.value = id;
-  ticketList.value = await ticketStore.getTicketByEvent(id);
-  console.log("Ticket list value:", ticketList.value);
+  const response = await ticketStore.getTicketByEvent(id);
+  ticketList.value = response.value;
 }
 
 </script>

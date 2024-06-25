@@ -22,7 +22,7 @@ const props = defineProps({
         </thead>
         <tbody>
           <tr v-for="ticket in tickets" :key="ticket.id">
-            <td>{{ ticket.ticketName }}</td>
+            <td>{{ ticket.ticketType }}</td>
             <td>{{ ticket.price }}</td>
             <td>{{ ticket.quantity }}</td>
             <td>{{ ticket.type }}</td>
