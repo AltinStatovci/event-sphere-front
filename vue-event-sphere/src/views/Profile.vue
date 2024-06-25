@@ -4,14 +4,14 @@ import { useUserStore } from "@/store/userStore.js";
 import { useAuthStore } from "@/store/authStore.js";
 import SideBar from "@/components/SideBar.vue";
 import UpdateRoleModalComponent from "@/components/modal/UpdateRoleModalComponent.vue";
-import Swal from "sweetalert2"; // Import the modal component
+import Swal from "sweetalert2";
 
 const activeTab = ref('profile');
-const showModal = ref(false); // State to manage modal visibility
-const selectedUser = ref(null); // State to manage selected user
+const showModal = ref(false);
+const selectedUser = ref(null);
 
 const authStore = useAuthStore();
-const id = authStore.id; // Get the authenticated user's ID
+const id = authStore.id;
 const userStore = useUserStore();
 const users = ref([]);
 
@@ -20,8 +20,11 @@ const password = ref({
   newPassword: ''
 });
 
+const confirmPassword = ref('')
+
 const showCurrentPassword = ref(false);
 const showNewPassword = ref(false);
+const showConfirmPassword = ref(false);
 
 const user = ref({
   id: id,
@@ -66,6 +69,15 @@ const editProfile = async () => {
 };
 
 const changePassword = async () => {
+  if (password.value.newPassword !== confirmPassword.value) {
+    await Swal.fire({
+      title: "Error!",
+      text: "New Password and Confirm Password do not match.",
+      icon: "error"
+    });
+    return;
+  }
+
   try {
     const result = await Swal.fire({
       title: "Are you sure?",
@@ -123,7 +135,7 @@ const deleteUser = async (userId) => {
 };
 
 const openModal = (user) => {
-  selectedUser.value = { ...user }; // Ensure deep copy to avoid mutations
+  selectedUser.value = { ...user };
   showModal.value = true;
 };
 
@@ -138,6 +150,11 @@ const toggleCurrentPasswordVisibility = () => {
 const toggleNewPasswordVisibility = () => {
   showNewPassword.value = !showNewPassword.value;
 };
+
+const toggleConfirmPasswordVisibility = () => {
+  showConfirmPassword.value = !showConfirmPassword.value;
+};
+
 
 onMounted(async () => {
   await fetchUserDetails();
@@ -227,6 +244,17 @@ onMounted(async () => {
                     </button>
                   </div>
                 </div>
+
+                <div class="mb-3 position-relative">
+                  <label class="small mb-1" for="confirmPassword">Confirm Password</label>
+                  <div class="input-group">
+                    <input class="form-control" :type="showConfirmPassword ? 'text' : 'password'" id="confirmPassword" placeholder="Enter your new Password" v-model="confirmPassword">
+                    <button type="button" class="btn btn-outline-white" @click="toggleConfirmPasswordVisibility">
+                      <i class="bi" :class="showConfirmPassword ? 'bi-eye-slash text-primary' : 'bi-eye text-primary'"></i>
+                    </button>
+                  </div>
+                </div>
+
                 <button class="btn btn-outline-primary btn-sm" type="button" @click="changePassword">Save</button>
               </form>
             </div>
@@ -272,7 +300,7 @@ onMounted(async () => {
     </div>
   </div>
 
-  <!-- Include the modal component and pass necessary props -->
+
   <update-role-modal-component :show-modal="showModal" :user="selectedUser" @close="showModal = false" />
 </template>
 
@@ -288,4 +316,22 @@ onMounted(async () => {
 }
 
 
+.nav-borders .nav-link.active {
+  color: #0061f2;
+  border-bottom-color: #0061f2;
+}
+
+.nav-borders .nav-link {
+  color: #69707a;
+  border-bottom-width: 0.125rem;
+  border-bottom-style: solid;
+  border-bottom-color: transparent;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  padding-left: 0;
+  padding-right: 0;
+  margin-left: 1rem;
+  margin-right: 1rem;
+  cursor: pointer;
+}
 </style>
