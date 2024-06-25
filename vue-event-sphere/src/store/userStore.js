@@ -66,6 +66,16 @@ export const useUserStore = defineStore('user', () => {
         }
     };
 
+    const updateUserPassword = async (id, updatePasswordDto) => {
+        try {
+            await client.patch(`${url}User/updateUserPassword/${id}`, updatePasswordDto);
+        } catch (error) {
+            console.error(`Error updating user password for id ${id}:`, error);
+            throw error;
+        }
+    };
+
+
     const deleteUser = async (id) => {
         try {
             await client.delete(`${url}User/deleteUser/${id}`);
@@ -75,5 +85,5 @@ export const useUserStore = defineStore('user', () => {
         }
     };
 
-    return { getUsers, getUserCount, getUser, updateUser, deleteUser, getRoles, user, users, userCount, roles };
+    return { getUsers, getUserCount, getUser, updateUser, deleteUser, getRoles,updateUserPassword ,user, users, userCount, roles };
 });
