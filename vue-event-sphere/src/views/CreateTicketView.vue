@@ -10,6 +10,7 @@
       
       <!-- Ticket List Section -->
       <div v-if="activeTab === 'ticketList'">
+        
         <div class="card mb-4">
           <div class="card-header">Ticket List</div>
           <div class="card-body">

@@ -63,6 +63,8 @@ export const useTicketStore = defineStore('ticket', () => {
         ticketType: ticket.ticketType,
         bookingReference: ticket.bookingReference,
       }));
+      console.log("Tickets", tickets.value);
+      return tickets;
     } catch (err) {
       console.log(err);
     }

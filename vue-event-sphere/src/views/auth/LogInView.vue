@@ -20,39 +20,32 @@ const route = useRoute();
 
 
 async function handleSubmit() {
-  formIsValid.value = true;
+    formIsValid.value = true;
 
-  if (!formData.email || !formData.password) {
-    formIsValid.value = false;
-    error.value = 'Email and password are required.'
+    if (!formData.email || !formData.password) {
+        formIsValid.value = false;
 
-    await Swal.fire({
-      title: "Error!",
-      text: error.value,
-      icon: "error"
-    });
-    return;
-  }
+        await Swal.fire({
+            title: "Error!",
+            text: "Email and password are required. ",
+            icon: "error"
+        });
+        return;
+    }
 
-
-  try {
-    await authStore.logIn(formData);
-    const redirectUrl = `${route.query.redirect || "/"}`;
-    await router.push(redirectUrl);
-  } catch (e) {
-    await Swal.fire({
-      title: "Error!",
-      text: e.message,
-      icon: "error"
-    });
-  }
-
+    try {
+        await authStore.logIn(formData);
+        console.log(authStore.isLoggedIn)
+        const redirectUrl = route.query.redirect || "/";
+        await router.push(redirectUrl);
+    } catch (e) {
+        await Swal.fire({
+            title: "Error!",
+            text: 'Invalid email or password. Please try again!',
+            icon: "error"
+        });
+    }
 }
-
-
-
-
-
 </script>
 
 <template>

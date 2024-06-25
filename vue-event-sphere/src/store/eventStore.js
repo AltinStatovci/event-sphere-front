@@ -29,10 +29,6 @@ export const useEventStore = defineStore('event', () => {
 
 
             events.value = allEvents;
-            console.log(allEvents);
-
-            events.value = allEvents; // Store the events in the state
-
             return allEvents;
         } catch (err) {
             console.error('Error fetching events:', err);
@@ -64,10 +60,6 @@ export const useEventStore = defineStore('event', () => {
 
 
             events.value = allEvents;
-            console.log(allEvents);
-
-            events.value = allEvents; // Store the events in the state
-
             return allEvents;
         } catch (err) {
             console.error('Error fetching events:', err);

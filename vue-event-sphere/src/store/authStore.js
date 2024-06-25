@@ -8,18 +8,21 @@ export const useAuthStore = defineStore('auth', () =>{
     const url ='http://localhost:5220/api/';
     const token = ref(CookieHelper.getCookie('token') || null);
 
-    async function logIn(user){
-        const response = await client.post(`${url}Account/authenticate`,user);
-
-        if (response.status === 200) {
-            CookieHelper.setCookie('token', response.data, 1); // Set token cookie for 30 days
-            token.value = response.data;
+    async function logIn(user) {
+        try {
+            const response = await client.post(`${url}Account/authenticate`, user);
+    
+            if (response.status === 200) {
+                CookieHelper.setCookie('token', response.data, 30); 
+                token.value = response.data;
+            } else {
+                throw new Error('Invalid login credentials');
+            }
+        } catch (error) {
+            throw new Error('Login failed: ' + error.response?.data?.message || error.message);
         }
-        console.log(response);
-        console.log("test");
-        console.log(response);
     }
-
+    
     async function signUp(registerUser){
         const response = await client.post(`${url}Account/register`,registerUser);
     }
