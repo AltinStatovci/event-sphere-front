@@ -18,7 +18,6 @@
               <thead>
                 <tr>
                   <th scope="col">Event Name</th>
-
                   <th scope="col">Location</th>
                   <th scope="col">Category Name</th>
                   <th scope="col">Start Date</th>
@@ -30,9 +29,7 @@
               </thead>
               <tbody>
                 <tr v-for="event in eventList" :key="event.id">
-
                   <td>{{ event.eventName }}</td>
-
                   <td>{{ event.address }}</td>
                   <td>{{ event.categoryName }}</td>
                   <td>{{ event.startDate }}</td>
@@ -60,48 +57,48 @@
 
                 <form @submit.prevent="handleSubmit">
                   <!-- Event Details Form -->
-                  <div class="row gx-4 mb-4">
-                    <div class="col-md-4">
+                  <div class="row gx-3 mb-3">
+                    <div class="col-md-3">
                       <label class="small mb-1" for="eventName">Event Name</label>
                       <input class="form-control" id="eventName" type="text" placeholder="Enter event name"
                         v-model.trim="formData.eventName">
                     </div>
-                    
-                  <div class="col-md-4">
-                    <label class="small mb-1" for="categorySelect">Category</label>
-                    <select id="categorySelect" class="form-control" v-model.trim="formData.categoryID">
-                      <option value="" disabled>Select a Category</option>
-                      <option v-for="category in categories" :key="category.id" :value="category.id">
-                        {{ category.categoryName }}
-                      </option>
-                    </select>
-                  </div>
-  
-                    <div class="col-md-4 ">
+
+                    <div class="col-md-3">
+                      <label class="small mb-1" for="categorySelect">Category</label>
+                      <select id="categorySelect" class="form-control custom-select" v-model.trim="formData.categoryID">
+                        <option value="" disabled>Select a Category</option>
+                        <option v-for="category in categories" :key="category.id" :value="category.id">
+                          {{ category.categoryName }}
+                        </option>
+                      </select>
+                    </div>
+
+                    <div class="col-md-3 ">
                       <label class="small mb-1" for="address">Address</label>
                       <input class="form-control" id="address" type="text" placeholder="Enter address"
                         v-model.trim="formData.address">
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                       <label class="small mb-1" for="citySelect">Location</label>
-                      <select id="citySelect" class="form-control" v-model.trim="formData.locationId">
+                      <select id="citySelect" class="form-control custom-select" v-model.trim="formData.locationId">
                         <option value="" disabled>Select a city</option>
                         <option v-for="location in locations" :key="location.id" :value="location.id">
                           {{ location.city }}, {{ location.country }}
                         </option>
                       </select>
                     </div>
-                    </div>
-                  
-                    <div class="col-md-4 w-25">
+
+                    <div class="col-md-6 ">
                       <label class="small mb-1" for="startDate">Start Date</label>
                       <input class="form-control" id="startDate" type="datetime-local" v-model="formData.startDate">
                     </div>
-                    <div class="col-md-4 w-25">
+                    <div class="col-md-6 ">
                       <label class="small mb-1" for="endDate">End Date</label>
                       <input class="form-control" id="endDate" type="datetime-local" v-model="formData.endDate">
                     </div>
-         
+                  </div>
+
                   <div class="row gx-3 mb-3">
                     <div class="col-md-6 w-25">
                       <label class="small mb-1" for="maxAttendees">Max Attendees</label>
@@ -129,8 +126,8 @@
                           <div class="small font-italic text-muted mb-4">Upload your EventImage</div>
                           <input class="form-control" id="file" type="file" ref="fileInput" @change="handleImageUpload"
                             style="display: none;">
-                          <button class="btn btn-outline-primary" type="button" @click="$refs.fileInput.click()">Upload new
-                            image</button>
+                          <button class="btn btn-outline-primary" type="button" @click="$refs.fileInput.click()">Upload
+                            new image</button>
                         </div>
                       </div>
                     </div>
@@ -144,12 +141,9 @@
           </div>
         </div>
       </div>
-
-
     </div>
   </div>
 </template>
-
 <script setup>
 import { ref, reactive, onMounted } from "vue";
 import { useEventStore } from "@/store/eventStore.js";
@@ -159,8 +153,6 @@ import Swal from "sweetalert2";
 import SideBar from "@/components/SideBar.vue";
 import { useLocationStore } from '@/store/locationStore';
 import { useCategoryStore } from "@/store/categoryStore";
-
-
 
 const router = useRouter();
 const eventStore = useEventStore();
@@ -186,8 +178,6 @@ const formData = reactive({
   dateCreated: new Date().toISOString(),
   image: '',
 });
-
-
 
 const imageUrl = ref('https://t4.ftcdn.net/jpg/05/65/22/41/360_F_565224180_QNRiRQkf9Fw0dKRoZGwUknmmfk51SuSS.jpg');
 
@@ -223,7 +213,6 @@ const handleSubmit = async () => {
     });
   }
 };
-
 
 const handleImageUpload = (event) => {
   const file = event.target.files[0];
@@ -296,7 +285,7 @@ const openEditForm = async (eventId) => {
 
   console.log("Event data retrieved:", eventById.value);
 
-  formData.id = eventById.value.id; 
+  formData.id = eventById.value.id;
   formData.eventName = eventById.value.eventName;
   formData.description = eventById.value.description;
   formData.startDate = eventById.value.startDate;
@@ -306,15 +295,12 @@ const openEditForm = async (eventId) => {
   formData.categoryID = eventById.value.categoryID;
   formData.maxAttendance = eventById.value.maxAttendance;
   formData.availableTickets = eventById.value.availableTickets;
-  formData.image= eventById.value.image;
+  formData.image = eventById.value.image;
 
   console.log("Updated formData:", formData);
 
   changeTab('eventForm');
 };
-
-
-
 
 const activeTab = ref('eventList');
 
@@ -341,8 +327,6 @@ const resetForm = () => {
   selectedEventId.value = null;
 };
 </script>
-
-
 <style scoped>
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');
 
@@ -397,6 +381,10 @@ body {
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
+.custom-select {
+  height: calc(1.5em + 1.75rem + 2px);
+}
+
 .nav-borders .nav-link.active {
   color: #0061f2;
   border-bottom-color: #0061f2;
@@ -445,7 +433,8 @@ body {
   font-size: 0.875rem;
   text-align: center;
 }
-.btn{
+
+.btn {
   text-transform: capitalize;
 }
 </style>
