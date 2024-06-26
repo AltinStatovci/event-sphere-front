@@ -1,37 +1,3 @@
-<!-- <script setup>
-import { ref, onMounted } from 'vue';
-import SideBar from "@/components/SideBar.vue";
-import { useAuthStore } from "@/store/authStore.js";
-import { usePaymentStore } from "@/store/paymentStore.js";
-import { useEventStore } from "@/store/eventStore.js";
-
-const payments = ref([]);
-const paymentStore = usePaymentStore();
-const authStore = useAuthStore();
-const eventStore = useEventStore();
-
-const fetchPayments = async (eventId) => {
-    try {
-        const response = await fetch(`http://localhost:5220/api/Payment/event/${eventId}`);
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        const data = await response.json();
-        payments.value = data;
-    } catch (error) {
-        console.error('Error fetching payments:', error);
-    }
-};
-
-onMounted(() => {
-    // Fetch payments when component is mounted
-    if (authStore.isOrganizer) {
-        // Assuming getEventsByOrganizerId fetches events for the logged-in organizer
-        eventStore.getEventsByOrganizerId(authStore.id);
-    }
-});
-</script> -->
-
 <template>
   <div class="d-flex">
     <SideBar />
@@ -41,9 +7,10 @@ onMounted(() => {
       </nav>
       <hr class="mt-0 mb-4">
 
-      <div v-if="authStore.isOrganizer">
-        <!-- Dropdown to select events -->
-        <select v-model="selectedEvent" @change="fetchPayments(selectedEvent)">
+      <div v-if="authStore.isOrganizer" class="dropdown-container">
+        <label for="event-select">Select an Event:</label>
+        <select id="event-select" v-model="selectedEvent" @change="fetchPayments" class="form-select">
+          <option value="" disabled>Select an event</option>
           <option v-for="event in eventStore.events" :key="event.id" :value="event.id">
             {{ event.eventName }}
           </option>
@@ -101,17 +68,18 @@ const authStore = useAuthStore();
 const eventStore = useEventStore();
 const selectedEvent = ref(null);
 
-const fetchPayments = async (eventId) => {
-  try {
-    const response = await fetch(`http://localhost:5220/api/Payment/event/${eventId}`);
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-    const data = await response.json();
-    payments.value = data;
-  } catch (error) {
-    console.error('Error fetching payments:', error);
+const fetchPayments = async () => {
+  if (selectedEvent.value) {
+    await paymentStore.getPaymentsByEvent(selectedEvent.value);
+    payments.value = paymentStore.payments;
+  } else {
+    payments.value = []; // Clear payments if no event is selected
   }
+};
+
+const fetchUserPayments = async () => {
+  await paymentStore.getPaymentsByUserId(authStore.id);
+  payments.value = paymentStore.payments;
 };
 
 const formatPaymentDateTime = (dateString) => {
@@ -123,16 +91,12 @@ const formatPaymentDateTime = (dateString) => {
 
 onMounted(async () => {
   if (authStore.isOrganizer) {
-    try {
-      const events = await eventStore.getEventByOrganizer(authStore.id);
-      console.log("Events fetched in component:", events);
-    } catch (error) {
-      console.error('Error fetching events:', error);
-    }
+    await eventStore.getEventByOrganizer(authStore.id);
+  } else {
+    await fetchUserPayments();
   }
 });
 </script>
-
 
 <style scoped>
 .dashboard {
@@ -164,7 +128,6 @@ h1 {
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
-
 
 .no-data {
     text-align: center;
@@ -228,5 +191,29 @@ nav.nav-borders .nav-link {
   margin-left: 1rem;
   margin-right: 1rem;
   cursor: pointer;
+}
+
+.dropdown-container {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.dropdown-container label {
+  margin-bottom: 8px;
+  font-weight: bold;
+}
+
+.dropdown-container .form-select {
+  padding: 0.75rem 1rem;
+  border-radius: 0.35rem;
+  border: 1px solid #c5ccd6;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.dropdown-container .form-select:focus {
+  border-color: #80bdff;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
 }
 </style>
