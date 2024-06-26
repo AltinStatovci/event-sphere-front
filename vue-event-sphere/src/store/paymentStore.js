@@ -65,10 +65,6 @@ export const usePaymentStore = defineStore('payment', () => {
             console.error('Error fetching payments by event ID:', error);
         }
     }
-    
 
     return { payments, amount,  getPaymentByTicket, getPaymentById, getPaymentsByUserId, getPaymentsByEvent};
 });
-
-
-

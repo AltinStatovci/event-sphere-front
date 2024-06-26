@@ -1,4 +1,4 @@
-<script setup>
+<!-- <script setup>
 import { ref, onMounted } from 'vue';
 import SideBar from "@/components/SideBar.vue";
 import { useAuthStore } from "@/store/authStore.js";
@@ -30,11 +30,11 @@ onMounted(() => {
         eventStore.getEventsByOrganizerId(authStore.id);
     }
 });
-</script>
+</script> -->
 
 <template>
   <div class="d-flex">
-    <side-bar />
+    <SideBar />
     <div class="container-xl px-4 mt-4">
       <nav class="nav nav-borders">
         <a class="nav-link">Payment List</a>
@@ -69,8 +69,8 @@ onMounted(() => {
               <tbody>
                 <tr v-for="payment in payments" :key="payment.id">
                   <td>{{ payment.id }}</td>
-                  <td>{{ payment.userName ? payment.userName : 'N/A' }}</td>
-                  <td>{{ payment.ticketName ? payment.ticketName : 'N/A' }}</td>
+                  <td>{{ payment.userName || 'N/A' }}</td>
+                  <td>{{ payment.ticketName || 'N/A' }}</td>
                   <td>{{ payment.amount }}</td>
                   <td>{{ payment.paymentMethod }}</td>
                   <td>{{ payment.paymentStatus }}</td>
@@ -88,61 +88,51 @@ onMounted(() => {
   </div>
 </template>
 
-<script>
+<script setup>
 import { ref, onMounted } from 'vue';
 import SideBar from "@/components/SideBar.vue";
 import { useAuthStore } from "@/store/authStore.js";
 import { usePaymentStore } from "@/store/paymentStore.js";
 import { useEventStore } from "@/store/eventStore.js";
 
-export default {
-  components: {
-    SideBar
-  },
-  setup() {
-    const payments = ref([]);
-    const paymentStore = usePaymentStore();
-    const authStore = useAuthStore();
-    const eventStore = useEventStore();
-    const selectedEvent = ref(null);
+const payments = ref([]);
+const paymentStore = usePaymentStore();
+const authStore = useAuthStore();
+const eventStore = useEventStore();
+const selectedEvent = ref(null);
 
-    const fetchPayments = async (eventId) => {
-      try {
-        const response = await fetch(`http://localhost:5220/api/Payment/event/${eventId}`);
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        const data = await response.json();
-        payments.value = data;
-      } catch (error) {
-        console.error('Error fetching payments:', error);
-      }
-    };
-
-    const formatPaymentDateTime = (dateString) => {
-      const date = new Date(dateString);
-      const formattedDate = date.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
-      const formattedTime = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric' });
-      return `${formattedDate} - ${formattedTime}`;
-    };
-
-    onMounted(() => {
-      if (authStore.isOrganizer) {
-        eventStore.getEventsByOrganizerId(authStore.id);
-      }
-    });
-
-    return {
-      payments,
-      fetchPayments,
-      formatPaymentDateTime,
-      selectedEvent,
-      eventStore,
-      authStore
-    };
+const fetchPayments = async (eventId) => {
+  try {
+    const response = await fetch(`http://localhost:5220/api/Payment/event/${eventId}`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    const data = await response.json();
+    payments.value = data;
+  } catch (error) {
+    console.error('Error fetching payments:', error);
   }
 };
+
+const formatPaymentDateTime = (dateString) => {
+  const date = new Date(dateString);
+  const formattedDate = date.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
+  const formattedTime = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric' });
+  return `${formattedDate} - ${formattedTime}`;
+};
+
+onMounted(async () => {
+  if (authStore.isOrganizer) {
+    try {
+      const events = await eventStore.getEventByOrganizer(authStore.id);
+      console.log("Events fetched in component:", events);
+    } catch (error) {
+      console.error('Error fetching events:', error);
+    }
+  }
+});
 </script>
+
 
 <style scoped>
 .dashboard {
