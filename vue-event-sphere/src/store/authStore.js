@@ -15,9 +15,9 @@ export const useAuthStore = defineStore('auth', () =>{
             CookieHelper.setCookie('token', response.data, 1); // Set token cookie for 30 days
             token.value = response.data;
         }
-        console.log(response);
-        console.log("test");
-        console.log(response);
+        else {
+            throw new Error(`Failed to authenticate. Status: ${response.status}`);
+          }
     }
 
     async function signUp(registerUser){

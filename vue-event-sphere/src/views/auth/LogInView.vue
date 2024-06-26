@@ -23,7 +23,7 @@ async function handleSubmit() {
 
   if (!formData.email || !formData.password) {
     formIsValid.value = false;
-    error.value = 'Email and password are required.'
+    error.value = 'Email and password are required.';
 
     await Swal.fire({
       title: "Error!",
@@ -34,17 +34,26 @@ async function handleSubmit() {
   }
 
   try {
-    await authStore.logIn(formData);
+    await authStore.logIn(formData); 
     const redirectUrl = `${route.query.redirect || "/"}`;
-    await router.push(redirectUrl);
+    await router.push(redirectUrl); 
   } catch (e) {
+    let errorMessage = 'An error occurred while logging in. Please try again later.';
+
+    if (e.message.includes('Failed to authenticate.')) {
+      errorMessage = 'Invalid email or password. Please check your credentials.';
+    } else {
+      errorMessage = e.message; 
+    }
+
     await Swal.fire({
       title: "Error!",
-      text: e.message,
+      text: errorMessage,
       icon: "error"
     });
   }
 }
+
 </script>
 
 <template>

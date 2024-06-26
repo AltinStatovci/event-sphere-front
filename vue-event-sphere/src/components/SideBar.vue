@@ -39,7 +39,7 @@ function onLogOut() {
 
     <h3>Menu</h3>
     <div class="menu">
-      <div v-if="authStore.isAdmin || authStore.isOrganizer">
+      <div v-if="authStore.isAdmin">
         <router-link to="/dashboard" class="button">
           <span class="material-icons">menu</span>
           <span class="text">Dashboard</span>
@@ -55,7 +55,7 @@ function onLogOut() {
           <span class="text">Manage Events</span>
         </router-link>
       </div>
-      <div v-if="authStore.isAdmin || authStore.isOrganizer">
+      <div v-if="authStore.isAdmin">
         <router-link to="/manageTickets" class="button">
           <i class="bi bi-ticket-perforated-fill" style="font-size: 30px ; color: white ; margin-right: 20px"></i>
           <span class="text">Manage Tickets</span>
