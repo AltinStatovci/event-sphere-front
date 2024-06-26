@@ -2,45 +2,53 @@
 import { useAuthStore } from "@/store/authStore.js";
 import { useRouter } from "vue-router";
 import DropdownLi from "@/components/DropdownLi.vue";
-import Logo from '@/assets/Logo.svg';
-import Location from '@/assets/Location.svg';
+import Logo from "@/assets/Logo.svg";
+import Location from "@/assets/Location.svg";
+import { useEventStore } from "@/store/eventStore";
 
-
+const eventStore = useEventStore();
 const authStore = useAuthStore();
 const router = useRouter();
 
 function onLogOut() {
   authStore.logOut();
-  router.push({ name: 'login' });
+  router.push({ name: "login" });
 }
 
-
 const onDashboard = () => {
-  router.push({ name: 'dashboard' })
+  router.push({ name: "dashboard" });
+};
+const onProfile = () => {
+  router.push({ name: "profile" });
 };
 
 const onHome = () => {
-  router.push({ path: '/' });
-}
+  router.push({ path: "/" });
+};
 const onAboutUs = () => {
-  router.push({ path: '/about' });
-}
+  router.push({ path: "/about" });
+};
 const onNearYou = () => {
-  router.push({ path: '/nearYou' });
-}
+  router.push({ path: "/nearYou" });
+};
 const onLogin = () => {
-  router.push({ path: '/login' });
-}
+  router.push({ path: "/login" });
+};
 const onSignup = () => {
-  router.push({ path: '/register' });
-}
+  router.push({ path: "/register" });
+};
+
+const getEventsByName = async (name) => {
+  try {
+    const response = await eventStore.getEventsByName(name);
+    events.value = response;
+  } catch (err) {
+    console.error(err);
+  }
+};
 </script>
 
-
-
-
 <template>
-
   <nav class="navbar navbar-expand-lg bg-body-tertiary">
     <div class="container-fluid">
       <Logo />
@@ -49,8 +57,12 @@ const onSignup = () => {
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav align-items-center">
           <li class="nav-item dropdown">
-            <a class="nav-link active dropdown-toggle custom-font-size" href="#" role="button"
-              data-bs-toggle="dropdown">
+            <a
+              class="nav-link active dropdown-toggle custom-font-size"
+              href="#"
+              role="button"
+              data-bs-toggle="dropdown"
+            >
               Events
             </a>
             <ul class="dropdown-menu">
@@ -58,12 +70,21 @@ const onSignup = () => {
             </ul>
           </li>
           <li class="nav-item">
-            <a class="nav-link active custom-font-size" @click="onNearYou" role="button">Near you
+            <a
+              class="nav-link active custom-font-size"
+              @click="onNearYou"
+              role="button"
+              >Near you
               <Location />
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link active custom-font-size" @click="onAboutUs" role="button">About us</a>
+            <a
+              class="nav-link active custom-font-size"
+              @click="onAboutUs"
+              role="button"
+              >About us</a
+            >
           </li>
         </ul>
         <div class="input-group justify-content-center">
@@ -78,20 +99,43 @@ const onSignup = () => {
         <div>
           <ul class="navbar-nav mb-2 mb-lg-0" v-if="authStore.loggedInUser">
             <li class="nav-item dropdown custom-margin-right">
-              <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown"
-                aria-expanded="false">
+              <a
+                class="nav-link dropdown-toggle d-flex align-items-center"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
                 <i class="bi bi-person-circle"></i>
               </a>
               <ul class="dropdown-menu dropdown-menu-end">
-                <li><button class="dropdown-item" @click="onDashboard">Dashboard</button></li>
-                <li><button class="btn btn-outline-danger btn-sm m-lg-2" @click="onLogOut()">Log Out</button> </li>
+                <li v-if="authStore.isAdmin">
+                  <button class="dropdown-item" @click="onDashboard">
+                    Dashboard
+                  </button>
+                </li>
+                <li v-else>
+                  <button class="dropdown-item" @click="onProfile">
+                    My Profile
+                  </button>
+                </li>
+                <li>
+                  <button
+                    class="btn btn-outline-danger btn-sm m-lg-2"
+                    @click="onLogOut()"
+                  >
+                    Log Out
+                  </button>
+                </li>
               </ul>
             </li>
           </ul>
           <div v-if="!authStore.loggedInUser" class="d-flex">
-          <button class="auth-btn btn" @click="onLogin">Log in</button>
-          <button class="auth-btn btn btn-primary" @click="onSignup">Sign up</button>
-        </div>
+            <button class="auth-btn btn" @click="onLogin">Log in</button>
+            <button class="auth-btn btn btn-primary" @click="onSignup">
+              Sign up
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -115,7 +159,7 @@ const onSignup = () => {
 }
 
 .navbar {
-  background-color: #ECECEC;
+  background-color: #ececec;
 }
 
 .navbar-nav {
@@ -134,12 +178,12 @@ const onSignup = () => {
   padding-left: 10px;
   font-size: 18px;
 }
-.auth-btn{
+.auth-btn {
   text-transform: capitalize;
   width: 100px;
   margin-right: 10px;
 }
-.bi-person-circle{
+.bi-person-circle {
   font-size: 30px;
   color: #1e1f22;
 }
