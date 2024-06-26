@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import axios from 'axios';
+import client from "@/helpers/client.js";
 
 export const useReportStore = defineStore('report', () => {
     const url = 'http://localhost:5220/api/';
@@ -9,7 +10,7 @@ export const useReportStore = defineStore('report', () => {
 
     async function fetchReports() {
         try {
-            const response = await axios.get(`${url}Report`);
+            const response = await client.get(`${url}Report`);
             reports.value = response.data;
         } catch (err) {
             console.error("Error fetching reports:", err);
@@ -18,7 +19,7 @@ export const useReportStore = defineStore('report', () => {
 
     async function getReportById(id) {
         try {
-            const response = await axios.get(`${url}Report/${id}`);
+            const response = await client.get(`${url}Report/${id}`);
             report.value = response.data;
             return report.value;
         } catch (err) {
@@ -29,7 +30,7 @@ export const useReportStore = defineStore('report', () => {
 
     async function submitReport(reportData) {
         try {
-            const response = await axios.post(`${url}Report`, reportData);
+            const response = await client.post(`${url}Report`, reportData);
             fetchReports(); // Refresh the reports list
             return response.data;
         } catch (err) {
@@ -39,7 +40,7 @@ export const useReportStore = defineStore('report', () => {
 
     async function updateReport(reportId, reportData) {
         try {
-            const response = await axios.put(`${url}Report/${reportId}`, reportData);
+            const response = await client.put(`${url}Report/${reportId}`, reportData);
             fetchReports(); // Refresh the reports list
             return response.data;
         } catch (err) {
@@ -48,7 +49,7 @@ export const useReportStore = defineStore('report', () => {
     }
     async function deleteReport(id){
         try {
-            await axios.delete(`${url}Report/${id}`);
+            await client.delete(`${url}Report/${id}`);
             }
         catch (error) {
             console.error('Error deleting expenses:', error);

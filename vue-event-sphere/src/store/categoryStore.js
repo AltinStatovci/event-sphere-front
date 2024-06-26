@@ -1,12 +1,13 @@
 import { defineStore } from 'pinia';
 import axios from 'axios';
+import client from "@/helpers/client.js";
 
 export const useCategoryStore = defineStore('category', () => {
     const url = 'http://localhost:5220/api/';
 
     async function getAllCategories() {
         try {
-            const response = await axios.get(`${url}EventCategory`);
+            const response = await client.get(`${url}EventCategory`);
             const data = response.data;
             return data.map(category => ({
                 id: category.id,

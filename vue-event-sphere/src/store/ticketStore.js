@@ -1,14 +1,17 @@
 import { defineStore } from 'pinia';
 import axios from 'axios';
 import { ref } from 'vue';
+import client from "@/helpers/client.js";
+import {useAuthStore} from "@/store/authStore.js";
 
 export const useTicketStore = defineStore('ticket', () => {
+  const authStore = useAuthStore();
   const url = 'http://localhost:5220/api/';
   const tickets = ref([]);
   
   const getTickets = async () => {
     try {
-      const response = await axios.get(`${url}Ticket`);
+      const response = await client.get(`${url}Ticket`);
       return response.data;
     } catch (err) {
       console.error('Error fetching tickets:', err);
@@ -18,7 +21,7 @@ export const useTicketStore = defineStore('ticket', () => {
 
   const getTicketById = async (id) => {
     try {
-      const response = await axios.get(`${url}Ticket/${id}`);
+      const response = await client.get(`${url}Ticket/${id}`);
       return response.data;
     } catch (err) {
       console.error('Error fetching ticket by ID:', err);
@@ -28,7 +31,7 @@ export const useTicketStore = defineStore('ticket', () => {
 
   const addTicket = async (ticketData) => {
     try {
-      const response = await axios.post(`${url}Ticket`, ticketData);
+      const response = await client.post(`${url}Ticket`, ticketData);
       return response.data;
     } catch (error) {
       throw error;
@@ -37,7 +40,7 @@ export const useTicketStore = defineStore('ticket', () => {
 
   const updateTicket = async (ticketData) => {
     try {
-      const response = await axios.put(`${url}Ticket/${ticketData.id}`, ticketData);
+      const response = await client.put(`${url}Ticket/${ticketData.id}`, ticketData);
       return response.data; 
     } catch (error) {
       throw error; 
@@ -46,7 +49,11 @@ export const useTicketStore = defineStore('ticket', () => {
 
   const deleteTicket = async (ticketId) => {
     try {
-      await axios.delete(`${url}Ticket/${ticketId}`);
+      await axios.delete(`${url}Ticket/${ticketId}`,{
+        headers: {
+          Authorization: `Bearer ${authStore.token}`
+        }
+      });
     } catch (error) {
       console.error('Error deleting ticket:', error);
       throw error;
@@ -54,7 +61,7 @@ export const useTicketStore = defineStore('ticket', () => {
   };
   async function getTicketByEvent(eventId) {
     try {
-      const response = await axios.get(`${url}Ticket/${eventId}/event`);
+      const response = await client.get(`${url}Ticket/${eventId}/event`);
       const data = response.data;
       tickets.value = data.map(ticket => ({
         id: ticket.id,
