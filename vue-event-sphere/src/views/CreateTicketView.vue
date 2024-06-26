@@ -32,6 +32,9 @@
                     <button class="btn btn-outline-primary btn-sm" @click="openEditForm(ticket.id)">Edit</button>
                   </td>
                 </tr>
+                <tr v-if="ticketList.length === 0">
+                            <td colspan="9" class="no-data">No tickets available</td>
+                        </tr>
               </tbody>
             </table>
           </div>

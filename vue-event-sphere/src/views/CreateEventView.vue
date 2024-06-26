@@ -41,6 +41,9 @@
                     <button class="btn btn-outline-primary btn-sm" @click="openEditForm(event.id)">Edit</button>
                   </td>
                 </tr>
+                <tr v-if="eventList.length === 0">
+                            <td colspan="9" class="no-data">No events available</td>
+                        </tr>
               </tbody>
             </table>
           </div>

@@ -45,6 +45,9 @@
                                             @click="deleteReport(report.reportId)">Delete</button>
                                     </td>
                                 </tr>
+                                <tr v-if="reports.length === 0">
+                            <td colspan="9" class="no-data">No reports available</td>
+                        </tr>
                             </tbody>
                         </table>
                     </div>
