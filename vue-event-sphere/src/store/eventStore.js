@@ -166,6 +166,7 @@ export const useEventStore = defineStore('event', () => {
         return [];
     }
 }
+
 async function getEventsByCountry(country) {
     try {
         const response = await client.get(`${url}Event/${country}/country`);
@@ -256,5 +257,6 @@ async function getEventsByCountry(country) {
         
     }
 }
-    return { getEventByCategory, getEventByOrganizer, getEventById,addEvent,updateEvent,getEvents, deleteEvent, event, getEventsByCity, getEventsByCountry };
+
+    return { getEventByCategory, getEventByOrganizer, getEventById,addEvent,updateEvent,getEvents, deleteEvent, event, getEventsByCity, getEventsByCountry, getEventByOrganizer};
 });

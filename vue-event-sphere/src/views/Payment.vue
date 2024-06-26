@@ -1,27 +1,42 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import SideBar from "@/components/SideBar.vue";
+import { useAuthStore } from "@/store/authStore.js";
+import { usePaymentStore } from "@/store/paymentStore.js";
 
 const payments = ref([]);
+const paymentStore = usePaymentStore();
+const authStore = useAuthStore();
 
 const fetchPayments = async () => {
     try {
-        const response = await fetch('http://localhost:5220/api/Payment');
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        const data = await response.json();
-        if (!data || data.length === 0) {
-            throw new Error('Empty response or invalid JSON format');
-        }
-        payments.value = data;
-        console.log('Fetched payments:', payments.value);
+    const response = await fetch(`http://localhost:5220/api/Payment/user/${authStore.id}`);
+    if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    const data = await response.json();
+    if (!data || data.length === 0) {
+        throw new Error('Empty response or invalid JSON format');
+    }
+    payments.value = data;
+    console.log('Fetched payments:', payments.value);
     } catch (error) {
-        console.error('Error fetching payments:', error);
+    console.error('Error fetching payments:', error);
     }
 };
 
-// Fetch payments on component mount
+const formatPaymentDateTime = (dateString) => {
+const date = new Date(dateString);
+
+const dateFormatOptions = { day: 'numeric', month: 'short', year: 'numeric' };
+const formattedDate = date.toLocaleDateString('en-US', dateFormatOptions);
+
+const timeFormatOptions = { hour: 'numeric', minute: 'numeric' };
+const formattedTime = date.toLocaleTimeString('en-US', timeFormatOptions);
+
+return `${formattedDate} - ${formattedTime}`;
+};
+
 onMounted(() => {
     fetchPayments();
 });
@@ -61,7 +76,7 @@ onMounted(() => {
                             <td>{{ payment.amount }}</td>
                             <td>{{ payment.paymentMethod }}</td>
                             <td>{{ payment.paymentStatus }}</td>
-                            <td>{{ payment.paymentDate }}</td>
+                            <td>{{ formatPaymentDateTime(payment.paymentDate) }}</td>
                 </tr>
                 <tr v-if="payments.length === 0">
                             <td colspan="9" class="no-data">No payments available</td>
