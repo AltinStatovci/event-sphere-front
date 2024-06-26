@@ -391,4 +391,11 @@ body {
 .btn {
     text-transform: capitalize;
 }
+.no-data {
+    text-align: center;
+    padding: 10px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    color: #999;
+}
 </style>
