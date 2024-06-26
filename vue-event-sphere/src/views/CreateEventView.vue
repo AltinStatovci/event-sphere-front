@@ -42,6 +42,9 @@
                     <button class="btn btn-outline-secondary btn-sm" @click="getTickets(event.id)">See Tickets</button>
                   </td>
                 </tr>
+                <tr v-if="eventList.length === 0">
+                            <td colspan="9" class="no-data">No events available</td>
+                        </tr>
               </tbody>
             </table>
           </div>
@@ -456,5 +459,12 @@ body {
 
 .btn {
   text-transform: capitalize;
+}
+.no-data {
+    text-align: center;
+    padding: 10px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    color: #999;
 }
 </style>

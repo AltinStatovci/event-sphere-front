@@ -1,6 +1,7 @@
 import { ref } from 'vue';
 import axios from 'axios';
 import { defineStore } from 'pinia';
+import client from "@/helpers/client.js";
 
 export const useLocationStore = defineStore('location', () => {
     const url = 'http://localhost:5220/api/';
@@ -8,7 +9,7 @@ export const useLocationStore = defineStore('location', () => {
 
     async function getLocations() {
         try {
-            const response = await axios.get(`${url}Location`);
+            const response = await client.get(`${url}Location`);
             const locations = response.data;
   
             const allLocations = locations.map(location => ({
@@ -26,7 +27,7 @@ export const useLocationStore = defineStore('location', () => {
     }
     async function getLocationById(id) {
         try {
-            const response = await axios.get(`${url}Location/${id}`);
+            const response = await client.get(`${url}Location/${id}`);
             const locationData = response.data;
 
             const fetchedLocation = {

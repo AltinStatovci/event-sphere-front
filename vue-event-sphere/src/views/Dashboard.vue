@@ -73,10 +73,8 @@ onMounted(() => {
 
 <template>
   <div class="d-flex">
-
-
-  <side-bar/>
-  <div class="dashboard" :style="{ backgroundColor: isDarkMode ? '#0f172a' : '#3fa387' }">
+  <side-bar />
+  <div class="dashboard" :style="{ backgroundColor: isDarkMode ? '#0f172a' : '#ffffff', borderRadius: '0px'  }">
 
     <div class="statistics-box">
       <span class="material-symbols-outlined icon">
@@ -86,15 +84,21 @@ onMounted(() => {
     </div>
 
     <div class="events-boxes">
+    <div class="event-count-box">
+        <span class="material-symbols-outlined icon">
+          groups
+        </span>
+        <p class="count-text">There are {{userCount}} Users</p>
+      </div>
       <div class="event-count-box">
         <span class="material-symbols-outlined icon">festival</span>
         <p class="count-text">There are {{ eventCount }} Events</p>
       </div>
       <div class="event-count-box">
         <span class="material-symbols-outlined icon">
-          groups
+          confirmation_number
         </span>
-        <p class="count-text">There are {{userCount}} Users</p>
+        <p class="count-text">There are {{ ticketCount }} Tickets</p>
       </div>
       <div class="event-count-box">
         <span class="material-symbols-outlined icon">
@@ -102,17 +106,12 @@ onMounted(() => {
         </span>
         <p class="count-text">There are {{ paymentCount }} Payments</p>
       </div>
+      
       <div class="event-count-box">
         <span class="material-symbols-outlined icon">
           assured_workload
         </span>
         <p class="count-text">Secure Transactions </p>
-      </div>
-      <div class="event-count-box">
-        <span class="material-symbols-outlined icon">
-          confirmation_number
-        </span>
-        <p class="count-text">There are {{ ticketCount }} Tickets</p>
       </div>
     </div>
 
@@ -131,8 +130,10 @@ onMounted(() => {
 
 <style scoped>
 .dashboard {
-  padding: 20px;
-  border-radius: 8px;
+  width: 100%;
+  padding-right: 1.5rem;
+  padding-left: 1.5rem ;
+  border-radius: 0px;
   width: 100% ;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   display: flex;
@@ -141,17 +142,21 @@ onMounted(() => {
   height: 100vh;
   transition: background-color 0.3s ease;
 }
-
+.dashboard.dark-mode {
+  background-color: #0f172a;
+  /* Other styles for dark mode */
+}
 .statistics-box {
   width: 100%;
-  padding: 20px;
+  padding: 15px;
   background-color: #efefef;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 60px;
+ 
 }
 
 .events-boxes {
@@ -159,18 +164,19 @@ onMounted(() => {
   justify-content: space-evenly;
   flex-wrap: wrap;
   width: 100%;
+  
 }
 
 .event-count-box {
-  width: 230px;
+  width: 195px;
   padding: 20px;
   background-color: #fff;
-  border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 10px;
+  margin-top: 35px;
+  border-radius: 8px;
 }
 
 .icon {
@@ -200,6 +206,6 @@ onMounted(() => {
 
 .dark-mode-button:hover {
   background-color: #cccccc;
-  color: #ffffff;
+  color: #0f172a;
 }
 </style>

@@ -23,7 +23,7 @@
                                     <th scope="col">Report Name</th>
                                     <th scope="col">Description</th>
                                     <th scope="col">Status</th>
-                                    <th scope="col"></th>
+                                    <th scope="col">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -34,17 +34,20 @@
                                     <td>{{ report.reportName }}</td>
                                     <td>{{ report.reportDesc }}</td>
                                     <td>
-                                        <button class="btn btn-outline-primary btn-sm"
+                                        <button class="btn btn-info btn-sm"
                                             @click="openStatusModal(report.reportAnsw)">Read</button>
                                     </td>
 
                                     <td>
-                                        <button v-if="user.roleName == 'Admin'" class="btn btn-outline-success btn-sm"
-                                            @click="openUpdateModal(report)">Respond</button>
-                                        <button class="btn btn-outline-danger btn-sm"
+                                        <button class="btn btn-danger btn-sm"
                                             @click="deleteReport(report.reportId)">Delete</button>
+                                        <button v-if="user.roleName == 'Admin'" class="btn btn-success btn-sm"
+                                            @click="openUpdateModal(report)">Respond</button>
                                     </td>
                                 </tr>
+                                <tr v-if="reports.length === 0">
+                            <td colspan="9" class="no-data">No reports available</td>
+                        </tr>
                             </tbody>
                         </table>
                     </div>
@@ -72,7 +75,7 @@
                 <div class="row">
                     <div class="col-xl-12">
                         <div class="card mb-4">
-                            <div class="card-header">{{ isEditMode ? 'Respond Report' : 'Create Report' }}</div>
+                            <div class="card-header">{{ isEditMode ? 'Edit Report' : 'Create Report' }}</div>
                             <div class="card-body">
                                 <form @submit.prevent="handleSubmit">
                                     <div class="row gx-3 mb-3">
@@ -116,8 +119,8 @@
                                                 placeholder="Enter status" v-model="reportAnsw"></textarea>
                                         </div>
                                     </div>
-                                    <button class="btn btn-primary" type="submit">{{ isEditMode ? 'Respond Report' :
-                    'Submit Report' }}</button>
+                                    <button class="btn btn-primary" type="submit">{{ isEditMode ? 'Update Report' :
+                                        'Submit Report' }}</button>
                                 </form>
                             </div>
                         </div>
@@ -168,9 +171,21 @@ const fetchReports = async () => {
     try {
         let response;
         if (user.roleName === 'Admin') {
-            response = await fetch('http://localhost:5220/api/Report');
+            response = await fetch('http://localhost:5220/api/Report', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authstore.token}`,
+                },
+            });
         } else if (user.roleName === 'User') {
-            response = await fetch(`http://localhost:5220/api/Report/GetReportByUserId/${authstore.id}`);
+            response = await fetch(`http://localhost:5220/api/Report/GetReportByUserId/${authstore.id}`,{
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authstore.token}`,
+                },
+            });
         }
         if (!response.ok) throw new Error(`Failed to fetch reports: ${response.statusText}`);
         reports.value = await response.json();
@@ -198,12 +213,13 @@ const handleSubmit = async () => {
         userEmail: user.email,
         reportName: reportName.value,
         reportDesc: complaintDescription.value,
-        reportAnsw: 'Waiting for response'
+        reportAnsw: 'Waiting for Respond'
     };
 
     if (isEditMode.value) {
         apiUrl = `http://localhost:5220/api/Report/${selectedReportId.value}`;
-        method = 'PUT';
+        method = 'PUT',
+
         complaintData = {
             ...selectedReport.value,
             reportDesc: complaintDescription.value,
@@ -214,15 +230,22 @@ const handleSubmit = async () => {
     try {
         const response = await fetch(apiUrl, {
             method: method,
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json'
+            , 'Authorization': `Bearer ${authstore.token}`
+            },
             body: JSON.stringify(complaintData),
         });
 
         if (!response.ok) {
             throw new Error(`Failed to ${isEditMode.value ? 'update' : 'create'} report: ${response.statusText}`);
         }
+
+        // If successful, fetch updated reports and reset form
         await fetchReports();
         changeTab('reportList');
+
+
+        // Show success notification based on the mode
         if (isEditMode.value) {
             Swal.fire({
                 title: "Report Responded Successfully!",
@@ -237,6 +260,8 @@ const handleSubmit = async () => {
         }
     } catch (error) {
         console.error(`Error ${isEditMode.value ? 'updating' : 'creating'} report:`, error.message);
+
+        // Show error notification
         Swal.fire({
             title: "Error!",
             text: error.message,
@@ -246,7 +271,7 @@ const handleSubmit = async () => {
 };
 
 const openUpdateModal = (report) => {
-    isEditMode.value = true;
+    isEditMode.value = true; // Set isEditMode to true
     if (report && report.reportId) {
         selectedReport.value = report;
         selectedReportId.value = report.reportId;
@@ -385,7 +410,16 @@ body {
     text-align: center;
 }
 
+
 .btn {
     text-transform: capitalize;
 }
+.no-data {
+    text-align: center;
+    padding: 10px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    color: #999;
+}
+
 </style>
