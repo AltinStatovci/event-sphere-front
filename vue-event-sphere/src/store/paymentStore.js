@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import axios from 'axios';
+import client from "@/helpers/client.js";
 
 export const usePaymentStore = defineStore('payment', () => {
     const url = 'http://localhost:5220/api/';
@@ -10,7 +11,7 @@ export const usePaymentStore = defineStore('payment', () => {
 
     async function getPaymentByTicket(ticketId){
         try{
-            const response = await axios.get(`${url}Payment/${ticketId}/ticket`);
+            const response = await client.get(`${url}Payment/${ticketId}/ticket`);
             const data = response.data;
             payments.value = data.map(payment => ({
                 id: payment.id,
@@ -29,7 +30,7 @@ export const usePaymentStore = defineStore('payment', () => {
     }
     async function getPaymentById(id){
         try{
-            const response = await axios.get(`${url}Payment/${id}`);
+            const response = await client.get(`${url}Payment/${id}`);
             const paymentData = response.data;
 
             const fetchedPayment = {

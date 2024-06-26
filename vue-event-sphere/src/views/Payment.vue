@@ -26,62 +26,55 @@ onMounted(() => {
     fetchPayments();
 });
 
-// Placeholder edit and delete functions
-const editPayment = (id) => {
-    console.log('Edit payment:', id);
-    // Implement edit logic here
-};
-
-const deletePayment = (id) => {
-    console.log('Delete payment:', id);
-    // Implement delete logic here
-};
 </script>
 
 <template>
+  <div class="d-flex">
+    <side-bar />
+    <div class="container-xl px-4 mt-4">
+      <nav class="nav nav-borders">
+      <a class="nav-link">Payment List</a>
+      </nav>
+      <hr class="mt-0 mb-4">
 
-<div class="d-flex">
-  <side-bar/>
-    <div class="dashboard">
-        <div class="content">
-            <span class="material-icons" style="font-size: 4rem; color: gray;">wallet</span>
-            <h1>Payments</h1>
-
-            <div class="table-container">
-                <table class="payment-table">
-                    <thead>
-                        <tr>
+      <div>
+        <div class="card mb-4">
+          <div class="card-header">Payment List</div>
+          <div class="card-body">
+            <table class="table">
+              <thead>
+                <tr>
                             <th class="id-col">ID</th>
-                            <th class="user-id-col">Client's Name</th>
-                            <th class="ticket-name-col">Ticket Name</th>
+                            <th class="user-id-col">User Name</th>
+                            <th class="ticket-id-col">Ticket ID</th>
                             <th class="amount-col">Amount</th>
                             <th class="payment-method-col">Payment Method</th>
                             <th class="payment-status-col">Payment Status</th>
                             <th class="payment-date-col">Payment Date</th>
-                            
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="payment in payments" :key="payment.id">
-                            <td>{{ payment.id }}</td>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="payment in payments" :key="payment.id">
+                           <td>{{ payment.id }}</td>
                             <td>{{ payment.userName ? payment.userName : 'N/A' }}</td>
                             <td>{{ payment.ticketName ? payment.ticketName : 'N/A' }}</td>
                             <td>{{ payment.amount }}</td>
                             <td>{{ payment.paymentMethod }}</td>
                             <td>{{ payment.paymentStatus }}</td>
                             <td>{{ payment.paymentDate }}</td>
-                           
-                        </tr>
-                        <tr v-if="payments.length === 0">
+                </tr>
+                <tr v-if="payments.length === 0">
                             <td colspan="9" class="no-data">No payments available</td>
                         </tr>
-                    </tbody>
-                </table>
-            </div>
+              </tbody>
+            </table>
+          </div>
         </div>
+      </div>
     </div>
-</div>
+  </div>
 </template>
+
 
 <style scoped>
 .dashboard {
@@ -114,65 +107,6 @@ h1 {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.payment-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-    background-color: #fff;
-    border-radius: 8px;
-}
-
-.payment-table th,
-.payment-table td {
-    border: 1px solid #e0e0e0;
-    padding: 14px 20px;
-    text-align: left;
-}
-
-.payment-table th {
-    background-color: #212121;
-    color: white;
-    font-weight: bold;
-    text-transform: uppercase;
-    font-size: 14px;
-    position: sticky;
-    top: 0;
-    z-index: 1;
-}
-
-.payment-table td {
-    color: #333;
-    font-size: 16px;
-}
-
-.payment-table tbody tr:nth-child(even) {
-    background-color: #f5f5f5;
-}
-
-.payment-table tbody tr:hover {
-    background-color: #ececec;
-}
-
-.action-btn {
-    padding: 8px 16px;
-    margin-right: 6px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background-color 0.3s;
-    outline: none;
-}
-
-.edit-btn {
-    background-color: #4CAF50;
-    color: white;
-}
-
-.delete-btn {
-    background-color: #f44336;
-    color: white;
-}
 
 .no-data {
     text-align: center;
@@ -181,4 +115,61 @@ h1 {
     border: 1px solid #ddd;
     color: #999;
 }
+
+.card {
+  box-shadow: 0 0.15rem 1.75rem 0 rgb(33 40 50 / 15%);
+}
+
+.card .card-header {
+  font-weight: 500;
+}
+
+.card-header:first-child {
+  border-radius: 0.35rem 0.35rem 0 0;
+}
+
+.card-header {
+  padding: 1rem 1.35rem;
+  margin-bottom: 0;
+  background-color: rgba(33, 40, 50, 0.03);
+  border-bottom: 1px solid rgba(33, 40, 50, 0.125);
+}
+
+.form-control,
+.dataTable-input,
+.form-select {
+  display: block;
+  width: 100%;
+  padding: 0.875rem 1.125rem;
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1;
+  color: #69707a;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid #c5ccd6;
+  appearance: none;
+  border-radius: 0.35rem;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+nav.nav-borders .nav-link {
+  color: #0061f2;
+  border-bottom-color: #0061f2;
+}
+
+.nav-borders .nav-link {
+  color: #69707a;
+  border-bottom-width: 0.125rem;
+  border-bottom-style: solid;
+  border-bottom-color: transparent;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  padding-left: 0;
+  padding-right: 0;
+  margin-left: 1rem;
+  margin-right: 1rem;
+  cursor: pointer;
+}
+
 </style>
