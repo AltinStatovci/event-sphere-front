@@ -45,6 +45,9 @@
                                             @click="openUpdateModal(report)">Respond</button>
                                     </td>
                                 </tr>
+                                <tr v-if="reports.length === 0">
+                            <td colspan="9" class="no-data">No reports available</td>
+                        </tr>
                             </tbody>
                         </table>
                     </div>
@@ -406,4 +409,17 @@ body {
     color: #999;
     text-align: center;
 }
+
+
+.btn {
+    text-transform: capitalize;
+}
+.no-data {
+    text-align: center;
+    padding: 10px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    color: #999;
+}
+
 </style>
