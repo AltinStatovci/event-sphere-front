@@ -11,7 +11,7 @@ export const useEventStore = defineStore('event', () => {
 
     async function getEventByCategory(id) {
         try {
-            const response = await axios.get(`${url}Event/${id}/eventCategory`);
+            const response = await client.get(`${url}Event/${id}/eventCategory`);
             const eventData = response.data;
             
             const allEvents = eventData.map(event => ({
@@ -43,7 +43,7 @@ export const useEventStore = defineStore('event', () => {
 
     async function getEventByOrganizer(id) {
         try {
-            const response = await axios.get(`${url}Event/${id}/organizer`);
+            const response = await client.get(`${url}Event/${id}/organizer`);
             const eventData = response.data;
 
             const allEvents = eventData.map(event => ({
@@ -78,7 +78,7 @@ export const useEventStore = defineStore('event', () => {
 
     async function getEventById(id) {
         try {
-            const response = await axios.get(`${url}Event/${id}`);
+            const response = await client.get(`${url}Event/${id}`);
             const eventData = response.data;
 
             const fetchedEvent = {
@@ -110,7 +110,7 @@ export const useEventStore = defineStore('event', () => {
     }
     async function getEvents() {
       try {
-          const response = await axios.get(`${url}Event`);
+          const response = await client.get(`${url}Event`);
           const eventData = response.data;
 
           const allEvents = eventData.map(event => ({
@@ -138,7 +138,7 @@ export const useEventStore = defineStore('event', () => {
   }
   async function getEventsByCity(city) {
     try {
-        const response = await axios.get(`${url}Event/${city}/city`);
+        const response = await client.get(`${url}Event/${city}/city`);
         const eventData = response.data;
         
         const allEvents = eventData.map(event => ({
@@ -168,7 +168,7 @@ export const useEventStore = defineStore('event', () => {
 }
 async function getEventsByCountry(country) {
     try {
-        const response = await axios.get(`${url}Event/${country}/country`);
+        const response = await client.get(`${url}Event/${country}/country`);
         const eventData = response.data;
         
         const allEvents = eventData.map(event => ({
@@ -232,7 +232,7 @@ async function getEventsByCountry(country) {
                 formData.append('newImage', event.image);
             }
 
-            const response = await axios.put(`${url}Event/${event.id}`, formData, {
+            const response = await client.put(`${url}Event/${event.id}`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
@@ -248,7 +248,7 @@ async function getEventsByCountry(country) {
 
     async function deleteEvent(eventId){
         try {
-            await axios.delete(`${url}Event/${eventId}`);
+            await client.delete(`${url}Event/${eventId}`);
             }
         catch (error) {
             console.error('Error deleting expenses:', error);

@@ -41,7 +41,7 @@
                                     <td>
                                         <button class="btn btn-danger btn-sm"
                                             @click="deleteReport(report.reportId)">Delete</button>
-                                        <button v-if="user.roleName == 'admin'" class="btn btn-success btn-sm"
+                                        <button v-if="user.roleName == 'Admin'" class="btn btn-success btn-sm"
                                             @click="openUpdateModal(report)">Respond</button>
                                     </td>
                                 </tr>
@@ -110,7 +110,7 @@
                                                 type="text" placeholder="Enter Your Report"
                                                 v-model="complaintDescription"></textarea>
                                         </div>
-                                        <div class="col-md-12" v-if="user.roleName === 'admin'">
+                                        <div class="col-md-12" v-if="user.roleName === 'Admin'">
                                             <label class="small mb-1" for="reportAnsw">Status</label>
                                             <textarea class="form-control" id="reportAnsw" type="text"
                                                 placeholder="Enter status" v-model="reportAnsw"></textarea>
@@ -167,10 +167,22 @@ onMounted(async () => {
 const fetchReports = async () => {
     try {
         let response;
-        if (user.roleName === 'admin') {
-            response = await fetch('http://localhost:5220/api/Report');
-        } else if (user.roleName === 'user') {
-            response = await fetch(`http://localhost:5220/api/Report/GetReportByUserId/${authstore.id}`);
+        if (user.roleName === 'Admin') {
+            response = await fetch('http://localhost:5220/api/Report', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authstore.token}`,
+                },
+            });
+        } else if (user.roleName === 'User') {
+            response = await fetch(`http://localhost:5220/api/Report/GetReportByUserId/${authstore.id}`,{
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authstore.token}`,
+                },
+            });
         }
         if (!response.ok) throw new Error(`Failed to fetch reports: ${response.statusText}`);
         reports.value = await response.json();
@@ -203,7 +215,8 @@ const handleSubmit = async () => {
 
     if (isEditMode.value) {
         apiUrl = `http://localhost:5220/api/Report/${selectedReportId.value}`;
-        method = 'PUT';
+        method = 'PUT',
+
         complaintData = {
             ...selectedReport.value,
             reportDesc: complaintDescription.value,
@@ -214,7 +227,9 @@ const handleSubmit = async () => {
     try {
         const response = await fetch(apiUrl, {
             method: method,
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json'
+            , 'Authorization': `Bearer ${authstore.token}`
+            },
             body: JSON.stringify(complaintData),
         });
 
