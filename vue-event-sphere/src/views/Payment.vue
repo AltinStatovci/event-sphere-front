@@ -3,44 +3,33 @@ import { ref, onMounted } from 'vue';
 import SideBar from "@/components/SideBar.vue";
 import { useAuthStore } from "@/store/authStore.js";
 import { usePaymentStore } from "@/store/paymentStore.js";
+import { useEventStore } from "@/store/eventStore.js";
 
 const payments = ref([]);
 const paymentStore = usePaymentStore();
 const authStore = useAuthStore();
+const eventStore = useEventStore();
 
-const fetchPayments = async () => {
+const fetchPayments = async (eventId) => {
     try {
-    const response = await fetch(`http://localhost:5220/api/Payment/user/${authStore.id}`);
-    if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-    const data = await response.json();
-    if (!data || data.length === 0) {
-        throw new Error('Empty response or invalid JSON format');
-    }
-    payments.value = data;
-    console.log('Fetched payments:', payments.value);
+        const response = await fetch(`http://localhost:5220/api/Payment/event/${eventId}`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const data = await response.json();
+        payments.value = data;
     } catch (error) {
-    console.error('Error fetching payments:', error);
+        console.error('Error fetching payments:', error);
     }
-};
-
-const formatPaymentDateTime = (dateString) => {
-const date = new Date(dateString);
-
-const dateFormatOptions = { day: 'numeric', month: 'short', year: 'numeric' };
-const formattedDate = date.toLocaleDateString('en-US', dateFormatOptions);
-
-const timeFormatOptions = { hour: 'numeric', minute: 'numeric' };
-const formattedTime = date.toLocaleTimeString('en-US', timeFormatOptions);
-
-return `${formattedDate} - ${formattedTime}`;
 };
 
 onMounted(() => {
-    fetchPayments();
+    // Fetch payments when component is mounted
+    if (authStore.isOrganizer) {
+        // Assuming getEventsByOrganizerId fetches events for the logged-in organizer
+        eventStore.getEventsByOrganizerId(authStore.id);
+    }
 });
-
 </script>
 
 <template>
@@ -48,9 +37,18 @@ onMounted(() => {
     <side-bar />
     <div class="container-xl px-4 mt-4">
       <nav class="nav nav-borders">
-      <a class="nav-link">Payment List</a>
+        <a class="nav-link">Payment List</a>
       </nav>
       <hr class="mt-0 mb-4">
+
+      <div v-if="authStore.isOrganizer">
+        <!-- Dropdown to select events -->
+        <select v-model="selectedEvent" @change="fetchPayments(selectedEvent)">
+          <option v-for="event in eventStore.events" :key="event.id" :value="event.id">
+            {{ event.eventName }}
+          </option>
+        </select>
+      </div>
 
       <div>
         <div class="card mb-4">
@@ -59,28 +57,28 @@ onMounted(() => {
             <table class="table">
               <thead>
                 <tr>
-                            <th class="id-col">ID</th>
-                            <th class="user-id-col">User Name</th>
-                            <th class="ticket-id-col">Ticket ID</th>
-                            <th class="amount-col">Amount</th>
-                            <th class="payment-method-col">Payment Method</th>
-                            <th class="payment-status-col">Payment Status</th>
-                            <th class="payment-date-col">Payment Date</th>
+                  <th>ID</th>
+                  <th>User Name</th>
+                  <th>Ticket ID</th>
+                  <th>Amount</th>
+                  <th>Payment Method</th>
+                  <th>Payment Status</th>
+                  <th>Payment Date</th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="payment in payments" :key="payment.id">
-                           <td>{{ payment.id }}</td>
-                            <td>{{ payment.userName ? payment.userName : 'N/A' }}</td>
-                            <td>{{ payment.ticketName ? payment.ticketName : 'N/A' }}</td>
-                            <td>{{ payment.amount }}</td>
-                            <td>{{ payment.paymentMethod }}</td>
-                            <td>{{ payment.paymentStatus }}</td>
-                            <td>{{ formatPaymentDateTime(payment.paymentDate) }}</td>
+                  <td>{{ payment.id }}</td>
+                  <td>{{ payment.userName ? payment.userName : 'N/A' }}</td>
+                  <td>{{ payment.ticketName ? payment.ticketName : 'N/A' }}</td>
+                  <td>{{ payment.amount }}</td>
+                  <td>{{ payment.paymentMethod }}</td>
+                  <td>{{ payment.paymentStatus }}</td>
+                  <td>{{ formatPaymentDateTime(payment.paymentDate) }}</td>
                 </tr>
                 <tr v-if="payments.length === 0">
-                            <td colspan="9" class="no-data">No payments available</td>
-                        </tr>
+                  <td colspan="7" class="no-data">No payments available</td>
+                </tr>
               </tbody>
             </table>
           </div>
@@ -90,6 +88,61 @@ onMounted(() => {
   </div>
 </template>
 
+<script>
+import { ref, onMounted } from 'vue';
+import SideBar from "@/components/SideBar.vue";
+import { useAuthStore } from "@/store/authStore.js";
+import { usePaymentStore } from "@/store/paymentStore.js";
+import { useEventStore } from "@/store/eventStore.js";
+
+export default {
+  components: {
+    SideBar
+  },
+  setup() {
+    const payments = ref([]);
+    const paymentStore = usePaymentStore();
+    const authStore = useAuthStore();
+    const eventStore = useEventStore();
+    const selectedEvent = ref(null);
+
+    const fetchPayments = async (eventId) => {
+      try {
+        const response = await fetch(`http://localhost:5220/api/Payment/event/${eventId}`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const data = await response.json();
+        payments.value = data;
+      } catch (error) {
+        console.error('Error fetching payments:', error);
+      }
+    };
+
+    const formatPaymentDateTime = (dateString) => {
+      const date = new Date(dateString);
+      const formattedDate = date.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
+      const formattedTime = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric' });
+      return `${formattedDate} - ${formattedTime}`;
+    };
+
+    onMounted(() => {
+      if (authStore.isOrganizer) {
+        eventStore.getEventsByOrganizerId(authStore.id);
+      }
+    });
+
+    return {
+      payments,
+      fetchPayments,
+      formatPaymentDateTime,
+      selectedEvent,
+      eventStore,
+      authStore
+    };
+  }
+};
+</script>
 
 <style scoped>
 .dashboard {
@@ -186,5 +239,4 @@ nav.nav-borders .nav-link {
   margin-right: 1rem;
   cursor: pointer;
 }
-
 </style>

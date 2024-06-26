@@ -57,9 +57,17 @@ export const usePaymentStore = defineStore('payment', () => {
             console.error('Error fetching payments:', error);
         }
     }
+    async function getPaymentsByEvent(eventId) {
+        try {
+            const response = await axios.get(`${url}Payment/event/${eventId}`);
+            payments.value = response.data;
+        } catch (error) {
+            console.error('Error fetching payments by event ID:', error);
+        }
+    }
     
 
-    return { payments, amount,  getPaymentByTicket, getPaymentById, getPaymentsByUserId};
+    return { payments, amount,  getPaymentByTicket, getPaymentById, getPaymentsByUserId, getPaymentsByEvent};
 });
 
 
