@@ -50,7 +50,7 @@ async function handleSubmit() {
 <template>
   <section class="vh-100 d-flex">
     <div class="video-section">
-      <video playsinline autoplay muted loop src="/EventSphere.mp4"></video>
+      <video playsinline autoplay muted loop src="/EventSphereee.mp4"></video>
     </div>
     <div class="form-section d-flex align-items-center justify-content-center">
       <form @submit.prevent="handleSubmit" class="form-container">
@@ -89,10 +89,6 @@ async function handleSubmit() {
             role="button">
             <i>Sign Up</i>
           </a>
-        </div>
-        <div class="starlabs-logo">
-          <p>POWERED BY</p>
-          <img src="/starlabs.png" alt="Starlabs Logo">
         </div>
       </form>
     </div>
@@ -159,18 +155,5 @@ async function handleSubmit() {
   width: 100%;
   max-width: 520px;
   border: 1px solid rgb(209, 207, 207);
-}
-
-.starlabs-logo {
-  position: absolute;
-  bottom: -200px;
-  left: 50%;
-  transform: translateX(-50%);
-  text-align: center;
-}
-
-.starlabs-logo img {
-  width: 90px;
-  height: 90px;
 }
 </style>
