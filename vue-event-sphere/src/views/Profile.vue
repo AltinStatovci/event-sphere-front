@@ -58,7 +58,6 @@ const editProfile = async () => {
     await userStore.updateUser(user.value);
     await Swal.fire({
       title: "User updated successfully!",
-      text: "Please login!",
       icon: "success"
     }).then(() => {
       location.reload();
@@ -181,7 +180,7 @@ onMounted(async () => {
             <div class="card-body text-center">
               <img class="img-account-profile rounded-circle mb-2" src="http://bootdey.com/img/Content/avatar/avatar1.png" alt="">
               <div class="small font-italic text-muted mb-4">{{user.name}} {{user.lastName}}</div>
-              <button class="btn btn-outline-primary" type="button">Upload new image</button>
+
             </div>
           </div>
         </div>

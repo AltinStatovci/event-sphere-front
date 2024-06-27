@@ -9,7 +9,7 @@ const ticketStore = useTicketStore();
 
 const props = defineProps({
     tickets: Array,
-    eventID: Number,  // Ensure eventId is received as a prop
+    eventID: Number,
 });
 
 const activeTab = ref('ticketList');

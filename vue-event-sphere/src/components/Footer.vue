@@ -9,11 +9,11 @@ import {
 
 <template>
     <MDBFooter :text="['center', 'lg-start']">
-      <!-- Grid container -->
+
       <MDBContainer class="p-4">
-        <!--Grid row-->
+
         <MDBRow>
-          <!--Grid column-->
+
           <MDBCol md="12" class="mb-4 mb-md-0">
             <h5 class="text-uppercase">Event Sphere</h5>
   
@@ -27,15 +27,14 @@ import {
             </p>
           </MDBCol>
         </MDBRow>
-        <!--Grid row-->
+
       </MDBContainer>
-      <!-- Grid container -->
-  
-      <!-- Copyright -->
+
+
       <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.2)">
         © 2024 Copyright:
       </div>
-      <!-- Copyright -->
+
     </MDBFooter>
   </template>
 

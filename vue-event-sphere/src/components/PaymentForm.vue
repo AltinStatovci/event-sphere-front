@@ -1,31 +1,3 @@
-<template>
-  <div class="payment-form-container">
-    <form @submit.prevent="submitPayment" class="payment-form">
-      <div class="form-group">
-        <label for="card-holder-name">Card Holder Name</label>
-        <input type="text" id="card-holder-name" v-model="cardHolderName" required />
-      </div>
-      <div class="form-group">
-        <label for="card-number">Card Number</label>
-        <div id="card-element" class="card-element"></div>
-      </div>
-      <div class="form-group">
-        <label for="card-expiry">Expiration Date</label>
-        <div id="card-expiry" class="card-element"></div>
-      </div>
-      <div class="form-group">
-        <label for="card-cvc">CVC</label>
-        <div id="card-cvc" class="card-element"></div>
-      </div>
-      <div class="form-group">
-        <label for="zip-code">ZIP Code</label>
-        <input type="text" id="zip-code" v-model="zipCode" required />
-      </div>
-      <button type="submit" :disabled="loading">Pay</button>
-    </form>
-    <p v-if="error" class="error-message">{{ error }}</p>
-  </div>
-</template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
@@ -121,11 +93,11 @@ const submitPayment = async () => {
 
 const processPayment = async (stripeToken) => {
   try {
-    const totalAmount = paymentStore.amount * ticket.value.price; 
+    const totalAmount = paymentStore.amount * ticket.value.price;
     const response = await axios.post('http://localhost:5220/api/Payment', {
-      userID: authStore.id,  
-      ticketID: ticket.value.id,  
-      amount: paymentStore.amount,  
+      userID: authStore.id,
+      ticketID: ticket.value.id,
+      amount: paymentStore.amount,
       price: totalAmount,
       paymentMethod: 'Stripe',
       paymentDate: new Date().toISOString(),
@@ -140,7 +112,7 @@ const processPayment = async (stripeToken) => {
         icon: "success",
         confirmButtonText: "OK"
       }).then(() => {
-        router.push({ name: 'home' }); 
+        router.push({ name: 'home' });
       });
     } else {
       console.error('Unexpected response:', response);
@@ -160,6 +132,38 @@ const processPayment = async (stripeToken) => {
   }
 };
 </script>
+
+
+
+<template>
+  <div class="payment-form-container">
+    <form @submit.prevent="submitPayment" class="payment-form">
+      <div class="form-group">
+        <label for="card-holder-name">Card Holder Name</label>
+        <input type="text" id="card-holder-name" v-model="cardHolderName" required />
+      </div>
+      <div class="form-group">
+        <label for="card-number">Card Number</label>
+        <div id="card-element" class="card-element"></div>
+      </div>
+      <div class="form-group">
+        <label for="card-expiry">Expiration Date</label>
+        <div id="card-expiry" class="card-element"></div>
+      </div>
+      <div class="form-group">
+        <label for="card-cvc">CVC</label>
+        <div id="card-cvc" class="card-element"></div>
+      </div>
+      <div class="form-group">
+        <label for="zip-code">ZIP Code</label>
+        <input type="text" id="zip-code" v-model="zipCode" required />
+      </div>
+      <button type="submit" :disabled="loading">Pay</button>
+    </form>
+    <p v-if="error" class="error-message">{{ error }}</p>
+  </div>
+</template>
+
 
 <style scoped>
 .payment-form-container {
