@@ -121,10 +121,11 @@ const getEventsByName = async (name) => {
                 </li>
                 <li>
                   <button
-                    class="btn btn-outline-danger btn-sm m-lg-2"
+                    class="dropdown-item"
                     @click="onLogOut()"
                   >
                     Log Out
+                    <i class=" ml-2 bi bi-box-arrow-right"></i>
                   </button>
                 </li>
               </ul>
@@ -186,5 +187,13 @@ const getEventsByName = async (name) => {
 .bi-person-circle {
   font-size: 30px;
   color: #1e1f22;
+}
+.ml-2{
+  margin-left: 3px;
+  font-size: 16px;
+}
+.dropdown-menu{
+  --bs-dropdown-link-active-bg: #f8f9fa;
+  --bs-dropdown-link-active-color: #6c757d;
 }
 </style>

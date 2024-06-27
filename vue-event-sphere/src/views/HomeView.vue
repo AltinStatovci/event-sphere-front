@@ -45,10 +45,19 @@ const previousSlide = () => {
   }
 };
 
-const formatDate = (dateString) => {
-  return dateString.split('T')[0]; // Splits the string at 'T' and returns the date part
-};
+function formatDate(dateString) {
+  const monthsFull = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
 
+  const date = new Date(dateString);
+  const day = date.getDate();
+  const monthIndex = date.getMonth();
+  const year = date.getFullYear();
+
+  return `${day} ${monthsFull[monthIndex]} ${year}`;
+}
 const getLocation = async (event) => {
   try {
     const loc = await locationStore.getLocationById(event.locationId);
@@ -73,7 +82,7 @@ onMounted(async () => {
     eventsByCategoryId.value[categoryId] = { categoryName, events };
   });
 
-  slideshowEvents.value = results.flatMap(result => result.events).slice(0, 5); 
+  slideshowEvents.value = results.flatMap(result => result.events).slice(0, 5);
 
   for (const event of slideshowEvents.value) {
     await getLocation(event);
@@ -98,65 +107,72 @@ function goToTicket(id) {
 
 <template>
   <div>
-      <div class="top-banner__item is-ref">
+    <div class="top-banner__item is-ref">
       <div id="slideshow">
         <div v-for="(event, index) in slideshowEvents" :key="index" class="slideshow-item">
-        <div class="event-info">
+          <div class="event-info">
             <p class="event-name">{{ event.eventName }}</p>
-            <p class="small">Event description: {{ event.description }}</p>
-            <p class="small">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="icon">
-                <path d="M12 2C8.1 2 5 5.1 5 9c0 4.4 5.1 11.2 6.1 12.3.3.4.9.4 1.2 0 1-1.1 6.1-7.9 6.1-12.3 0-3.9-3.1-7-7-7zm0 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/>
-              </svg>Event location: {{ event.city }}</p>
-            <p class="small"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="icon">
-                <path d="M5 2v2H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1V2h-2v2H7V2H5zm0 4h14v14H5V6zm2 4v2h2v-2H7zm4 0v2h2v-2h-2zm4 0v2h2v-2h-2z"/>
-              </svg> Event start date: {{ formatDate(event.startDate) }}</p>
-            <p class="small"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="icon">
-                <path d="M5 2v2H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1V2h-2v2H7V2H5zm0 4h14v14H5V6zm2 4v2h2v-2H7zm4 0v2h2v-2h-2zm4 0v2h2v-2h-2z"/>
-              </svg> Event end date: {{ formatDate(event.endDate) }}</p>
-            
+            <p class="small">{{ event.description }}</p>
+            <p class="small mr-20">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="icon">
+                <path
+                  d="M12 2C8.1 2 5 5.1 5 9c0 4.4 5.1 11.2 6.1 12.3.3.4.9.4 1.2 0 1-1.1 6.1-7.9 6.1-12.3 0-3.9-3.1-7-7-7zm0 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z" />
+              </svg> {{ event.city }}
+            </p>
+            <p class="small"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                class="icon">
+                <path
+                  d="M5 2v2H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1V2h-2v2H7V2H5zm0 4h14v14H5V6zm2 4v2h2v-2H7zm4 0v2h2v-2h-2zm4 0v2h2v-2h-2z" />
+              </svg> {{ formatDate(event.startDate) }}</p>
+            <p class="small"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                class="icon">
+                <path
+                  d="M5 2v2H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1V2h-2v2H7V2H5zm0 4h14v14H5V6zm2 4v2h2v-2H7zm4 0v2h2v-2h-2zm4 0v2h2v-2h-2z" />
+              </svg> {{ formatDate(event.endDate) }}</p>
+
             <button @click="() => goToTicket(event.id)" class="btn btn-primary">Buy Ticket</button>
           </div>
-          <img
-            class="top-banner__image washed-out"
-            :src="`data:image/png;base64,${event.photoData}`"
-            :alt="event.eventName"
-          />
+          <img class="top-banner__image washed-out" :src="`data:image/png;base64,${event.photoData}`"
+            :alt="event.eventName" />
         </div>
         <button class="btn btn-primary nav-button left" @click="previousSlide">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
-  <path d="M15 18l-6-6 6-6"/>
-</svg>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+            <path d="M15 18l-6-6 6-6" />
+          </svg>
 
         </button>
         <button class="btn btn-primary nav-button right" @click="nextSlide">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
-  <path d="M9 6l6 6-6 6"/>
-</svg>
+            <path d="M9 6l6 6-6 6" />
+          </svg>
 
         </button>
       </div>
     </div>
-    
+
     <br />
 
     <div v-for="(category, categoryId) in filteredCategories" :key="categoryId" class="">
-      <h2 class="text-center">{{ category.categoryName }}</h2>
+      <div class="d-flex justify-content-center">
+      <h2 class="text-center custom-heading">Upcoming Events on: </h2>
+      <h2 class="text-center category-name">{{ category.categoryName }}</h2>
+    </div>
       <div class="d-flex justify-content-center flex-wrap">
-        <EventCard v-for="event in category.events" :key="event.id" :event="event" />
+        <EventCard class="event-card" v-for="event in category.events.slice(0, 4)" :key="event.id" :event="event" />
       </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-#top-banner__item is-ref{
-  height:100%;
+#top-banner__item is-ref {
+  height: 100%;
 }
+
 #slideshow {
   position: relative;
   width: 100%;
-  height: 400px;
+  height: 45vh;
   overflow: hidden;
 }
 
@@ -169,15 +185,15 @@ function goToTicket(id) {
 }
 
 .slideshow-item:first-child {
-  opacity: 1; /* Ensure the first slide is visible initially */
+  opacity: 1;
 }
 
 .slideshow-item img {
   width: 100%;
   height: 100%;
- /* Ensures images cover the container without white spaces */
-  object-position: center; /* Keeps the image centered */
+  object-position: center;
 }
+
 .nav-button {
   position: absolute;
   top: 50%;
@@ -201,6 +217,7 @@ function goToTicket(id) {
 .nav-button:hover {
   background-color: rgba(0, 0, 0, 0.8);
 }
+
 .event-info {
   position: absolute;
   top: 50%;
@@ -209,13 +226,16 @@ function goToTicket(id) {
   text-align: center;
   color: white;
 }
+
 .event-name {
   font-size: 24px;
   font-weight: bold;
 }
+
 .event-description {
   font-size: 18px;
 }
+
 .event-info {
   position: absolute;
   top: 50%;
@@ -223,26 +243,38 @@ function goToTicket(id) {
   transform: translate(-50%, -50%);
   text-align: center;
   color: white;
-  z-index: 2; /* Increased z-index to appear above the image */
+  z-index: 2;
 }
+
 .washed-out {
-  filter: brightness(20%); /* Adjust brightness percentage as needed */
+  filter: brightness(20%);
 }
+
 .small {
-  font-size: 14px; /* Adjust the font size as needed */
+  font-size: 14px;
 }
+
 .icon {
   width: 18px;
   height: 18px;
   vertical-align: middle;
   margin-right: 5px;
 }
-.btn{
+
+.btn {
   background-color: transparent;
   border-color: white;
-  --mdb-btn-box-shadow:  0 4px 9px -4px #e1eafa;
+  --mdb-btn-box-shadow: 0 4px 9px -4px #e1eafa;
   text-transform: none;
-  
-}
-</style>
 
+}
+
+.category-name{
+  margin-left: 10px;
+  color: #6596E0;
+}
+.mr-20{
+  margin-right: 20px;
+}
+
+</style>

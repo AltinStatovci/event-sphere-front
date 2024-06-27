@@ -14,9 +14,6 @@ const categoryId = ref(route.params.id);
 
 const getData = async (id) => {
   eventsByCategoryId.value[id] = await eventStore.getEventByCategory(id);
-
-  console.log(eventsByCategoryId.value[id]);
-  console.log(eventsByCategoryId.value);
 }
 
 onMounted(async () => {
@@ -34,7 +31,7 @@ watch(
 
 <template>
   <div>
-    <div v-if="eventsByCategoryId[categoryId] && eventsByCategoryId[categoryId].length > 0" class="d-flex justify-content-between flex-wrap">
+    <div v-if="eventsByCategoryId[categoryId] && eventsByCategoryId[categoryId].length > 0" class="d-flex justify-content-center flex-wrap">
       <div v-for="event in eventsByCategoryId[categoryId]" :key="event.id">
         <EventCard :event="event"/>
       </div>

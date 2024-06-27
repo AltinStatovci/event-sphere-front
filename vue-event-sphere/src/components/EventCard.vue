@@ -50,20 +50,29 @@ function formatDateString(dateString) {
 </script>
 
 <template>
-  <div>
-    <div class="d-flex my-5">
-      <div class="card mx-3" style="width: 23rem">
-        <img :src="`data:image/png;base64,${event.photoData}`" class="card-img-top" alt="Base64 Image" width="100%" height="250px">
-        <div class="card-body">
-          <h5 class="card-title text-center mb-4 event-title">{{ event.eventName }}</h5>
-          <div class="d-flex">
-            <p class="card-text"><i class="bi bi-calendar-event mr-3"></i>{{ formatDateString(event.startDate) }}</p>
+  <div class="event-card m-2">
+    <div class="d-flex justify-content-center my-5">
+      <div class="card shadow-lg mx-3" style="width: 23rem; border-radius: 10px; overflow: hidden;">
+        <img :src="`data:image/png;base64,${event.photoData}`" class="card-img-top" alt="Event Image" style="height: 250px; object-fit: cover;">
+        <div class="card-body" style="background-color: #fff; padding: 20px;">
+          <h5 class="card-title text-center mb-3" style="font-weight: bold; color: #333;">{{ event.eventName }}</h5>
+          <div class="d-flex justify-content-center align-items-center mb-3" style="color: #666;">
+            <i class="bi bi-calendar-event mr-2"></i>
+            <span>{{ formatDateString(event.startDate) }}</span>
             <span class="mx-2">-</span>
-            <p class="card-text">{{ formatDateString(event.endDate) }}</p>
+            <span>{{ formatDateString(event.endDate) }}</span>
           </div>
-          <p class="card-text address" v-if="location.city"><i class="bi bi-geo-alt-fill mr-3"></i>{{ location.city }}, {{ location.country }}</p>
-          <p class="card-text"><i class="bi bi-ticket-perforated mr-3"></i>Available tickets: {{ event.availableTickets }}</p>
-          <button @click="() => goToEvent(event.id)" class="btn">Find out more</button>
+          <p class="card-text text-center mb-3" v-if="location.city" style="color: #666;">
+            <i class="bi bi-geo-alt-fill mr-2"></i>{{ location.city }}, {{ location.country }}
+          </p>
+          <p class="card-text text-center mb-4" style="color: #666;">
+            <i class="bi bi-ticket-perforated mr-2"></i> Tickets left:<strong class="ticket-nr"> {{ event.availableTickets }}</strong>
+          </p>
+          <div class="text-center">
+            <button @click="() => goToEvent(event.id)" class="btn btn-primary" style=" border: none; padding: 10px 20px; border-radius: 5px;">
+              Find out more
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -87,8 +96,28 @@ function formatDateString(dateString) {
 }
 i {
   color: #6596E0;
+  margin-right: 5px;
 }
 .address{
   text-transform: capitalize;
 }
+.card-title {
+  font-family: 'Roboto', sans-serif;
+  font-size: 1.5rem;
+}
+.card-text {
+  font-family: 'Roboto', sans-serif;
+  font-size: 1rem;
+}
+.ticket-nr{
+  margin-left: 5px;
+}
+.event-card {
+  transition: transform 0.3s ease; /* Smooth transition for the scaling */
+}
+
+.event-card:hover {
+  transform: scale(1.1); /* Scale the card to 110% of its original size on hover */
+}
+
 </style>
