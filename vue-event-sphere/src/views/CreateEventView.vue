@@ -39,6 +39,7 @@
                   <td>
                     <button class="btn btn-outline-danger btn-sm" @click="deleteEvent(event.id)">Delete</button>
                     <button class="btn btn-outline-primary btn-sm" @click="openEditForm(event.id)">Edit</button>
+                    <button class="btn btn-outline-secondary btn-sm" @click="getTickets(event.id)">See Tickets</button>
                   </td>
                 </tr>
                 <tr v-if="eventList.length === 0">
@@ -48,6 +49,9 @@
             </table>
           </div>
         </div>
+        <div v-if="showTicketsTable">
+        <ticket-list :tickets="ticketList" :eventID="eventID"/>
+      </div>
       </div>
 
       <!-- Event Form Section -->
@@ -156,15 +160,20 @@ import Swal from "sweetalert2";
 import SideBar from "@/components/SideBar.vue";
 import { useLocationStore } from '@/store/locationStore';
 import { useCategoryStore } from "@/store/categoryStore";
+import { useTicketStore } from "@/store/ticketStore";
+import TicketList from "@/components/TicketList.vue";
 
 const router = useRouter();
 const eventStore = useEventStore();
 const authStore = useAuthStore();
+const ticketStore = useTicketStore();
 const eventById = ref(null);
 const locationStore = useLocationStore();
 const categoryStore = useCategoryStore();
 const locations = ref([]);
 const categories = ref([]);
+const ticketList = ref([]);
+
 
 const formData = reactive({
   id: '',
@@ -229,14 +238,12 @@ const eventList = ref([]);
 
 const fetchEvents = async () => {
   eventList.value = await eventStore.getEventByOrganizer(authStore.id);
-  console.log(eventList.value);
 }
 
 const getAllLocations = async () => {
   try {
     const response = await locationStore.getLocations();
     locations.value = response;
-    console.log("Locations", locations.value);
   } catch (err) {
     console.error(err);
   }
@@ -246,7 +253,6 @@ const getAllCategories = async () => {
   try {
     const response = await categoryStore.getAllCategories();
     categories.value = response;
-    console.log("Categories", categories.value);
   } catch (err) {
     console.error(err);
   }
@@ -279,14 +285,11 @@ const deleteEvent = async (eventId) => {
 const showEditForm = ref(false);
 
 const openEditForm = async (eventId) => {
-  console.log("Opening edit form for event ID:", eventId);
-  selectedEventId.value = eventId; // Ensure the selectedEventId is set
+  selectedEventId.value = eventId; 
   isEditMode.value = true;
   showEditForm.value = true;
 
   eventById.value = await eventStore.getEventById(eventId);
-
-  console.log("Event data retrieved:", eventById.value);
 
   formData.id = eventById.value.id;
   formData.eventName = eventById.value.eventName;
@@ -299,8 +302,6 @@ const openEditForm = async (eventId) => {
   formData.maxAttendance = eventById.value.maxAttendance;
   formData.availableTickets = eventById.value.availableTickets;
   formData.image = eventById.value.image;
-
-  console.log("Updated formData:", formData);
 
   changeTab('eventForm');
 };
@@ -336,6 +337,25 @@ const resetForm = () => {
   isEditMode.value = false;
   selectedEventId.value = null;
 };
+const showTicketsTable = ref(null);
+
+const eventID = ref(0);
+
+const getTickets = async (id) => {
+  const response = await ticketStore.getTicketByEvent(id);
+  eventID.value = id;
+  console.log(eventID);
+  ticketList.value = response.value;
+  showTicketsTable.value = true;
+  if (ticketList.value.length === 0) {
+    Swal.fire({
+      title: "No Tickets",
+      text: "No tickets here",
+      icon: "info",
+    });
+  }
+}
+
 </script>
 <style scoped>
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');

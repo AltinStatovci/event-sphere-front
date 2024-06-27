@@ -2,125 +2,53 @@
   <div class="d-flex">
     <side-bar />
     <div class="container-xl px-4 mt-4">
-      <nav class="nav nav-borders">
-        <a class="nav-link" :class="{ active: activeTab === 'ticketList' }" @click.prevent="changeTab('ticketList')">Ticket List</a>
-        <a class="nav-link" :class="{ active: activeTab === 'ticketForm' }" @click.prevent="changeTab('ticketForm')">Ticket Form</a>
-      </nav>
-      <hr class="mt-0 mb-4">
-      
-      <!-- Ticket List Section -->
-      <div v-if="activeTab === 'ticketList'">
-        <div class="card mb-4">
-          <div class="card-header">Ticket List</div>
-          <div class="card-body">
-            <table class="table">
-              <thead>
-                <tr>
-                  <th scope="col">Ticket Type</th>
-                  <th scope="col">Price</th>
-                  <th scope="col">Booking Reference</th>
-                  <th scope="col">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="ticket in ticketList" :key="ticket.id">
-                  <td>{{ ticket.ticketType }}</td>
-                  <td>{{ ticket.price }}</td>
-                  <td>{{ ticket.bookingReference }}</td>
-                  <td>
-                    <button class="btn btn-outline-danger btn-sm" @click="deleteTicket(ticket.id)">Delete</button>
-                    <button class="btn btn-outline-primary btn-sm" @click="openEditForm(ticket.id)">Edit</button>
-                  </td>
-                </tr>
-                <tr v-if="ticketList.length === 0">
-                            <td colspan="9" class="no-data">No tickets available</td>
-                        </tr>
-              </tbody>
-            </table>
-          </div>
+      <div class="card mb-4">
+        <div class="card-header">Ticket List</div>
+        <div class="card-body">
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">Event Name</th>
+                <th scope="col">Ticket Type</th>
+                <th scope="col">Price</th>
+                <th scope="col">Booking Reference</th>
+                <th scope="col"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="ticket in ticketList" :key="ticket.id">
+                <td>{{ ticket.eventName }}</td>
+                <td>{{ ticket.ticketType }}</td>
+                <td>{{ ticket.price }}</td>
+                <td>{{ ticket.bookingReference }}</td>
+                <td>
+                  <button class="btn btn-outline-danger btn-sm" @click="deleteTicket(ticket.id)">Delete</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-      </div>
-      
-      <!-- Ticket Form Section -->
-      <div v-if="activeTab === 'ticketForm'">
-        <div class="row">
-          <div class="col-xl-12">
-            <div class="card mb-4">
-              <div class="card-header">Ticket Details</div>
-              <div class="card-body">
-                <form @submit.prevent="handleSubmit">
-                  <div class="row gx-3 mb-3">
-                    <div class="col-md-6">
-                      <label class="small mb-1" for="ticketType">Ticket Type</label>
-                      <input class="form-control" id="ticketType" type="text" placeholder="Enter ticket type" v-model.trim="formData.ticketType">
-                    </div>
-                    
-                  </div>
-                  <div class="row gx-3 mb-3">
-                    <div class="col-md-6">
-                      <label class="small mb-1" for="price">Price</label>
-                      <input class="form-control" id="price" type="number" placeholder="Enter price" v-model.trim="formData.price">
-                    </div>
-                    <div class="col-md-6">
-                      <label class="small mb-1" for="bookingReference">Booking Reference</label>
-                      <input class="form-control" id="bookingReference" type="text" placeholder="Enter booking reference" v-model.trim="formData.bookingReference">
-                    </div>
-                  </div>
-                  <button class="btn btn-primary" type="submit">Submit</button>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Edit Ticket Form Section -->
-      <div v-if="showEditForm">
-        <UpdateTicketView :ticketId="selectedTicketId" :ticketById="ticketById" />
       </div>
     </div>
   </div>
+
 </template>
 
 <script setup>
 import { ref, reactive, onMounted } from "vue";
 import { useTicketStore } from "@/store/ticketStore.js";
-import { useRouter } from "vue-router";
 import Swal from "sweetalert2";
 import SideBar from "@/components/SideBar.vue";
-import UpdateTicketView from "./UpdateTicketView.vue";
 
 const ticketStore = useTicketStore();
-const router = useRouter();
 const ticketById = ref(null);
 
 const formData = reactive({
-  eventID: 1,
+
   ticketType: '',
   price: 0,
   bookingReference: '',
 });
-
-const selectedTicketId = ref(null); 
-
-const handleSubmit = async () => {
-  try {
-    await ticketStore.addTicket(formData);
-    Swal.fire({
-      title: 'Ticket Added successfully!',
-      icon: 'success'
-    }).then(() => {
-      fetchTickets();
-      changeTab('ticketList');
-    });
-  } catch (e) {
-    Swal.fire({
-      title: 'Error!',
-      text: e.response ? e.response.data : e.message || 'Failed to add ticket',
-      icon: 'error'
-    });
-  }
-}
 
 const ticketList = ref([]);
 
@@ -265,14 +193,8 @@ body {
   font-size: 0.875rem;
   text-align: center;
 }
-.btn{
+
+.btn {
   text-transform: capitalize;
-}
-.no-data {
-    text-align: center;
-    padding: 10px;
-    background-color: #fff;
-    border: 1px solid #ddd;
-    color: #999;
 }
 </style>

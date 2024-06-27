@@ -12,10 +12,12 @@ const ticketById = ref(null);
 const props = defineProps({
     ticketId: Number,
     ticketById: Object,
+    eventId: Number,
 });
 
 const selectedTicket = reactive({
     id: props.ticketId,
+    eventID: props.eventId,
     ticketType: '',
     price: 0,
     bookingReference: '',
@@ -31,15 +33,17 @@ watch(() => props.ticketId, async (newValue) => {
 const updateTicket = async () => {
     try {
         await ticketStore.updateTicket(selectedTicket);
-        await Swal.fire({
-            title: "Ticket updated successfully!",
-            icon: "success"
+        Swal.fire({
+            title: 'Ticket Updated successfully!',
+            icon: 'success'
+        }).then(() => {
+            location.reload();
         });
     } catch (e) {
-        await Swal.fire({
-            title: "Error!",
-            text: e.message,
-            icon: "error"
+        Swal.fire({
+            title: 'Error!',
+            text: e.response ? e.response.data : e.message || 'Failed to add ticket',
+            icon: 'error'
         });
     }
 };
@@ -53,7 +57,7 @@ const updateTicket = async () => {
                 <div class="card-body">
                     <form @submit.prevent="updateTicket">
                         <div class="row gx-3 mb-3">
-                            
+
                             <div class="col-md-6">
                                 <label class="small mb-1" for="editTicketType">Ticket Type</label>
                                 <input class="form-control" id="editTicketType" type="text"

@@ -25,6 +25,7 @@ export const usePaymentStore = defineStore('payment', () => {
                 ticketName: payment.ticketName
             }));
         } catch (err) {
+        } catch (err) {
             console.log(err);
         }
     }
@@ -44,7 +45,9 @@ export const usePaymentStore = defineStore('payment', () => {
                 paymentDate: paymentData.paymentDate
             };
             payment.value = fetchedPayment;
+            payment.value = fetchedPayment;
             return fetchedPayment;
+        } catch (err) {
         } catch (err) {
             console.error("error fetching payment: ", err);
             return null;

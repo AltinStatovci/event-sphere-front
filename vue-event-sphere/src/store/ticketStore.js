@@ -65,11 +65,13 @@ export const useTicketStore = defineStore('ticket', () => {
       const data = response.data;
       tickets.value = data.map(ticket => ({
         id: ticket.id,
+        eventID: ticket.eventID,
         eventName: ticket.eventName,
         price: ticket.price,
         ticketType: ticket.ticketType,
         bookingReference: ticket.bookingReference,
       }));
+      return tickets;
     } catch (err) {
       console.log(err);
     }

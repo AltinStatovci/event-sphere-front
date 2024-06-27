@@ -1,11 +1,23 @@
 <template>
   <div class="d-flex">
     <SideBar />
+    <SideBar />
     <div class="container-xl px-4 mt-4">
       <nav class="nav nav-borders">
         <a class="nav-link">Payment List</a>
+        <a class="nav-link">Payment List</a>
       </nav>
       <hr class="mt-0 mb-4">
+
+      <div v-if="authStore.isOrganizer" class="dropdown-container">
+        <label for="event-select">Select an Event:</label>
+        <select id="event-select" v-model="selectedEvent" @change="fetchPayments" class="form-select">
+          <option value="" disabled>Select an event</option>
+          <option v-for="event in eventStore.events" :key="event.id" :value="event.id">
+            {{ event.eventName }}
+          </option>
+        </select>
+      </div>
 
       <div v-if="authStore.isOrganizer" class="dropdown-container">
         <label for="event-select">Select an Event:</label>
@@ -31,6 +43,13 @@
                   <th>Payment Method</th>
                   <th>Payment Status</th>
                   <th>Payment Date</th>
+                  <th>ID</th>
+                  <th>User Name</th>
+                  <th>Ticket ID</th>
+                  <th>Amount</th>
+                  <th>Payment Method</th>
+                  <th>Payment Status</th>
+                  <th>Payment Date</th>
                 </tr>
               </thead>
               <tbody>
@@ -42,8 +61,17 @@
                   <td>{{ payment.paymentMethod }}</td>
                   <td>{{ payment.paymentStatus }}</td>
                   <td>{{ formatPaymentDateTime(payment.paymentDate) }}</td>
+                  <td>{{ payment.id }}</td>
+                  <td>{{ payment.userName || 'N/A' }}</td>
+                  <td>{{ payment.ticketName || 'N/A' }}</td>
+                  <td>{{ payment.amount }}</td>
+                  <td>{{ payment.paymentMethod }}</td>
+                  <td>{{ payment.paymentStatus }}</td>
+                  <td>{{ formatPaymentDateTime(payment.paymentDate) }}</td>
                 </tr>
                 <tr v-if="payments.length === 0">
+                  <td colspan="7" class="no-data">No payments available</td>
+                </tr>
                   <td colspan="7" class="no-data">No payments available</td>
                 </tr>
               </tbody>
@@ -193,6 +221,29 @@ nav.nav-borders .nav-link {
   cursor: pointer;
 }
 
+.dropdown-container {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.dropdown-container label {
+  margin-bottom: 8px;
+  font-weight: bold;
+}
+
+.dropdown-container .form-select {
+  padding: 0.75rem 1rem;
+  border-radius: 0.35rem;
+  border: 1px solid #c5ccd6;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.dropdown-container .form-select:focus {
+  border-color: #80bdff;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
 .dropdown-container {
   display: flex;
   flex-direction: column;
