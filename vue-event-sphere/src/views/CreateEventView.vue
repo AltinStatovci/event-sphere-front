@@ -83,8 +83,14 @@ const handleImageUpload = (event) => {
 
 const eventList = ref([]);
 
+const allEventList = ref([])
+
 const fetchEvents = async () => {
   eventList.value = await eventStore.getEventByOrganizer(authStore.id);
+}
+
+const fetchAllEvents = async () => {
+  allEventList.value = await eventStore.getEvents()
 }
 
 const getAllLocations = async () => {
@@ -107,6 +113,7 @@ const getAllCategories = async () => {
 
 onMounted(() => {
   fetchEvents();
+  fetchAllEvents();
   getAllLocations();
   getAllCategories();
 })
@@ -215,6 +222,7 @@ const getTickets = async (id) => {
           List</a>
         <a class="nav-link" :class="{ active: activeTab === 'eventForm' }" @click.prevent="changeTab('eventForm')">Event
           Form</a>
+        <a  v-if="authStore.isAdmin" class="nav-link" :class="{ active: activeTab === 'AdminList' }" @click.prevent="changeTab('AdminList')">Admin List</a>
       </nav>
       <hr class="mt-0 mb-4">
 
@@ -355,6 +363,51 @@ const getTickets = async (id) => {
             </div>
           </div>
         </div>
+      </div>
+
+
+
+    <!-- Admin List Tab -->
+      <div v-if="activeTab === 'AdminList' && authStore.isAdmin">
+        <div class="card mb-4">
+          <div class="card-header">Event List</div>
+          <div class="card-body">
+            <table class="table">
+              <thead>
+              <tr>
+                <th scope="col">Organizer</th>
+                <th scope="col">Event Name</th>
+                <th scope="col">Location</th>
+                <th scope="col">Category Name</th>
+                <th scope="col">Start Date</th>
+                <th scope="col">End Date</th>
+                <th scope="col">Max Attendees</th>
+                <th scope="col">Available Tickets</th>
+                <th scope="col"></th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr v-for="event in allEventList" :key="event.id">
+                <td>{{event.organizerName}}</td>
+                <td>{{ event.eventName }}</td>
+                <td>{{ event.address }}</td>
+                <td>{{ event.categoryName }}</td>
+                <td>{{ formatDateTime(event.startDate) }}</td>
+                <td>{{ formatDateTime(event.endDate) }}</td>
+                <td>{{ event.maxAttendance }}</td>
+                <td>{{ event.availableTickets }}</td>
+                <td>
+                  <button class="btn btn-outline-danger btn-sm" @click="deleteEvent(event.id)">Delete</button>
+                </td>
+              </tr>
+              <tr v-if="allEventList.length === 0">
+                <td colspan="9" class="no-data">No events available</td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
