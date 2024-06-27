@@ -5,12 +5,12 @@ import SignUpView from '@/views/auth/SignUpView.vue';
 import DetailsView from '@/views/DetailsView.vue';
 import TicketsView from '@/views/TicketsView.vue';
 import { useAuthStore } from '@/store/authStore.js';
-
+import TicketCard from '@/components/TicketCard.vue';
 import EventByCategoryView from "@/views/EventByCategoryView.vue";
 import AboutView from '@/views/AboutView.vue';
-
+import ContactView from '@/views/NearYouView.vue';
 import Dashboard from "@/views/Dashboard.vue";
-
+import SideBar from "@/components/SideBar.vue";
 import Profile from "@/views/Profile.vue";
 import Payment from "@/views/Payment.vue";
 import Report from "@/views/Report.vue";
@@ -75,19 +75,19 @@ const routes = [
       path: '/dashboard',
       name: 'dashboard',
       component: Dashboard,
-      meta: { requiresAuth: true, requiresAdmin:true },
+      meta: { requiresAuth: true },
     },
     {
       path: '/manageEvent',
       name: 'manageEvent',
       component: CreateEventView,
-      meta: { requiresAuth: true , requiresAdminOrOrganizer:true},
+      meta: { requiresAuth: true },
     },
     {
       path: '/manageTickets',
       name: 'manageTickets',
       component: CreateTicketView,
-      meta: { requiresAuth: true , requiresAdmin: true},
+      meta: { requiresAuth: true },
     },
     
     {
@@ -114,9 +114,14 @@ const routes = [
     path: '/createEvent',
     name: 'createEvent',
     component:CreateEventView,
-    meta: { requiresAuth: true, requiresAdminOrOrganizer: true },
+    meta: { requiresAuth: true },
   }, 
-
+  {
+    path: '/createTickets',
+    name: 'createTickets',
+    component:CreateTicketView,
+    meta: { requiresAuth: true },
+  },
  {
   path: '/paymentDashboard',
   name: 'paymentDashboard',
@@ -144,28 +149,7 @@ router.beforeEach((to, from, next) => {
       query: { redirect: to.fullPath },
     });
   } else {
-    const requiresAdmin = to.meta.requiresAdmin || false;
-    const requiresOrganizer = to.meta.requiresOrganizer || false;
-    const requiresAdminOrOrganizer = to.meta.requiresAdminOrOrganizer || false;
-
-    if (requiresAdmin && !authStore.isAdmin) {
-      next({
-        path: '/',
-        query: { redirect: to.fullPath },
-      });
-    } else if (requiresOrganizer && !authStore.isOrganizer) {
-      next({
-        path: '/',
-        query: { redirect: to.fullPath },
-      });
-    } else if (requiresAdminOrOrganizer && !(authStore.isAdmin || authStore.isOrganizer)) {
-      next({
-        path: '/',
-        query: { redirect: to.fullPath },
-      });
-    } else {
-      next();
-    }
+    next();
   }
 });
 

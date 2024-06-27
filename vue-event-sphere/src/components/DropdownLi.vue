@@ -1,7 +1,7 @@
 <script setup>
 import { useCategoryStore } from '@/store/categoryStore';
 import { useRouter } from 'vue-router';
-import {onMounted, ref} from "vue";
+import {onMounted, ref} from "vue"; // Import for routing
 
 const categoryStore = useCategoryStore();
 const router = useRouter();
@@ -18,7 +18,7 @@ onMounted(async () => {
   const fetchedCategories = await categoryStore.getAllCategories();
   categories.value = fetchedCategories.map(category => ({
     categoryName: category.categoryName,
-    categoryId: category.id
+    categoryId: category.id // Assuming the ID property is named "id"
   }));
 });
 </script>
@@ -30,5 +30,5 @@ onMounted(async () => {
 </template>
 
 <style scoped>
-
+/* Add Bootstrap CSS or your preferred styling for the dropdown */
 </style>
