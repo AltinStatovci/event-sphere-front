@@ -41,7 +41,7 @@ function formatTimeAndDate(timestamp) {
 
     var am_pm = hours >= 12 ? 'PM' : 'AM';
     hours = hours % 12;
-    hours = hours ? hours : 12; // Handle midnight (0 hours)
+    hours = hours ? hours : 12;
 
     minutes = minutes < 10 ? '0' + minutes : minutes;
     seconds = seconds < 10 ? '0' + seconds : seconds;
@@ -51,7 +51,7 @@ function formatTimeAndDate(timestamp) {
     return formattedTimeAndDate;
 }
 
-// Example usage:
+
 var timestamp = "2024-06-19T12:21:55.623";
 var formatted = formatTimeAndDate(timestamp);
 console.log(formatted);

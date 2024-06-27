@@ -9,10 +9,10 @@
 <template>
     <div class="bg-image flex-fill"
         style="background-image: url('https://en.idei.club/uploads/posts/2023-06/1686948162_en-idei-club-p-business-office-background-dizain-instagra-1.jpg'); height: 50vh; position: relative;">
-        <!-- Mask for shading -->
+
         <div class="mask"
             style="background-color: rgba(0, 0, 0, 0.6); height: 100%; width: 100%; position: absolute; top: 0; left: 0;">
-            <!-- Text on top of the image -->
+
             <div class="d-flex justify-content-center align-items-center h-100">
                 <div class="text-white text-center">
                     <h1 class="mb-4">Learn more about us</h1>

@@ -51,7 +51,7 @@ async function handleSubmit(){
 
   } catch (e) {
     formIsValid.value = false;
-    // error.value = e.response.data.error.message;
+
     console.log(e)
   }
 
@@ -137,7 +137,7 @@ async function handleSubmit(){
             </a>
 
           </div>
-            <!-- Submit button -->
+
 
           </form>
         </div>

@@ -29,7 +29,7 @@ export const useEventStore = defineStore('event', () => {
 
 
             events.value = allEvents;
-            console.log(allEvents);
+
 
             events.value = allEvents; // Store the events in the state
 
@@ -64,7 +64,7 @@ export const useEventStore = defineStore('event', () => {
 
 
             events.value = allEvents;
-            console.log(allEvents);
+
 
             events.value = allEvents; // Store the events in the state
 
@@ -129,7 +129,7 @@ export const useEventStore = defineStore('event', () => {
               photoData: event.photoData, 
           }));
           events.value = allEvents; 
-          console.log(events.value);
+
           return allEvents;
       } catch (err) {
           console.error('Error fetching events:', err);
@@ -156,7 +156,7 @@ export const useEventStore = defineStore('event', () => {
 
 
         events.value = allEvents;
-        console.log(allEvents);
+
 
         events.value = allEvents; 
 
@@ -186,7 +186,7 @@ async function getEventsByCountry(country) {
 
 
         events.value = allEvents;
-        console.log(allEvents);
+
 
         events.value = allEvents; 
 

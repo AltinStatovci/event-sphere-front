@@ -21,7 +21,7 @@ const fetchPayments = async () => {
     }
 };
 
-// Fetch payments on component mount
+
 onMounted(() => {
     fetchPayments();
 });

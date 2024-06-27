@@ -1,3 +1,203 @@
+<script setup>
+import { ref, reactive, onMounted } from "vue";
+import { useEventStore } from "@/store/eventStore.js";
+import { useAuthStore } from "@/store/authStore.js";
+import { useRouter } from "vue-router";
+import Swal from "sweetalert2";
+import SideBar from "@/components/SideBar.vue";
+import { useLocationStore } from '@/store/locationStore';
+import { useCategoryStore } from "@/store/categoryStore";
+import { useTicketStore } from "@/store/ticketStore";
+import TicketList from "@/components/TicketList.vue";
+
+const router = useRouter();
+const eventStore = useEventStore();
+const authStore = useAuthStore();
+const ticketStore = useTicketStore();
+const eventById = ref(null);
+const locationStore = useLocationStore();
+const categoryStore = useCategoryStore();
+const locations = ref([]);
+const categories = ref([]);
+const ticketList = ref([]);
+
+
+const formData = reactive({
+  id: '',
+  eventName: '',
+  description: '',
+  startDate: '',
+  endDate: '',
+  address: '',
+  locationId: '',
+  categoryID: '',
+  organizerID: authStore.id,
+  maxAttendance: 0,
+  availableTickets: 0,
+  dateCreated: new Date().toISOString(),
+  image: '',
+});
+
+const imageUrl = ref('https://t4.ftcdn.net/jpg/05/65/22/41/360_F_565224180_QNRiRQkf9Fw0dKRoZGwUknmmfk51SuSS.jpg');
+
+const selectedEventId = ref(null);
+const isEditMode = ref(false);
+
+const handleSubmit = async () => {
+  try {
+    if (isEditMode.value) {
+      await eventStore.updateEvent(formData);
+      Swal.fire({
+        title: "Event Updated successfully!",
+        icon: "success"
+      }).then(() => {
+        const redirectUrl = `/`;
+        router.push(redirectUrl);
+      });
+    } else {
+      await eventStore.addEvent(formData);
+      Swal.fire({
+        title: "Event Added successfully!",
+        icon: "success"
+      }).then(() => {
+        const redirectUrl = `/`;
+        router.push(redirectUrl);
+      });
+    }
+  } catch (e) {
+    await Swal.fire({
+      title: "Error!",
+      text: e.message,
+      icon: "error"
+    });
+  }
+};
+
+const handleImageUpload = (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    formData.image = file;
+    imageUrl.value = URL.createObjectURL(file);
+  }
+};
+
+const eventList = ref([]);
+
+const fetchEvents = async () => {
+  eventList.value = await eventStore.getEventByOrganizer(authStore.id);
+}
+
+const getAllLocations = async () => {
+  try {
+    const response = await locationStore.getLocations();
+    locations.value = response;
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const getAllCategories = async () => {
+  try {
+    const response = await categoryStore.getAllCategories();
+    categories.value = response;
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+onMounted(() => {
+  fetchEvents();
+  getAllLocations();
+  getAllCategories();
+})
+
+const deleteEvent = async (eventId) => {
+  try {
+    await eventStore.deleteEvent(eventId);
+    Swal.fire({
+      title: "Event Deleted successfully!",
+      icon: "success"
+    }).then(() => {
+      location.reload();
+    });
+  } catch (err) {
+    await Swal.fire({
+      title: "Error!",
+      text: err.value,
+      icon: "error"
+    });
+  }
+}
+
+const showEditForm = ref(false);
+
+const openEditForm = async (eventId) => {
+  selectedEventId.value = eventId;
+  isEditMode.value = true;
+  showEditForm.value = true;
+
+  eventById.value = await eventStore.getEventById(eventId);
+
+  formData.id = eventById.value.id;
+  formData.eventName = eventById.value.eventName;
+  formData.description = eventById.value.description;
+  formData.startDate = eventById.value.startDate;
+  formData.endDate = eventById.value.endDate;
+  formData.address = eventById.value.address;
+  formData.locationId = eventById.value.locationId;
+  formData.categoryID = eventById.value.categoryID;
+  formData.maxAttendance = eventById.value.maxAttendance;
+  formData.availableTickets = eventById.value.availableTickets;
+  formData.image = eventById.value.image;
+
+  changeTab('eventForm');
+};
+
+const activeTab = ref('eventList');
+
+const changeTab = (tab) => {
+  activeTab.value = tab;
+  if (tab === 'eventForm' && !isEditMode.value) {
+    resetForm();
+  }
+};
+
+const resetForm = () => {
+  formData.eventName = '';
+  formData.description = '';
+  formData.startDate = '';
+  formData.endDate = '';
+  formData.address = '';
+  formData.locationId = '';
+  formData.categoryID = '';
+  formData.maxAttendance = 0;
+  formData.availableTickets = 0;
+  formData.image = '';
+  imageUrl.value = 'https://t4.ftcdn.net/jpg/05/65/22/41/360_F_565224180_QNRiRQkf9Fw0dKRoZGwUknmmfk51SuSS.jpg';
+  isEditMode.value = false;
+  selectedEventId.value = null;
+};
+const showTicketsTable = ref(null);
+
+const eventID = ref(0);
+
+const getTickets = async (id) => {
+  const response = await ticketStore.getTicketByEvent(id);
+  eventID.value = id;
+
+  ticketList.value = response.value;
+  showTicketsTable.value = true;
+  if (ticketList.value.length === 0) {
+    Swal.fire({
+      title: "No Tickets",
+      text: "No tickets here",
+      icon: "info",
+    });
+  }
+}
+
+</script>
+
 <template>
   <div class="d-flex">
     <side-bar />
@@ -151,205 +351,7 @@
     </div>
   </div>
 </template>
-<script setup>
-import { ref, reactive, onMounted } from "vue";
-import { useEventStore } from "@/store/eventStore.js";
-import { useAuthStore } from "@/store/authStore.js";
-import { useRouter } from "vue-router";
-import Swal from "sweetalert2";
-import SideBar from "@/components/SideBar.vue";
-import { useLocationStore } from '@/store/locationStore';
-import { useCategoryStore } from "@/store/categoryStore";
-import { useTicketStore } from "@/store/ticketStore";
-import TicketList from "@/components/TicketList.vue";
 
-const router = useRouter();
-const eventStore = useEventStore();
-const authStore = useAuthStore();
-const ticketStore = useTicketStore();
-const eventById = ref(null);
-const locationStore = useLocationStore();
-const categoryStore = useCategoryStore();
-const locations = ref([]);
-const categories = ref([]);
-const ticketList = ref([]);
-
-
-const formData = reactive({
-  id: '',
-  eventName: '',
-  description: '',
-  startDate: '',
-  endDate: '',
-  address: '',
-  locationId: '',
-  categoryID: '',
-  organizerID: authStore.id,
-  maxAttendance: 0,
-  availableTickets: 0,
-  dateCreated: new Date().toISOString(),
-  image: '',
-});
-
-const imageUrl = ref('https://t4.ftcdn.net/jpg/05/65/22/41/360_F_565224180_QNRiRQkf9Fw0dKRoZGwUknmmfk51SuSS.jpg');
-
-const selectedEventId = ref(null);
-const isEditMode = ref(false);
-
-const handleSubmit = async () => {
-  try {
-    if (isEditMode.value) {
-      await eventStore.updateEvent(formData);
-      Swal.fire({
-        title: "Event Updated successfully!",
-        icon: "success"
-      }).then(() => {
-        const redirectUrl = `/`;
-        router.push(redirectUrl);
-      });
-    } else {
-      await eventStore.addEvent(formData);
-      Swal.fire({
-        title: "Event Added successfully!",
-        icon: "success"
-      }).then(() => {
-        const redirectUrl = `/`;
-        router.push(redirectUrl);
-      });
-    }
-  } catch (e) {
-    await Swal.fire({
-      title: "Error!",
-      text: e.message,
-      icon: "error"
-    });
-  }
-};
-
-const handleImageUpload = (event) => {
-  const file = event.target.files[0];
-  if (file) {
-    formData.image = file;
-    imageUrl.value = URL.createObjectURL(file);
-  }
-};
-
-const eventList = ref([]);
-
-const fetchEvents = async () => {
-  eventList.value = await eventStore.getEventByOrganizer(authStore.id);
-}
-
-const getAllLocations = async () => {
-  try {
-    const response = await locationStore.getLocations();
-    locations.value = response;
-  } catch (err) {
-    console.error(err);
-  }
-};
-
-const getAllCategories = async () => {
-  try {
-    const response = await categoryStore.getAllCategories();
-    categories.value = response;
-  } catch (err) {
-    console.error(err);
-  }
-};
-
-onMounted(() => {
-  fetchEvents();
-  getAllLocations();
-  getAllCategories();
-})
-
-const deleteEvent = async (eventId) => {
-  try {
-    await eventStore.deleteEvent(eventId);
-    Swal.fire({
-      title: "Event Deleted successfully!",
-      icon: "success"
-    }).then(() => {
-      location.reload();
-    });
-  } catch (err) {
-    await Swal.fire({
-      title: "Error!",
-      text: err.value,
-      icon: "error"
-    });
-  }
-}
-
-const showEditForm = ref(false);
-
-const openEditForm = async (eventId) => {
-  selectedEventId.value = eventId; 
-  isEditMode.value = true;
-  showEditForm.value = true;
-
-  eventById.value = await eventStore.getEventById(eventId);
-
-  formData.id = eventById.value.id;
-  formData.eventName = eventById.value.eventName;
-  formData.description = eventById.value.description;
-  formData.startDate = eventById.value.startDate;
-  formData.endDate = eventById.value.endDate;
-  formData.address = eventById.value.address;
-  formData.locationId = eventById.value.locationId;
-  formData.categoryID = eventById.value.categoryID;
-  formData.maxAttendance = eventById.value.maxAttendance;
-  formData.availableTickets = eventById.value.availableTickets;
-  formData.image = eventById.value.image;
-
-  changeTab('eventForm');
-};
-
-const activeTab = ref('eventList');
-
-const changeTab = (tab) => {
-  activeTab.value = tab;
-  if (tab === 'eventForm' && !isEditMode.value) {
-    resetForm();
-  }
-};
-
-const resetForm = () => {
-  formData.eventName = '';
-  formData.description = '';
-  formData.startDate = '';
-  formData.endDate = '';
-  formData.address = '';
-  formData.locationId = '';
-  formData.categoryID = '';
-  formData.maxAttendance = 0;
-  formData.availableTickets = 0;
-  formData.image = '';
-  imageUrl.value = 'https://t4.ftcdn.net/jpg/05/65/22/41/360_F_565224180_QNRiRQkf9Fw0dKRoZGwUknmmfk51SuSS.jpg';
-  isEditMode.value = false;
-  selectedEventId.value = null;
-};
-const showTicketsTable = ref(null);
-
-const eventID = ref(0);
-
-const getTickets = async (id) => {
-  const response = await ticketStore.getTicketByEvent(id);
-  eventID.value = id;
-  console.log(eventID);
-  ticketList.value = response.value;
-  showTicketsTable.value = true;
-  if (ticketList.value.length === 0) {
-    Swal.fire({
-      title: "No Tickets",
-      text: "No tickets here",
-      icon: "info",
-    });
-  }
-}
-
-</script>
 <style scoped>
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');
 

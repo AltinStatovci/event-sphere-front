@@ -5,12 +5,12 @@ import SignUpView from '@/views/auth/SignUpView.vue';
 import DetailsView from '@/views/DetailsView.vue';
 import TicketsView from '@/views/TicketsView.vue';
 import { useAuthStore } from '@/store/authStore.js';
-import TicketCard from '@/components/TicketCard.vue';
+
 import EventByCategoryView from "@/views/EventByCategoryView.vue";
 import AboutView from '@/views/AboutView.vue';
-import ContactView from '@/views/NearYouView.vue';
+
 import Dashboard from "@/views/Dashboard.vue";
-import SideBar from "@/components/SideBar.vue";
+
 import Profile from "@/views/Profile.vue";
 import Payment from "@/views/Payment.vue";
 import Report from "@/views/Report.vue";

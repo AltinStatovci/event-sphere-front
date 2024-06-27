@@ -18,7 +18,7 @@ const formData = reactive({
 
 const handleSubmit = async () => {
     try {
-        console.log(formData);
+
         await ticketStore.addTicket(formData);
         Swal.fire({
             title: 'Ticket Added successfully!',

@@ -9,7 +9,7 @@ const userCount = ref(0)
 const eventCount = ref(0);
 const paymentCount = ref(0);
 const ticketCount = ref(0);
-const isDarkMode = ref(false); // Reactive variable for dark mode
+const isDarkMode = ref(false);
 
 const fetchEventCount = async () => {
   try {

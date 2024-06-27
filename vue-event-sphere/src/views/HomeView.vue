@@ -46,7 +46,7 @@ const previousSlide = () => {
 };
 
 const formatDate = (dateString) => {
-  return dateString.split('T')[0]; // Splits the string at 'T' and returns the date part
+  return dateString.split('T')[0];
 };
 
 const getLocation = async (event) => {
