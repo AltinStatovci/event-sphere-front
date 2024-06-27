@@ -73,13 +73,8 @@ const fetchPayments = async () => {
     await paymentStore.getPaymentsByEvent(selectedEvent.value);
     payments.value = paymentStore.payments;
   } else {
-    payments.value = []; // Clear payments if no event is selected
+    payments.value = []; 
   }
-};
-
-const fetchUserPayments = async () => {
-  await paymentStore.getPaymentsByUserId(authStore.id);
-  payments.value = paymentStore.payments;
 };
 
 const formatPaymentDateTime = (dateString) => {
@@ -93,7 +88,12 @@ onMounted(async () => {
   if (authStore.isOrganizer) {
     await eventStore.getEventByOrganizer(authStore.id);
   } else {
-    await fetchUserPayments();
+    await paymentStore.getPaymentsByUserId(authStore.id);
+    payments.value = paymentStore.payments;
+  }
+  if (authStore.isAdmin) {
+    await paymentStore.getAllPayments();
+    payments.value = paymentStore.payments;
   }
 });
 </script>

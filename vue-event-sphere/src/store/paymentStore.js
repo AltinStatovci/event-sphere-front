@@ -69,8 +69,9 @@ export const usePaymentStore = defineStore('payment', () => {
     }
     async function getAllPayments() {
         try {
-          const response = await axios.get(`${url}Payment/all`);
+          const response = await axios.get(`${url}Payment`);
           payments.value = response.data;
+          return payments;
         } catch (error) {
           console.error('Error fetching all payments:', error);
         }
