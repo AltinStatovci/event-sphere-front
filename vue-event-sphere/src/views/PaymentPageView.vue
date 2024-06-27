@@ -1,16 +1,9 @@
+<script setup>
+import PaymentForm from '@/components/PaymentForm.vue';
+</script>
+
 <template>
-    <div>
-     
-      <PaymentForm />
-    </div>
-  </template>
-  
-  <script>
-  import PaymentForm from '@/components/PaymentForm.vue';
-  
-  export default {
-    components: {
-      PaymentForm,
-    },
-  };
-  </script>
+  <PaymentForm />
+</template>
+
+<style scoped></style>

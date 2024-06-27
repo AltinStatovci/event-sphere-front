@@ -1,3 +1,48 @@
+
+<script setup>
+import { ref, onMounted } from 'vue';
+import SideBar from "@/components/SideBar.vue";
+import { useAuthStore } from "@/store/authStore.js";
+import { usePaymentStore } from "@/store/paymentStore.js";
+import { useEventStore } from "@/store/eventStore.js";
+
+const payments = ref([]);
+const paymentStore = usePaymentStore();
+const authStore = useAuthStore();
+const eventStore = useEventStore();
+const selectedEvent = ref(null);
+
+const fetchPayments = async () => {
+  if (selectedEvent.value) {
+    await paymentStore.getPaymentsByEvent(selectedEvent.value);
+    payments.value = paymentStore.payments;
+  } else {
+    payments.value = [];
+  }
+};
+
+const formatPaymentDateTime = (dateString) => {
+  const date = new Date(dateString);
+  const formattedDate = date.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
+  const formattedTime = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric' });
+  return `${formattedDate} - ${formattedTime}`;
+};
+
+onMounted(async () => {
+  if (authStore.isOrganizer) {
+    await eventStore.getEventByOrganizer(authStore.id);
+  } else {
+    await paymentStore.getPaymentsByUserId(authStore.id);
+    payments.value = paymentStore.payments;
+  }
+  if (authStore.isAdmin) {
+    await paymentStore.getAllPayments();
+    payments.value = paymentStore.payments;
+  }
+});
+</script>
+
+
 <template>
   <div class="d-flex">
     <SideBar />
@@ -54,49 +99,6 @@
     </div>
   </div>
 </template>
-
-<script setup>
-import { ref, onMounted } from 'vue';
-import SideBar from "@/components/SideBar.vue";
-import { useAuthStore } from "@/store/authStore.js";
-import { usePaymentStore } from "@/store/paymentStore.js";
-import { useEventStore } from "@/store/eventStore.js";
-
-const payments = ref([]);
-const paymentStore = usePaymentStore();
-const authStore = useAuthStore();
-const eventStore = useEventStore();
-const selectedEvent = ref(null);
-
-const fetchPayments = async () => {
-  if (selectedEvent.value) {
-    await paymentStore.getPaymentsByEvent(selectedEvent.value);
-    payments.value = paymentStore.payments;
-  } else {
-    payments.value = []; 
-  }
-};
-
-const formatPaymentDateTime = (dateString) => {
-  const date = new Date(dateString);
-  const formattedDate = date.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
-  const formattedTime = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric' });
-  return `${formattedDate} - ${formattedTime}`;
-};
-
-onMounted(async () => {
-  if (authStore.isOrganizer) {
-    await eventStore.getEventByOrganizer(authStore.id);
-  } else {
-    await paymentStore.getPaymentsByUserId(authStore.id);
-    payments.value = paymentStore.payments;
-  }
-  if (authStore.isAdmin) {
-    await paymentStore.getAllPayments();
-    payments.value = paymentStore.payments;
-  }
-});
-</script>
 
 <style scoped>
 .dashboard {

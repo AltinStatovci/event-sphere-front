@@ -1,38 +1,3 @@
-<template>
-  <div class="d-flex">
-    <side-bar />
-    <div class="container-xl px-4 mt-4">
-      <div class="card mb-4">
-        <div class="card-header">Ticket List</div>
-        <div class="card-body">
-          <table class="table">
-            <thead>
-              <tr>
-                <th scope="col">Event Name</th>
-                <th scope="col">Ticket Type</th>
-                <th scope="col">Price</th>
-                <th scope="col">Booking Reference</th>
-                <th scope="col"></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="ticket in ticketList" :key="ticket.id">
-                <td>{{ ticket.eventName }}</td>
-                <td>{{ ticket.ticketType }}</td>
-                <td>{{ ticket.price }}</td>
-                <td>{{ ticket.bookingReference }}</td>
-                <td>
-                  <button class="btn btn-outline-danger btn-sm" @click="deleteTicket(ticket.id)">Delete</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
-
-</template>
 
 <script setup>
 import { ref, reactive, onMounted } from "vue";
@@ -90,6 +55,43 @@ const changeTab = (tab) => {
   activeTab.value = tab;
 };
 </script>
+
+<template>
+  <div class="d-flex">
+    <side-bar />
+    <div class="container-xl px-4 mt-4">
+      <div class="card mb-4">
+        <div class="card-header">Ticket List</div>
+        <div class="card-body">
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">Event Name</th>
+                <th scope="col">Ticket Type</th>
+                <th scope="col">Price</th>
+                <th scope="col">Booking Reference</th>
+                <th scope="col"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="ticket in ticketList" :key="ticket.id">
+                <td>{{ ticket.eventName }}</td>
+                <td>{{ ticket.ticketType }}</td>
+                <td>{{ ticket.price }}</td>
+                <td>{{ ticket.bookingReference }}</td>
+                <td>
+                  <button class="btn btn-outline-danger btn-sm" @click="deleteTicket(ticket.id)">Delete</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</template>
+
 
 <style scoped>
 /* Your scoped styles here */
