@@ -373,6 +373,7 @@ body {
   border-bottom: 1px solid rgba(33, 40, 50, 0.125);
 }
 
+
 .form-control,
 .dataTable-input,
 .form-select {
