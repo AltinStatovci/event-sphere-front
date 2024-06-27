@@ -29,7 +29,7 @@ export const useEventStore = defineStore('event', () => {
 
 
             events.value = allEvents;
-
+            console.log(allEvents);
 
             events.value = allEvents; // Store the events in the state
 
@@ -43,37 +43,33 @@ export const useEventStore = defineStore('event', () => {
 
     async function getEventByOrganizer(id) {
         try {
-            const response = await client.get(`${url}Event/${id}/organizer`);
-            const eventData = response.data;
-
-            const allEvents = eventData.map(event => ({
-                id: event.id,
-                eventName: event.eventName,
-                description: event.description,
-                address: event.address,
-                locationId: event.locationId,
-                categoryName: event.categoryName,
-                startDate: event.startDate,
-                endDate: event.endDate,
-                image: event.image,
-                organizerName: event.organizerName,
-                maxAttendance: event.maxAttendance,
-                availableTickets: event.availableTickets,
-                photoData: event.photoData,
-            }));
-
-
-            events.value = allEvents;
-
-
-            events.value = allEvents; // Store the events in the state
-
-            return allEvents;
+          const response = await client.get(`${url}Event/${id}/organizer`);
+          const eventData = response.data;
+    
+          const allEvents = eventData.map(event => ({
+            id: event.id,
+            eventName: event.eventName,
+            description: event.description,
+            address: event.address,
+            locationId: event.locationId,
+            categoryName: event.categoryName,
+            startDate: event.startDate,
+            endDate: event.endDate,
+            image: event.image,
+            organizerName: event.organizerName,
+            maxAttendance: event.maxAttendance,
+            availableTickets: event.availableTickets,
+            photoData: event.photoData,
+          }));
+    
+          events.value = allEvents;
+          console.log("All events:", allEvents);
+          return allEvents;
         } catch (err) {
-            console.error('Error fetching events:', err);
-            return [];
+          console.error('Error fetching events:', err);
+          return [];
         }
-    }
+      }
 
 
     async function getEventById(id) {
@@ -129,7 +125,7 @@ export const useEventStore = defineStore('event', () => {
               photoData: event.photoData, 
           }));
           events.value = allEvents; 
-
+          console.log(events.value);
           return allEvents;
       } catch (err) {
           console.error('Error fetching events:', err);
@@ -156,7 +152,7 @@ export const useEventStore = defineStore('event', () => {
 
 
         events.value = allEvents;
-
+        console.log(allEvents);
 
         events.value = allEvents; 
 
@@ -166,6 +162,7 @@ export const useEventStore = defineStore('event', () => {
         return [];
     }
 }
+
 async function getEventsByCountry(country) {
     try {
         const response = await client.get(`${url}Event/${country}/country`);
@@ -186,7 +183,7 @@ async function getEventsByCountry(country) {
 
 
         events.value = allEvents;
-
+        console.log(allEvents);
 
         events.value = allEvents; 
 
@@ -244,8 +241,6 @@ async function getEventsByCountry(country) {
         }
     }
 
-
-
     async function deleteEvent(eventId){
         try {
             await client.delete(`${url}Event/${eventId}`);
@@ -256,5 +251,6 @@ async function getEventsByCountry(country) {
         
     }
 }
-    return { getEventByCategory, getEventByOrganizer, getEventById,addEvent,updateEvent,getEvents, deleteEvent, event, getEventsByCity, getEventsByCountry };
+
+    return { getEventByCategory, getEventByOrganizer, getEventById,addEvent,updateEvent,getEvents, deleteEvent, event, events, getEventsByCity, getEventsByCountry, getEventByOrganizer};
 });

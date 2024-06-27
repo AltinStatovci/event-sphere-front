@@ -18,7 +18,7 @@ const decrease = () => {
   }
 }
 function goToPayment(id) {
-  paymentStore.amount = quantity.value;
+  paymentStore.amount = quantity.value;  // Ensure the quantity is updated in the store
   router.push(`/Payment/${id}`);
 }
 

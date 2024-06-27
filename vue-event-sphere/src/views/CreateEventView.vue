@@ -1,3 +1,156 @@
+<template>
+  <div class="d-flex">
+    <side-bar />
+    <div class="container-xl px-4 mt-4">
+      <nav class="nav nav-borders">
+        <a class="nav-link" :class="{ active: activeTab === 'eventList' }" @click.prevent="changeTab('eventList')">Event
+          List</a>
+        <a class="nav-link" :class="{ active: activeTab === 'eventForm' }" @click.prevent="changeTab('eventForm')">Event
+          Form</a>
+      </nav>
+      <hr class="mt-0 mb-4">
+
+      <div v-if="activeTab === 'eventList'">
+        <div class="card mb-4">
+          <div class="card-header">Event List</div>
+          <div class="card-body">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">Event Name</th>
+                  <th scope="col">Location</th>
+                  <th scope="col">Category Name</th>
+                  <th scope="col">Start Date</th>
+                  <th scope="col">End Date</th>
+                  <th scope="col">Max Attendees</th>
+                  <th scope="col">Available Tickets</th>
+                  <th scope="col"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="event in eventList" :key="event.id">
+                  <td>{{ event.eventName }}</td>
+                  <td>{{ event.address }}</td>
+                  <td>{{ event.categoryName }}</td>
+                  <td>{{ formatDateTime(event.startDate) }}</td>
+                  <td>{{ formatDateTime(event.endDate) }}</td>
+                  <td>{{ event.maxAttendance }}</td>
+                  <td>{{ event.availableTickets }}</td>
+                  <td>
+                    <button class="btn btn-outline-danger btn-sm" @click="deleteEvent(event.id)">Delete</button>
+                    <button class="btn btn-outline-primary btn-sm" @click="openEditForm(event.id)">Edit</button>
+                    <button class="btn btn-outline-secondary btn-sm" @click="getTickets(event.id)">See Tickets</button>
+                  </td>
+                </tr>
+                <tr v-if="eventList.length === 0">
+                            <td colspan="9" class="no-data">No events available</td>
+                        </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div v-if="showTicketsTable">
+        <ticket-list :tickets="ticketList" :eventID="eventID"/>
+      </div>
+      </div>
+
+      <!-- Event Form Section -->
+      <div v-if="activeTab === 'eventForm'">
+        <div class="row">
+          <div class="col-xl-12">
+            <div class="card mb-4">
+              <div class="card-header">{{ isEditMode ? 'Edit Event' : 'Create Event' }}</div>
+              <div class="card-body">
+
+                <form @submit.prevent="handleSubmit">
+                  <!-- Event Details Form -->
+                  <div class="row gx-3 mb-3">
+                    <div class="col-md-3">
+                      <label class="small mb-1" for="eventName">Event Name</label>
+                      <input class="form-control" id="eventName" type="text" placeholder="Enter event name"
+                        v-model.trim="formData.eventName">
+                    </div>
+
+                    <div class="col-md-3">
+                      <label class="small mb-1" for="categorySelect">Category</label>
+                      <select id="categorySelect" class="form-control custom-select" v-model.trim="formData.categoryID">
+                        <option value="" disabled>Select a Category</option>
+                        <option v-for="category in categories" :key="category.id" :value="category.id">
+                          {{ category.categoryName }}
+                        </option>
+                      </select>
+                    </div>
+
+                    <div class="col-md-3 ">
+                      <label class="small mb-1" for="address">Address</label>
+                      <input class="form-control" id="address" type="text" placeholder="Enter address"
+                        v-model.trim="formData.address">
+                    </div>
+                    <div class="col-md-3">
+                      <label class="small mb-1" for="citySelect">Location</label>
+                      <select id="citySelect" class="form-control custom-select" v-model.trim="formData.locationId">
+                        <option value="" disabled>Select a city</option>
+                        <option v-for="location in locations" :key="location.id" :value="location.id">
+                          {{ location.city }}, {{ location.country }}
+                        </option>
+                      </select>
+                    </div>
+
+                    <div class="col-md-6 ">
+                      <label class="small mb-1" for="startDate">Start Date</label>
+                      <input class="form-control" id="startDate" type="datetime-local" v-model="formData.startDate">
+                    </div>
+                    <div class="col-md-6 ">
+                      <label class="small mb-1" for="endDate">End Date</label>
+                      <input class="form-control" id="endDate" type="datetime-local" v-model="formData.endDate">
+                    </div>
+                  </div>
+
+                  <div class="row gx-3 mb-3">
+                    <div class="col-md-6 w-25">
+                      <label class="small mb-1" for="maxAttendees">Max Attendees</label>
+                      <input class="form-control" id="maxAttendees" type="number" v-model="formData.maxAttendance">
+                    </div>
+                    <div class="col-md-6 w-25">
+                      <label class="small mb-1" for="availableTickets">Available Tickets</label>
+                      <input class="form-control" id="availableTickets" type="number"
+                        v-model="formData.availableTickets">
+                    </div>
+                    <div class="col-md-6 w-50">
+                      <label class="small mb-1" for="description">Description</label>
+                      <input class="form-control" id="description" type="text" placeholder="Enter description"
+                        v-model.trim="formData.description">
+                    </div>
+                  </div>
+                  <div class="row gx-3 mb-3">
+                    <div class="col-md-12">
+                      <div class="card mb-4 mb-xl-0">
+                        <div class="card-header">Event Image</div>
+                        <div class="card-body text-center" style="align-self: center;">
+                          <div class="image-container" :style="{ backgroundImage: `url(${imageUrl})` }">
+                            <div v-if="!imageUrl" class="placeholder">No Image Selected</div>
+                          </div>
+                          <div class="small font-italic text-muted mb-4">Upload your EventImage</div>
+                          <input class="form-control" id="file" type="file" ref="fileInput" @change="handleImageUpload"
+                            style="display: none;">
+                          <button class="btn btn-outline-primary" type="button" @click="$refs.fileInput.click()">Upload
+                            new image</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Submit Button -->
+                  <button class="btn btn-primary" type="submit">{{ isEditMode ? 'Update' : 'Submit' }}</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
 <script setup>
 import { ref, reactive, onMounted } from "vue";
 import { useEventStore } from "@/store/eventStore.js";
@@ -132,7 +285,7 @@ const deleteEvent = async (eventId) => {
 const showEditForm = ref(false);
 
 const openEditForm = async (eventId) => {
-  selectedEventId.value = eventId;
+  selectedEventId.value = eventId; 
   isEditMode.value = true;
   showEditForm.value = true;
 
@@ -151,6 +304,13 @@ const openEditForm = async (eventId) => {
   formData.image = eventById.value.image;
 
   changeTab('eventForm');
+};
+
+const formatDateTime = (dateString) => {
+  const date = new Date(dateString);
+  const formattedDate = date.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
+  const formattedTime = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric' });
+  return `${formattedDate} - ${formattedTime}`;
 };
 
 const activeTab = ref('eventList');
@@ -184,7 +344,7 @@ const eventID = ref(0);
 const getTickets = async (id) => {
   const response = await ticketStore.getTicketByEvent(id);
   eventID.value = id;
-
+  console.log(eventID);
   ticketList.value = response.value;
   showTicketsTable.value = true;
   if (ticketList.value.length === 0) {
@@ -197,161 +357,6 @@ const getTickets = async (id) => {
 }
 
 </script>
-
-<template>
-  <div class="d-flex">
-    <side-bar />
-    <div class="container-xl px-4 mt-4">
-      <nav class="nav nav-borders">
-        <a class="nav-link" :class="{ active: activeTab === 'eventList' }" @click.prevent="changeTab('eventList')">Event
-          List</a>
-        <a class="nav-link" :class="{ active: activeTab === 'eventForm' }" @click.prevent="changeTab('eventForm')">Event
-          Form</a>
-      </nav>
-      <hr class="mt-0 mb-4">
-
-      <div v-if="activeTab === 'eventList'">
-        <div class="card mb-4">
-          <div class="card-header">Event List</div>
-          <div class="card-body">
-            <table class="table">
-              <thead>
-                <tr>
-                  <th scope="col">Event Name</th>
-                  <th scope="col">Location</th>
-                  <th scope="col">Category Name</th>
-                  <th scope="col">Start Date</th>
-                  <th scope="col">End Date</th>
-                  <th scope="col">Max Attendees</th>
-                  <th scope="col">Available Tickets</th>
-                  <th scope="col"></th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="event in eventList" :key="event.id">
-                  <td>{{ event.eventName }}</td>
-                  <td>{{ event.address }}</td>
-                  <td>{{ event.categoryName }}</td>
-                  <td>{{ event.startDate }}</td>
-                  <td>{{ event.endDate }}</td>
-                  <td>{{ event.maxAttendance }}</td>
-                  <td>{{ event.availableTickets }}</td>
-                  <td>
-                    <button class="btn btn-outline-danger btn-sm" @click="deleteEvent(event.id)">Delete</button>
-                    <button class="btn btn-outline-primary btn-sm" @click="openEditForm(event.id)">Edit</button>
-                    <button class="btn btn-outline-secondary btn-sm" @click="getTickets(event.id)">See Tickets</button>
-                  </td>
-                </tr>
-                <tr v-if="eventList.length === 0">
-                            <td colspan="9" class="no-data">No events available</td>
-                        </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <div v-if="showTicketsTable">
-        <ticket-list :tickets="ticketList" :eventID="eventID"/>
-      </div>
-      </div>
-
-      <!-- Event Form Section -->
-      <div v-if="activeTab === 'eventForm'">
-        <div class="row">
-          <div class="col-xl-12">
-            <div class="card mb-4">
-              <div class="card-header">{{ isEditMode ? 'Edit Event' : 'Create Event' }}</div>
-              <div class="card-body">
-
-                <form @submit.prevent="handleSubmit">
-                  <!-- Event Details Form -->
-                  <div class="row gx-3 mb-3">
-                    <div class="col-md-3">
-                      <label class="small mb-1" for="eventName">Event Name</label>
-                      <input class="form-control" id="eventName" type="text" placeholder="Enter event name"
-                        v-model.trim="formData.eventName">
-                    </div>
-
-                    <div class="col-md-3">
-                      <label class="small mb-1" for="categorySelect">Category</label>
-                      <select id="categorySelect" class="form-control custom-select" v-model.trim="formData.categoryID">
-                        <option value="" disabled>Select a Category</option>
-                        <option v-for="category in categories" :key="category.id" :value="category.id">
-                          {{ category.categoryName }}
-                        </option>
-                      </select>
-                    </div>
-
-                    <div class="col-md-3 ">
-                      <label class="small mb-1" for="address">Address</label>
-                      <input class="form-control" id="address" type="text" placeholder="Enter address"
-                        v-model.trim="formData.address">
-                    </div>
-                    <div class="col-md-3">
-                      <label class="small mb-1" for="citySelect">Location</label>
-                      <select id="citySelect" class="form-control custom-select" v-model.trim="formData.locationId">
-                        <option value="" disabled>Select a city</option>
-                        <option v-for="location in locations" :key="location.id" :value="location.id">
-                          {{ location.city }}, {{ location.country }}
-                        </option>
-                      </select>
-                    </div>
-
-                    <div class="col-md-6 ">
-                      <label class="small mb-1" for="startDate">Start Date</label>
-                      <input class="form-control" id="startDate" type="datetime-local" v-model="formData.startDate">
-                    </div>
-                    <div class="col-md-6 ">
-                      <label class="small mb-1" for="endDate">End Date</label>
-                      <input class="form-control" id="endDate" type="datetime-local" v-model="formData.endDate">
-                    </div>
-                  </div>
-
-                  <div class="row gx-3 mb-3">
-                    <div class="col-md-6 w-25">
-                      <label class="small mb-1" for="maxAttendees">Max Attendees</label>
-                      <input class="form-control" id="maxAttendees" type="number" v-model="formData.maxAttendance">
-                    </div>
-                    <div class="col-md-6 w-25">
-                      <label class="small mb-1" for="availableTickets">Available Tickets</label>
-                      <input class="form-control" id="availableTickets" type="number"
-                        v-model="formData.availableTickets">
-                    </div>
-                    <div class="col-md-6 w-50">
-                      <label class="small mb-1" for="description">Description</label>
-                      <input class="form-control" id="description" type="text" placeholder="Enter description"
-                        v-model.trim="formData.description">
-                    </div>
-                  </div>
-                  <div class="row gx-3 mb-3">
-                    <div class="col-md-12">
-                      <div class="card mb-4 mb-xl-0">
-                        <div class="card-header">Event Image</div>
-                        <div class="card-body text-center" style="align-self: center;">
-                          <div class="image-container" :style="{ backgroundImage: `url(${imageUrl})` }">
-                            <div v-if="!imageUrl" class="placeholder">No Image Selected</div>
-                          </div>
-                          <div class="small font-italic text-muted mb-4">Upload your EventImage</div>
-                          <input class="form-control" id="file" type="file" ref="fileInput" @change="handleImageUpload"
-                            style="display: none;">
-                          <button class="btn btn-outline-primary" type="button" @click="$refs.fileInput.click()">Upload
-                            new image</button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Submit Button -->
-                  <button class="btn btn-primary" type="submit">{{ isEditMode ? 'Update' : 'Submit' }}</button>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</template>
-
 <style scoped>
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');
 
@@ -387,6 +392,7 @@ body {
   background-color: rgba(33, 40, 50, 0.03);
   border-bottom: 1px solid rgba(33, 40, 50, 0.125);
 }
+
 
 .form-control,
 .dataTable-input,

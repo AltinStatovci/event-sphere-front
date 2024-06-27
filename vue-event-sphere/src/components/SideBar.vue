@@ -55,7 +55,6 @@ function onLogOut() {
           <span class="text">Manage Events</span>
         </router-link>
       </div>
-
       <div v-if="authStore.isAdmin">
         <router-link to="/manageTickets" class="button">
           <i class="bi bi-ticket-perforated-fill" style="font-size: 30px ; color: white ; margin-right: 20px"></i>

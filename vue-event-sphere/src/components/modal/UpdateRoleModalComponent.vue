@@ -1,3 +1,25 @@
+<template>
+  <div v-if="showModal" class="modal-overlay">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h5>Update User Role</h5>
+        <button @click="$emit('close')" class="close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form @submit.prevent="updateRole">
+          <div class="mb-3">
+            <label class="form-label" for="roleSelect">Role</label>
+            <select id="roleSelect" class="form-select" v-model="selectedRoleId">
+              <option v-for="role in roles" :key="role.id" :value="role.id">{{ role.roleName }}</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary">Save changes</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</template>
+
 <script setup>
 import { ref, watch, onMounted } from 'vue';
 import { useUserStore } from "@/store/userStore.js";
@@ -47,32 +69,6 @@ watch(() => props.showModal, async (newVal) => {
   }
 });
 </script>
-
-
-
-
-<template>
-  <div v-if="showModal" class="modal-overlay">
-    <div class="modal-container">
-      <div class="modal-header">
-        <h5>Update User Role</h5>
-        <button @click="$emit('close')" class="close-btn">&times;</button>
-      </div>
-      <div class="modal-body">
-        <form @submit.prevent="updateRole">
-          <div class="mb-3">
-            <label class="form-label" for="roleSelect">Role</label>
-            <select id="roleSelect" class="form-select" v-model="selectedRoleId">
-              <option v-for="role in roles" :key="role.id" :value="role.id">{{ role.roleName }}</option>
-            </select>
-          </div>
-          <button type="submit" class="btn btn-primary">Save changes</button>
-        </form>
-      </div>
-    </div>
-  </div>
-</template>
-
 
 <style scoped>
 .modal-overlay {

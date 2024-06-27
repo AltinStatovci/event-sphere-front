@@ -1,201 +1,3 @@
-
-<script setup>
-import { ref, reactive, onMounted } from 'vue';
-import SideBar from "@/components/SideBar.vue";
-import { useAuthStore } from '@/store/authStore';
-import { useReportStore } from '@/store/reportStore';
-import { useUserStore } from '@/store/userStore';
-import Swal from "sweetalert2";
-import { useRouter } from 'vue-router';
-
-const authstore = useAuthStore();
-const reportStore = useReportStore();
-const userStore = useUserStore();
-const router = useRouter();
-const selectedReportId = ref(null);
-const isEditMode = ref(false);
-const activeTab = ref('reportList');
-const selectedReport = ref(null);
-const reportName = ref('');
-const complaintDescription = ref('');
-const reportAnsw = ref('');
-const reports = ref([]);
-
-const user = reactive({
-  id: authstore.id,
-  name: '',
-  lastName: '',
-  email: '',
-  roleID: '',
-  roleName: '',
-});
-
-onMounted(async () => {
-  await fetchUserDetails();
-  await fetchReports();
-});
-
-const fetchReports = async () => {
-  try {
-    let response;
-    if (user.roleName === 'Admin') {
-      response = await fetch('http://localhost:5220/api/Report', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${authstore.token}`,
-        },
-      });
-    } else if (user.roleName === 'User') {
-      response = await fetch(`http://localhost:5220/api/Report/GetReportByUserId/${authstore.id}`,{
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${authstore.token}`,
-        },
-      });
-    }
-    if (!response.ok) throw new Error(`Failed to fetch reports: ${response.statusText}`);
-    reports.value = await response.json();
-  } catch (error) {
-    console.error('Error fetching reports:', error.message);
-  }
-};
-
-const fetchUserDetails = async () => {
-  try {
-    const response = await userStore.getUser(authstore.id);
-    Object.assign(user, response);
-  } catch (error) {
-    console.error('Error fetching user details:', error.message);
-  }
-};
-
-const handleSubmit = async () => {
-  let apiUrl = 'http://localhost:5220/api/Report';
-  let method = 'POST';
-  let complaintData = {
-    userId: user.id,
-    userName: user.name,
-    userlastName: user.lastName,
-    userEmail: user.email,
-    reportName: reportName.value,
-    reportDesc: complaintDescription.value,
-    reportAnsw: 'Waiting for Respond'
-  };
-
-  if (isEditMode.value) {
-    apiUrl = `http://localhost:5220/api/Report/${selectedReportId.value}`;
-    method = 'PUT',
-
-        complaintData = {
-          ...selectedReport.value,
-          reportDesc: complaintDescription.value,
-          reportAnsw: reportAnsw.value
-        };
-  }
-
-  try {
-    const response = await fetch(apiUrl, {
-      method: method,
-      headers: { 'Content-Type': 'application/json'
-        , 'Authorization': `Bearer ${authstore.token}`
-      },
-      body: JSON.stringify(complaintData),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to ${isEditMode.value ? 'update' : 'create'} report: ${response.statusText}`);
-    }
-
-    // If successful, fetch updated reports and reset form
-    await fetchReports();
-    changeTab('reportList');
-
-
-    // Show success notification based on the mode
-    if (isEditMode.value) {
-      Swal.fire({
-        title: "Report Responded Successfully!",
-        icon: "success"
-      });
-      resetForm();
-    } else {
-      Swal.fire({
-        title: "Report Created Successfully!",
-        icon: "success"
-      });
-    }
-  } catch (error) {
-    console.error(`Error ${isEditMode.value ? 'updating' : 'creating'} report:`, error.message);
-
-    // Show error notification
-    Swal.fire({
-      title: "Error!",
-      text: error.message,
-      icon: "error"
-    });
-  }
-};
-
-const openUpdateModal = (report) => {
-  isEditMode.value = true; // Set isEditMode to true
-  if (report && report.reportId) {
-    selectedReport.value = report;
-    selectedReportId.value = report.reportId;
-    activeTab.value = 'reportForm';
-    reportName.value = report.reportName;
-    complaintDescription.value = report.reportDesc;
-    reportAnsw.value = report.reportAnsw;
-  } else {
-    console.error("Invalid report object or missing report ID");
-  }
-};
-
-const changeTab = (tab) => {
-  activeTab.value = tab;
-  if (tab === 'reportForm' && !isEditMode.value) resetForm();
-};
-
-const deleteReport = async (reportId) => {
-  try {
-    await reportStore.deleteReport(reportId);
-    Swal.fire({
-      title: "Report Deleted successfully!",
-      icon: "success"
-    }).then(() => {
-      location.reload();
-    });
-  } catch (err) {
-    await Swal.fire({
-      title: "Error!",
-      text: err.value,
-      icon: "error"
-    });
-  }
-}
-
-const resetForm = () => {
-  isEditMode.value = false;
-  reportName.value = '';
-  complaintDescription.value = '';
-  reportAnsw.value = '';
-};
-const showStatusModal = ref(false);
-const selectedStatus = ref('');
-
-const openStatusModal = (status) => {
-  selectedStatus.value = status;
-  showStatusModal.value = true;
-};
-
-const closeStatusModal = () => {
-  showStatusModal.value = false;
-  selectedStatus.value = '';
-};
-
-</script>
-
 <template>
     <div class="d-flex">
         <side-bar />
@@ -329,6 +131,202 @@ const closeStatusModal = () => {
     </div>
 </template>
 
+<script setup>
+import { ref, reactive, onMounted } from 'vue';
+import SideBar from "@/components/SideBar.vue";
+import { useAuthStore } from '@/store/authStore';
+import { useReportStore } from '@/store/reportStore';
+import { useUserStore } from '@/store/userStore';
+import Swal from "sweetalert2";
+import { useRouter } from 'vue-router';
+
+const authstore = useAuthStore();
+const reportStore = useReportStore();
+const userStore = useUserStore();
+const router = useRouter();
+const selectedReportId = ref(null);
+const isEditMode = ref(false);
+const activeTab = ref('reportList');
+const selectedReport = ref(null);
+const reportName = ref('');
+const complaintDescription = ref('');
+const reportAnsw = ref('');
+const reports = ref([]);
+
+const user = reactive({
+    id: authstore.id,
+    name: '',
+    lastName: '',
+    email: '',
+    roleID: '',
+    roleName: '',
+});
+
+onMounted(async () => {
+    await fetchUserDetails();
+    await fetchReports();
+});
+
+const fetchReports = async () => {
+    try {
+        let response;
+        if (user.roleName === 'Admin') {
+            response = await fetch('http://localhost:5220/api/Report', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authstore.token}`,
+                },
+            });
+        } else if (user.roleName === 'User') {
+            response = await fetch(`http://localhost:5220/api/Report/GetReportByUserId/${authstore.id}`,{
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authstore.token}`,
+                },
+            });
+        }
+        if (!response.ok) throw new Error(`Failed to fetch reports: ${response.statusText}`);
+        reports.value = await response.json();
+    } catch (error) {
+        console.error('Error fetching reports:', error.message);
+    }
+};
+
+const fetchUserDetails = async () => {
+    try {
+        const response = await userStore.getUser(authstore.id);
+        Object.assign(user, response);
+    } catch (error) {
+        console.error('Error fetching user details:', error.message);
+    }
+};
+
+const handleSubmit = async () => {
+    let apiUrl = 'http://localhost:5220/api/Report';
+    let method = 'POST';
+    let complaintData = {
+        userId: user.id,
+        userName: user.name,
+        userlastName: user.lastName,
+        userEmail: user.email,
+        reportName: reportName.value,
+        reportDesc: complaintDescription.value,
+        reportAnsw: 'Waiting for Respond'
+    };
+
+    if (isEditMode.value) {
+        apiUrl = `http://localhost:5220/api/Report/${selectedReportId.value}`;
+        method = 'PUT',
+
+        complaintData = {
+            ...selectedReport.value,
+            reportDesc: complaintDescription.value,
+            reportAnsw: reportAnsw.value
+        };
+    }
+
+    try {
+        const response = await fetch(apiUrl, {
+            method: method,
+            headers: { 'Content-Type': 'application/json'
+            , 'Authorization': `Bearer ${authstore.token}`
+            },
+            body: JSON.stringify(complaintData),
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to ${isEditMode.value ? 'update' : 'create'} report: ${response.statusText}`);
+        }
+
+        // If successful, fetch updated reports and reset form
+        await fetchReports();
+        changeTab('reportList');
+
+
+        // Show success notification based on the mode
+        if (isEditMode.value) {
+            Swal.fire({
+                title: "Report Responded Successfully!",
+                icon: "success"
+            });
+            resetForm();
+        } else {
+            Swal.fire({
+                title: "Report Created Successfully!",
+                icon: "success"
+            });
+        }
+    } catch (error) {
+        console.error(`Error ${isEditMode.value ? 'updating' : 'creating'} report:`, error.message);
+
+        // Show error notification
+        Swal.fire({
+            title: "Error!",
+            text: error.message,
+            icon: "error"
+        });
+    }
+};
+
+const openUpdateModal = (report) => {
+    isEditMode.value = true; // Set isEditMode to true
+    if (report && report.reportId) {
+        selectedReport.value = report;
+        selectedReportId.value = report.reportId;
+        activeTab.value = 'reportForm';
+        reportName.value = report.reportName;
+        complaintDescription.value = report.reportDesc;
+        reportAnsw.value = report.reportAnsw;
+    } else {
+        console.error("Invalid report object or missing report ID");
+    }
+};
+
+const changeTab = (tab) => {
+    activeTab.value = tab;
+    if (tab === 'reportForm' && !isEditMode.value) resetForm();
+};
+
+const deleteReport = async (reportId) => {
+    try {
+        await reportStore.deleteReport(reportId);
+        Swal.fire({
+            title: "Report Deleted successfully!",
+            icon: "success"
+        }).then(() => {
+            location.reload();
+        });
+    } catch (err) {
+        await Swal.fire({
+            title: "Error!",
+            text: err.value,
+            icon: "error"
+        });
+    }
+}
+
+const resetForm = () => {
+    isEditMode.value = false;
+    reportName.value = '';
+    complaintDescription.value = '';
+    reportAnsw.value = '';
+};
+const showStatusModal = ref(false);
+const selectedStatus = ref('');
+
+const openStatusModal = (status) => {
+    selectedStatus.value = status;
+    showStatusModal.value = true;
+};
+
+const closeStatusModal = () => {
+    showStatusModal.value = false;
+    selectedStatus.value = '';
+};
+
+</script>
 
 <style scoped>
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');

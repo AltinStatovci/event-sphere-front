@@ -1,13 +1,3 @@
-<script>
-import PaymentForm from '@/components/PaymentForm.vue';
-
-export default {
-  components: {
-    PaymentForm,
-  },
-};
-</script>
-
 <template>
     <div>
      
@@ -15,7 +5,12 @@ export default {
     </div>
   </template>
   
-
-<style scoped>
-
-</style>
+  <script>
+  import PaymentForm from '@/components/PaymentForm.vue';
+  
+  export default {
+    components: {
+      PaymentForm,
+    },
+  };
+  </script>
