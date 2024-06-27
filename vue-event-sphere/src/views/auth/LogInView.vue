@@ -50,7 +50,7 @@ async function handleSubmit() {
 <template>
   <section class="vh-100 d-flex">
     <div class="video-section">
-      <video playsinline autoplay muted loop src="/EventSphereee.mp4"></video>
+      <video playsinline autoplay muted loop src="/EventVideo.mp4"></video>
     </div>
     <div class="form-section d-flex align-items-center justify-content-center">
       <form @submit.prevent="handleSubmit" class="form-container">
