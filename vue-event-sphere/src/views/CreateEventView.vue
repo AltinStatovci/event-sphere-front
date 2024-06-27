@@ -32,8 +32,8 @@
                   <td>{{ event.eventName }}</td>
                   <td>{{ event.address }}</td>
                   <td>{{ event.categoryName }}</td>
-                  <td>{{ event.startDate }}</td>
-                  <td>{{ event.endDate }}</td>
+                  <td>{{ formatDateTime(event.startDate) }}</td>
+                  <td>{{ formatDateTime(event.endDate) }}</td>
                   <td>{{ event.maxAttendance }}</td>
                   <td>{{ event.availableTickets }}</td>
                   <td>
@@ -306,6 +306,13 @@ const openEditForm = async (eventId) => {
   changeTab('eventForm');
 };
 
+const formatDateTime = (dateString) => {
+  const date = new Date(dateString);
+  const formattedDate = date.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
+  const formattedTime = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric' });
+  return `${formattedDate} - ${formattedTime}`;
+};
+
 const activeTab = ref('eventList');
 
 const changeTab = (tab) => {
@@ -385,6 +392,7 @@ body {
   background-color: rgba(33, 40, 50, 0.03);
   border-bottom: 1px solid rgba(33, 40, 50, 0.125);
 }
+
 
 .form-control,
 .dataTable-input,

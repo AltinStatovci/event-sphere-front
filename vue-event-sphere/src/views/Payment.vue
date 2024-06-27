@@ -1,41 +1,21 @@
-<script setup>
-import { ref, onMounted } from 'vue';
-import SideBar from "@/components/SideBar.vue";
-
-const payments = ref([]);
-
-const fetchPayments = async () => {
-    try {
-        const response = await fetch('http://localhost:5220/api/Payment');
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        const data = await response.json();
-        if (!data || data.length === 0) {
-            throw new Error('Empty response or invalid JSON format');
-        }
-        payments.value = data;
-        console.log('Fetched payments:', payments.value);
-    } catch (error) {
-        console.error('Error fetching payments:', error);
-    }
-};
-
-// Fetch payments on component mount
-onMounted(() => {
-    fetchPayments();
-});
-
-</script>
-
 <template>
   <div class="d-flex">
-    <side-bar />
+    <SideBar />
     <div class="container-xl px-4 mt-4">
       <nav class="nav nav-borders">
-      <a class="nav-link">Payment List</a>
+        <a class="nav-link">Payment List</a>
       </nav>
       <hr class="mt-0 mb-4">
+
+      <div v-if="authStore.isOrganizer" class="dropdown-container">
+        <label for="event-select">Select an Event:</label>
+        <select id="event-select" v-model="selectedEvent" @change="fetchPayments" class="form-select">
+          <option value="" disabled>Select an event</option>
+          <option v-for="event in eventStore.events" :key="event.id" :value="event.id">
+            {{ event.eventName }}
+          </option>
+        </select>
+      </div>
 
       <div>
         <div class="card mb-4">
@@ -44,28 +24,28 @@ onMounted(() => {
             <table class="table">
               <thead>
                 <tr>
-                            <th class="id-col">ID</th>
-                            <th class="user-id-col">User Name</th>
-                            <th class="ticket-id-col">Ticket ID</th>
-                            <th class="amount-col">Amount</th>
-                            <th class="payment-method-col">Payment Method</th>
-                            <th class="payment-status-col">Payment Status</th>
-                            <th class="payment-date-col">Payment Date</th>
+                  <th>ID</th>
+                  <th>User Name</th>
+                  <th>Ticket ID</th>
+                  <th>Amount</th>
+                  <th>Payment Method</th>
+                  <th>Payment Status</th>
+                  <th>Payment Date</th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="payment in payments" :key="payment.id">
-                           <td>{{ payment.id }}</td>
-                            <td>{{ payment.userName ? payment.userName : 'N/A' }}</td>
-                            <td>{{ payment.ticketName ? payment.ticketName : 'N/A' }}</td>
-                            <td>{{ payment.amount }}</td>
-                            <td>{{ payment.paymentMethod }}</td>
-                            <td>{{ payment.paymentStatus }}</td>
-                            <td>{{ payment.paymentDate }}</td>
+                  <td>{{ payment.id }}</td>
+                  <td>{{ payment.userName || 'N/A' }}</td>
+                  <td>{{ payment.ticketName || 'N/A' }}</td>
+                  <td>{{ payment.amount }}</td>
+                  <td>{{ payment.paymentMethod }}</td>
+                  <td>{{ payment.paymentStatus }}</td>
+                  <td>{{ formatPaymentDateTime(payment.paymentDate) }}</td>
                 </tr>
                 <tr v-if="payments.length === 0">
-                            <td colspan="9" class="no-data">No payments available</td>
-                        </tr>
+                  <td colspan="7" class="no-data">No payments available</td>
+                </tr>
               </tbody>
             </table>
           </div>
@@ -75,6 +55,48 @@ onMounted(() => {
   </div>
 </template>
 
+<script setup>
+import { ref, onMounted } from 'vue';
+import SideBar from "@/components/SideBar.vue";
+import { useAuthStore } from "@/store/authStore.js";
+import { usePaymentStore } from "@/store/paymentStore.js";
+import { useEventStore } from "@/store/eventStore.js";
+
+const payments = ref([]);
+const paymentStore = usePaymentStore();
+const authStore = useAuthStore();
+const eventStore = useEventStore();
+const selectedEvent = ref(null);
+
+const fetchPayments = async () => {
+  if (selectedEvent.value) {
+    await paymentStore.getPaymentsByEvent(selectedEvent.value);
+    payments.value = paymentStore.payments;
+  } else {
+    payments.value = []; 
+  }
+};
+
+const formatPaymentDateTime = (dateString) => {
+  const date = new Date(dateString);
+  const formattedDate = date.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
+  const formattedTime = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric' });
+  return `${formattedDate} - ${formattedTime}`;
+};
+
+onMounted(async () => {
+  if (authStore.isOrganizer) {
+    await eventStore.getEventByOrganizer(authStore.id);
+  } else {
+    await paymentStore.getPaymentsByUserId(authStore.id);
+    payments.value = paymentStore.payments;
+  }
+  if (authStore.isAdmin) {
+    await paymentStore.getAllPayments();
+    payments.value = paymentStore.payments;
+  }
+});
+</script>
 
 <style scoped>
 .dashboard {
@@ -106,7 +128,6 @@ h1 {
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
-
 
 .no-data {
     text-align: center;
@@ -172,4 +193,28 @@ nav.nav-borders .nav-link {
   cursor: pointer;
 }
 
+.dropdown-container {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.dropdown-container label {
+  margin-bottom: 8px;
+  font-weight: bold;
+}
+
+.dropdown-container .form-select {
+  padding: 0.75rem 1rem;
+  border-radius: 0.35rem;
+  border: 1px solid #c5ccd6;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.dropdown-container .form-select:focus {
+  border-color: #80bdff;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
 </style>
+
