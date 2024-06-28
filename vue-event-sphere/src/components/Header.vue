@@ -70,7 +70,8 @@ watch(eventname, (newValue) => {
 <template>
   <nav class="navbar navbar-expand-lg bg-body-tertiary">
     <div class="container-fluid">
-      <Logo />
+      <!-- <Logo /> -->
+       <img src="../assets/Logo1.png" width="60px" height="60px">
       <a class="navbar-brand title" href="/">EventSphere</a>
 
       <div class="collapse navbar-collapse" id="navbarSupportedContent">

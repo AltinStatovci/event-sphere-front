@@ -22,6 +22,9 @@ export const useAuthStore = defineStore('auth', () =>{
 
     async function signUp(registerUser){
         const response = await client.post(`${url}Account/register`,registerUser);
+        if(response.status === 500){
+            throw new Error('This email already exists');
+        }
     }
 
     function logOut() {

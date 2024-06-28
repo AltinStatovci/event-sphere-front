@@ -49,7 +49,13 @@ async function handleSubmit() {
 
   } catch (e) {
     formIsValid.value = false;
-    console.log(e);
+    let errorMessage = 'This email already exists!. Please log in.';
+
+    await Swal.fire({
+      title: "Error!",
+      text: errorMessage,
+      icon: "error"
+    });
   }
 }
 </script>

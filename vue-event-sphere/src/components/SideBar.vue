@@ -291,10 +291,6 @@ aside {
       opacity: 0;
     }
   }
-
-#aside{
-  height: auto;
-}
   @media (max-width: 1024px) {
     position: absolute;
     z-index: 99;
