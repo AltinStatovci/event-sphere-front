@@ -46,7 +46,7 @@ const fetchReports = async () => {
           'Authorization': `Bearer ${authstore.token}`,
         },
       });
-    } else if (user.roleName === 'User') {
+    } else if (user.roleName === 'User' || user.roleName ==='Organizer') {
       response = await fetch(`http://localhost:5220/api/Report/GetReportByUserId/${authstore.id}`,{
         method: 'GET',
         headers: {

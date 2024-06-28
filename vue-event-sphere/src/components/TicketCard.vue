@@ -34,8 +34,7 @@ defineProps({
   <div class="container card my-5">
     <div class="card-body">
       <h5 class="card-title">Ticket type: {{ ticket.ticketType }}</h5>
-      <p class="card-text">Price: {{ ticket.price }}</p>
-      <p class="card-text">Date:</p>
+      <p class="card-text">Price: {{ ticket.price }}.00 €</p>
     </div>
     <div class="mt-5">
       <div class="card-body row">

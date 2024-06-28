@@ -60,7 +60,6 @@ const changeTab = (tab) => {
                 <thead>
                     <tr>
                         <th scope="col">Event Name</th>
-                        <th scope="col">Event Id</th>
                         <th scope="col">Ticket Type</th>
                         <th scope="col">Price</th>
                         <th scope="col">Booking Reference</th>
@@ -70,7 +69,6 @@ const changeTab = (tab) => {
                 <tbody>
                     <tr v-for="ticket in tickets" :key="ticket.id">
                         <td>{{ ticket.eventName }}</td>
-                        <td>{{ ticket.eventID }}</td>
                         <td>{{ ticket.ticketType }}</td>
                         <td>{{ ticket.price }} €</td>
                         <td>{{ ticket.bookingReference }}</td>
