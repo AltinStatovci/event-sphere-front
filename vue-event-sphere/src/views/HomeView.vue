@@ -154,9 +154,9 @@ function goToTicket(id) {
 
     <div v-for="(category, categoryId) in filteredCategories" :key="categoryId" class="">
       <div class="d-flex justify-content-center">
-      <h2 class="text-center custom-heading">Upcoming Events on: </h2>
-      <h2 class="text-center category-name">{{ category.categoryName }}</h2>
-    </div>
+        <h2 class="text-center custom-heading">Upcoming Events on: </h2>
+        <h2 class="text-center category-name">{{ category.categoryName }}</h2>
+      </div>
       <div class="d-flex justify-content-center flex-wrap">
         <EventCard class="event-card" v-for="event in category.events.slice(0, 4)" :key="event.id" :event="event" />
       </div>
@@ -269,12 +269,12 @@ function goToTicket(id) {
 
 }
 
-.category-name{
+.category-name {
   margin-left: 10px;
   color: #6596E0;
 }
-.mr-20{
+
+.mr-20 {
   margin-right: 20px;
 }
-
 </style>
