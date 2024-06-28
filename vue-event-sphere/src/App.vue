@@ -53,4 +53,18 @@ main {
   --light: #f1f5f9;
   --sidebar-width: 300px;
 }
+::-webkit-scrollbar {
+  width: 1px;
+  height: 1px;
+}
+
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+
+::-webkit-scrollbar-thumb {
+  background: black;
+}
 </style>

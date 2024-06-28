@@ -26,7 +26,7 @@ function onLogOut() {
 
 
 <template>
-  <aside :class="`${is_expanded ? 'is-expanded' : ''}`">
+  <aside :class="`${is_expanded ? 'is-expanded' : ''}`" id="aside">
     <div class="logo">
       <span class="material-icons" style="font-size: 3rem;">data_thresholding</span>
     </div>
@@ -292,6 +292,9 @@ aside {
     }
   }
 
+#aside{
+  height: auto;
+}
   @media (max-width: 1024px) {
     position: absolute;
     z-index: 99;
