@@ -8,6 +8,7 @@ export const useEventStore = defineStore('event', () => {
     const events = ref([]);
     const eventsByLocation = ref([]);
     const event = ref(null);
+    const filteredEvents = ref([]);
 
     async function getEventByCategory(id) {
         try {
@@ -163,6 +164,36 @@ export const useEventStore = defineStore('event', () => {
     }
 }
 
+async function getEventsByName(name) {
+    try {
+      const response = await client.get(`${url}Event/getEventsByName`, {
+        params: { name: name },
+      });
+      const eventData = response.data;
+
+      const filteredEventsByName = eventData.map((event) => ({
+        id: event.id,
+                eventName: event.eventName,
+                description: event.description,
+                address: event.address,
+                locationId: event.locationId,
+                categoryID: event.categoryID,
+                startDate: event.startDate,
+                endDate: event.endDate,
+                image: event.image,
+                organizerName: event.organizerName,
+                maxAttendance: event.maxAttendance,
+                availableTickets: event.availableTickets,
+                photoData: event.photoData, 
+      }));
+      filteredEvents.value = filteredEventsByName;
+      return filteredEventsByName;
+    } catch (err) {
+      console.error("Error fetching events:", err);
+      return [];
+    }
+  }
+  
 async function getEventsByCountry(country) {
     try {
         const response = await client.get(`${url}Event/${country}/country`);
@@ -252,5 +283,5 @@ async function getEventsByCountry(country) {
     }
 }
 
-    return { getEventByCategory, getEventByOrganizer, getEventById,addEvent,updateEvent,getEvents, deleteEvent, event, events, getEventsByCity, getEventsByCountry, getEventByOrganizer};
+    return { getEventByCategory, getEventsByName,getEventByOrganizer,getEventById,addEvent,updateEvent,getEvents, deleteEvent, event, events, filteredEvents,getEventsByCity, getEventsByCountry, getEventByOrganizer};
 });

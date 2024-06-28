@@ -5,10 +5,13 @@ import DropdownLi from "@/components/DropdownLi.vue";
 import Logo from "@/assets/Logo.svg";
 import Location from "@/assets/Location.svg";
 import { useEventStore } from "@/store/eventStore";
+import { ref, watch } from "vue";
 
 const eventStore = useEventStore();
 const authStore = useAuthStore();
 const router = useRouter();
+const eventbyname = ref([]);
+const eventname = ref("");
 
 function onLogOut() {
   authStore.logOut();
@@ -41,11 +44,27 @@ const onSignup = () => {
 const getEventsByName = async (name) => {
   try {
     const response = await eventStore.getEventsByName(name);
-    events.value = response;
+    eventbyname.value = response;
+    console.log("eventiiiiii", eventbyname);
   } catch (err) {
     console.error(err);
   }
 };
+const toEventDetails = async (eventId) => {
+  router.push({
+    path: `/eventdetails/${eventId}`
+  }).then(() => {
+    location.reload();
+  });
+}
+
+watch(eventname, (newValue) => {
+  if (newValue) {
+    getEventsByName(newValue);
+  } else {
+    eventbyname.value = [];
+  }
+});
 </script>
 
 <template>
@@ -57,12 +76,8 @@ const getEventsByName = async (name) => {
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav align-items-center">
           <li class="nav-item dropdown">
-            <a
-              class="nav-link active dropdown-toggle custom-font-size"
-              href="#"
-              role="button"
-              data-bs-toggle="dropdown"
-            >
+            <a class="nav-link active dropdown-toggle custom-font-size" href="#" role="button"
+              data-bs-toggle="dropdown">
               Events
             </a>
             <ul class="dropdown-menu">
@@ -70,42 +85,37 @@ const getEventsByName = async (name) => {
             </ul>
           </li>
           <li class="nav-item">
-            <a
-              class="nav-link active custom-font-size"
-              @click="onNearYou"
-              role="button"
-              >Near you
+            <a class="nav-link active custom-font-size" @click="onNearYou" role="button">Near you
               <Location />
             </a>
           </li>
           <li class="nav-item">
-            <a
-              class="nav-link active custom-font-size"
-              @click="onAboutUs"
-              role="button"
-              >About us</a
-            >
+            <a class="nav-link active custom-font-size" @click="onAboutUs" role="button">About us</a>
           </li>
         </ul>
-        <div class="input-group justify-content-center">
+        <div class="search-container input-group justify-content-center position-relative">
           <div class="form-outline bg-white rounded" data-mdb-input-init>
-            <input type="search" id="form1" class="form-control" />
-            <label class="form-label" for="form1">Search</label>
+            <form @submit.prevent="getEventsByName(eventname)">
+              <input type="search" id="form1" class="form-control" v-model="eventname" />
+              <label class="form-label" for="form1">Search</label>
+            </form>
           </div>
-          <button type="button" class="btn btn-primary" data-mdb-ripple-init>
+          <button type="button" class="btn btn-primary" @click="getEventsByName(eventname)">
             <i class="fas fa-search"></i>
           </button>
+          <ul class="dropdown-menu show search-dropdown" v-if="eventbyname.length">
+            <li v-for="event in eventbyname" :key="event.id">
+              <a class="dropdown-item" @click="toEventDetails(event.id)">
+                <strong>Event :</strong> {{ event.eventName }}
+              </a>
+            </li>
+          </ul>
         </div>
         <div>
           <ul class="navbar-nav mb-2 mb-lg-0" v-if="authStore.loggedInUser">
             <li class="nav-item dropdown custom-margin-right">
-              <a
-                class="nav-link dropdown-toggle d-flex align-items-center"
-                href="#"
-                role="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
+              <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button"
+                data-bs-toggle="dropdown" aria-expanded="false">
                 <i class="bi bi-person-circle"></i>
               </a>
               <ul class="dropdown-menu dropdown-menu-end">
@@ -120,10 +130,7 @@ const getEventsByName = async (name) => {
                   </button>
                 </li>
                 <li>
-                  <button
-                    class="dropdown-item"
-                    @click="onLogOut()"
-                  >
+                  <button class="dropdown-item" @click="onLogOut()">
                     Log Out
                     <i class=" ml-2 bi bi-box-arrow-right"></i>
                   </button>
@@ -179,21 +186,43 @@ const getEventsByName = async (name) => {
   padding-left: 10px;
   font-size: 18px;
 }
+
 .auth-btn {
   text-transform: capitalize;
   width: 100px;
   margin-right: 10px;
 }
+
 .bi-person-circle {
   font-size: 30px;
   color: #1e1f22;
 }
-.ml-2{
+
+.ml-2 {
   margin-left: 3px;
   font-size: 16px;
 }
-.dropdown-menu{
+
+.dropdown-menu {
   --bs-dropdown-link-active-bg: #f8f9fa;
   --bs-dropdown-link-active-color: #6c757d;
+}
+
+.search-container {
+  position: relative;
+}
+
+.search-dropdown {
+  position: absolute;
+  background-color: white;
+  border: 1px solid #ccc;
+  max-height: 200px;
+  overflow-y: auto;
+  width: 25%;
+  z-index: 1000;
+  top: 100%;
+  margin-top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
 }
 </style>
