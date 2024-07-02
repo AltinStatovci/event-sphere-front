@@ -158,7 +158,7 @@ function goToTicket(id) {
         <h2 class="text-center category-name">{{ category.categoryName }}</h2>
       </div>
       <div class="d-flex justify-content-center flex-wrap">
-        <EventCard class="event-card" v-for="event in category.events.slice(0, 4)" :key="event.id" :event="event" />
+        <EventCard class="event-card" v-for="event in category.events.slice(0, 4)" :key="event.id" :event="event"/>
       </div>
     </div>
   </div>

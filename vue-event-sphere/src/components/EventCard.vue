@@ -50,7 +50,7 @@ function formatDateString(dateString) {
 </script>
 
 <template>
-  <div class="event-card m-2">
+  <div class="event-card m-2" v-if="event.isApproved === true">
     <div class="d-flex justify-content-center my-5">
       <div class="card shadow-lg mx-3" style="width: 23rem; border-radius: 10px; overflow: hidden;">
         <img :src="`data:image/png;base64,${event.photoData}`" class="card-img-top" alt="Event Image" style="height: 250px; object-fit: cover;">

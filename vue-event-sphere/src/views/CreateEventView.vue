@@ -36,6 +36,7 @@ const formData = reactive({
   availableTickets: 0,
   dateCreated: new Date().toISOString(),
   image: '',
+  isApproved: false,
 });
 
 const imageUrl = ref('https://t4.ftcdn.net/jpg/05/65/22/41/360_F_565224180_QNRiRQkf9Fw0dKRoZGwUknmmfk51SuSS.jpg');
@@ -209,7 +210,23 @@ const getTickets = async (id) => {
     });
   }
 }
-
+const approveEvent = async(id) => {
+  try {
+    await eventStore.approveEvent(id);
+    Swal.fire({
+      title: "Event Approved successfully!",
+      icon: "success"
+    }).then(() => {
+      location.reload();
+    });
+  } catch (err) {
+    await Swal.fire({
+      title: "Error!",
+      text: err.value,
+      icon: "error"
+    });
+  }
+}
 </script>
 
 
@@ -222,13 +239,12 @@ const getTickets = async (id) => {
           List</a>
         <a class="nav-link" :class="{ active: activeTab === 'eventForm' }" @click.prevent="changeTab('eventForm')">Event
           Form</a>
-        <a  v-if="authStore.isAdmin" class="nav-link" :class="{ active: activeTab === 'AdminList' }" @click.prevent="changeTab('AdminList')">Admin List</a>
       </nav>
       <hr class="mt-0 mb-4">
 
-      <div v-if="activeTab === 'eventList'">
-        <div class="card mb-4">
-          <div class="card-header">Event List</div>
+      <div v-if="activeTab === 'eventList' ">
+        <div class="card mb-4" v-if="authStore.isOrganizer">
+          <div class="card-header">Approved Events</div>
           <div class="card-body">
             <table class="table">
               <thead>
@@ -243,8 +259,8 @@ const getTickets = async (id) => {
                   <th scope="col"></th>
                 </tr>
               </thead>
-              <tbody>
-                <tr v-for="event in eventList" :key="event.id">
+              <tbody v-for="event in eventList" :key="event.id">
+                <tr v-if="event.isApproved">
                   <td>{{ event.eventName }}</td>
                   <td>{{ event.address }}</td>
                   <td>{{ event.categoryName }}</td>
@@ -258,17 +274,133 @@ const getTickets = async (id) => {
                     <button class="btn btn-outline-secondary btn-sm" @click="getTickets(event.id)">See Tickets</button>
                   </td>
                 </tr>
-                <tr v-if="eventList.length === 0">
-                            <td colspan="9" class="no-data">No events available</td>
-                        </tr>
+                <tr v-if="eventList && eventList.length === 0">
+                  <td colspan="8" class="no-data">No events available</td>
+                </tr>
               </tbody>
             </table>
           </div>
         </div>
+        <div class="card mb-4" v-if="authStore.isAdmin">
+          <div class="card-header">Event List</div>
+          <div class="card-body">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">Organizer</th>
+                  <th scope="col">Event Name</th>
+                  <th scope="col">Location</th>
+                  <th scope="col">Category Name</th>
+                  <th scope="col">Start Date</th>
+                  <th scope="col">End Date</th>
+                  <th scope="col">Max Attendees</th>
+                  <th scope="col">Available Tickets</th>
+                  <th scope="col"></th>
+                </tr>
+              </thead>
+              <tbody v-for="event in allEventList" :key="event.id">
+                <tr v-if="event.isApproved">
+                  <td>{{ event.organizerName }}</td>
+                  <td>{{ event.eventName }}</td>
+                  <td>{{ event.address }}</td>
+                  <td>{{ event.categoryName }}</td>
+                  <td>{{ formatDateTime(event.startDate) }}</td>
+                  <td>{{ formatDateTime(event.endDate) }}</td>
+                  <td>{{ event.maxAttendance }}</td>
+                  <td>{{ event.availableTickets }}</td>
+                  <td>
+                    <button class="btn btn-outline-danger btn-sm" @click="deleteEvent(event.id)">Delete</button>
+                  </td>
+                </tr>
+                <tr v-if="allEventList.length === 0">
+                  <td colspan="9" class="no-data">No events available</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card mb-4" v-if="authStore.isOrganizer">
+        <div class="card-header">Waiting for approval</div>
+          <div class="card-body">
+        <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">Event Name</th>
+                  <th scope="col">Location</th>
+                  <th scope="col">Category Name</th>
+                  <th scope="col">Start Date</th>
+                  <th scope="col">End Date</th>
+                  <th scope="col">Max Attendees</th>
+                  <th scope="col">Available Tickets</th>
+                  <th scope="col"></th>
+                </tr>
+              </thead>
+              <tbody v-for="event in eventList" :key="event.id">
+                <tr v-if="!event.isApproved">
+                  <td>{{ event.eventName }}</td>
+                  <td>{{ event.address }}</td>
+                  <td>{{ event.categoryName }}</td>
+                  <td>{{ formatDateTime(event.startDate) }}</td>
+                  <td>{{ formatDateTime(event.endDate) }}</td>
+                  <td>{{ event.maxAttendance }}</td>
+                  <td>{{ event.availableTickets }}</td>
+                  <td>
+                    <button class="btn btn-outline-danger btn-sm" @click="deleteEvent(event.id)">Delete</button>
+                    <button class="btn btn-outline-primary btn-sm" @click="openEditForm(event.id)">Edit</button>
+                  </td>
+                </tr>
+                <tr v-if="eventList && eventList.length === 0">
+                  <td colspan="8" class="no-data">No events available</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          </div>
+          <div class="card mb-4" v-if="authStore.isAdmin">
+        <div class="card-header">Waiting for approval</div>
+          <div class="card-body">
+        <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">Organizer Name</th>
+                  <th scope="col">Event Name</th>
+                  <th scope="col">Location</th>
+                  <th scope="col">Category Name</th>
+                  <th scope="col">Start Date</th>
+                  <th scope="col">End Date</th>
+                  <th scope="col">Max Attendees</th>
+                  <th scope="col">Available Tickets</th>
+                  <th scope="col">Description</th>
+                  <th scope="col"></th>
+                </tr>
+              </thead>
+              <tbody v-for="event in allEventList" :key="event.id">
+                <tr v-if="!event.isApproved">
+                  <td>{{ event.organizerName }}</td>
+                  <td>{{ event.eventName }}</td>
+                  <td>{{ event.address }}</td>
+                  <td>{{ event.categoryName }}</td>
+                  <td>{{ formatDateTime(event.startDate) }}</td>
+                  <td>{{ formatDateTime(event.endDate) }}</td>
+                  <td>{{ event.maxAttendance }}</td>
+                  <td>{{ event.availableTickets }}</td>
+                  <td>{{event.description}}</td>
+                  <td>
+                    <button class="btn btn-outline-success btn-sm" @click="approveEvent(event.id)">Approve</button>
+                    <button class="btn btn-outline-primary btn-sm">Reject</button>
+                  </td>
+                </tr>
+                <tr v-if="eventList && eventList.length === 0">
+                  <td colspan="8" class="no-data">No events available</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          </div>
+        </div>
         <div v-if="showTicketsTable">
-        <ticket-list :tickets="ticketList" :eventID="eventID"/>
-      </div>
-      </div>
+          <ticket-list :tickets="ticketList" :eventID="eventID" />
+        </div>
 
       <!-- Event Form Section -->
       <div v-if="activeTab === 'eventForm'">
@@ -363,51 +495,6 @@ const getTickets = async (id) => {
             </div>
           </div>
         </div>
-      </div>
-
-
-
-    <!-- Admin List Tab -->
-      <div v-if="activeTab === 'AdminList' && authStore.isAdmin">
-        <div class="card mb-4">
-          <div class="card-header">Event List</div>
-          <div class="card-body">
-            <table class="table">
-              <thead>
-              <tr>
-                <th scope="col">Organizer</th>
-                <th scope="col">Event Name</th>
-                <th scope="col">Location</th>
-                <th scope="col">Category Name</th>
-                <th scope="col">Start Date</th>
-                <th scope="col">End Date</th>
-                <th scope="col">Max Attendees</th>
-                <th scope="col">Available Tickets</th>
-                <th scope="col"></th>
-              </tr>
-              </thead>
-              <tbody>
-              <tr v-for="event in allEventList" :key="event.id">
-                <td>{{event.organizerName}}</td>
-                <td>{{ event.eventName }}</td>
-                <td>{{ event.address }}</td>
-                <td>{{ event.categoryName }}</td>
-                <td>{{ formatDateTime(event.startDate) }}</td>
-                <td>{{ formatDateTime(event.endDate) }}</td>
-                <td>{{ event.maxAttendance }}</td>
-                <td>{{ event.availableTickets }}</td>
-                <td>
-                  <button class="btn btn-outline-danger btn-sm" @click="deleteEvent(event.id)">Delete</button>
-                </td>
-              </tr>
-              <tr v-if="allEventList.length === 0">
-                <td colspan="9" class="no-data">No events available</td>
-              </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
       </div>
     </div>
   </div>
@@ -524,11 +611,12 @@ body {
 .btn {
   text-transform: capitalize;
 }
+
 .no-data {
-    text-align: center;
-    padding: 10px;
-    background-color: #fff;
-    border: 1px solid #ddd;
-    color: #999;
+  text-align: center;
+  padding: 10px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  color: #999;
 }
 </style>
