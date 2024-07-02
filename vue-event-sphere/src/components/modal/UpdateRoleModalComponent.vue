@@ -25,12 +25,12 @@ const fetchRoles = async () => {
 
 const updateRole = async () => {
   try {
-    await userStore.updateUser({ ...props.user, roleID: selectedRoleId.value, roleName: roles.value.find(role => role.id === selectedRoleId.value).roleName });
+    await userStore.updateUser({ ...props.user, roleId: selectedRoleId.value, roleName: roles.value.find(role => role.id === selectedRoleId.value).roleName });
     await Swal.fire({
       title: "User Role updated successfully!",
       icon: "success"
     }).then(() => {
-      emit('close');
+      emit('close'); 
 
     }).then(() => {
       location.reload()
@@ -44,7 +44,7 @@ const updateRole = async () => {
 watch(() => props.showModal, async (newVal) => {
   if (newVal) {
     await fetchRoles();
-    selectedRoleId.value = props.user.roleID;
+    selectedRoleId.value = props.user.roleId;
   }
 });
 </script>

@@ -28,7 +28,7 @@ function onLogOut() {
 <template>
   <aside :class="`${is_expanded ? 'is-expanded' : ''}`" id="aside">
     <div class="logo">
-      <span class="material-icons" style="font-size: 3rem;">data_thresholding</span>
+      <img src="../assets/LogoWhite.png" width="60px" height="60px">
     </div>
 
     <div class="menu-toggle-wrap">
