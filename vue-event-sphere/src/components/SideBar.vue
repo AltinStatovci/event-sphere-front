@@ -22,6 +22,10 @@ function onLogOut() {
   router.push({ name: 'login' });
 }
 
+const onLogs = () => {
+  router.push({ name: 'logs' });
+}
+
 </script>
 
 
@@ -88,6 +92,15 @@ function onLogOut() {
         <span class="material-icons">settings</span>
         <span class="text">Settings</span>
       </button>
+
+      <span v-if="showLogout && authStore.isAdmin" class="logs">
+        <button @click="onLogs" class="button">
+          <i class="bi bi-clipboard-check" style="color: white ; font-size: 25px "></i>
+          <span class="text" style="color: white;">Logs</span>
+        </button>
+      </span>
+
+
       <span v-if="showLogout" class="logout-button">
         <button @click="onLogOut" class="button">
           <span class="material-icons" style="color: red;">logout</span>
