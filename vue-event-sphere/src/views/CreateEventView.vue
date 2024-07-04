@@ -9,6 +9,7 @@ import { useLocationStore } from '@/store/locationStore';
 import { useCategoryStore } from "@/store/categoryStore";
 import { useTicketStore } from "@/store/ticketStore";
 import TicketList from "@/components/TicketList.vue";
+import RejectMessageModalComponent from "@/components/modal/RejectMessageModalComponent.vue";
 
 const router = useRouter();
 const eventStore = useEventStore();
@@ -210,7 +211,7 @@ const getTickets = async (id) => {
     });
   }
 }
-const approveEvent = async(id) => {
+const approveEvent = async (id) => {
   try {
     await eventStore.approveEvent(id);
     Swal.fire({
@@ -227,6 +228,26 @@ const approveEvent = async(id) => {
     });
   }
 }
+const rejectModal = ref({
+  visible: false,
+  eventId: null
+});
+
+const openRejectModal = (id) => {
+  rejectModal.value = {
+    visible: true,
+    eventId: id
+  };
+};
+const handleClose = () => {
+  rejectModal.value.visible = false;
+  rejectModal.value.eventId = null;
+};
+const truncateDescription = (text) => {
+  const maxLength = 50; // adjust as needed
+  return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+};
+
 </script>
 
 
@@ -242,7 +263,7 @@ const approveEvent = async(id) => {
       </nav>
       <hr class="mt-0 mb-4">
 
-      <div v-if="activeTab === 'eventList' ">
+      <div v-if="activeTab === 'eventList'">
         <div class="card mb-4" v-if="authStore.isOrganizer">
           <div class="card-header">Approved Events</div>
           <div class="card-body">
@@ -320,9 +341,9 @@ const approveEvent = async(id) => {
           </div>
         </div>
         <div class="card mb-4" v-if="authStore.isOrganizer">
-        <div class="card-header">Waiting for approval</div>
+          <div class="card-header">Waiting for approval</div>
           <div class="card-body">
-        <table class="table">
+            <table class="table">
               <thead>
                 <tr>
                   <th scope="col">Event Name</th>
@@ -355,11 +376,11 @@ const approveEvent = async(id) => {
               </tbody>
             </table>
           </div>
-          </div>
-          <div class="card mb-4" v-if="authStore.isAdmin">
-        <div class="card-header">Waiting for approval</div>
+        </div>
+        <div class="card mb-4" v-if="authStore.isAdmin">
+          <div class="card-header">Waiting for approval</div>
           <div class="card-body">
-        <table class="table">
+            <table class="table">
               <thead>
                 <tr>
                   <th scope="col">Organizer Name</th>
@@ -384,23 +405,32 @@ const approveEvent = async(id) => {
                   <td>{{ formatDateTime(event.endDate) }}</td>
                   <td>{{ event.maxAttendance }}</td>
                   <td>{{ event.availableTickets }}</td>
-                  <td>{{event.description}}</td>
                   <td>
-                    <button class="btn btn-outline-success btn-sm" @click="approveEvent(event.id)">Approve</button>
-                    <button class="btn btn-outline-primary btn-sm">Reject</button>
+                    <div class="tooltip-container">
+                      <span>{{ truncateDescription(event.description) }}</span>
+                      <div class="tooltip-text">{{ event.description }}</div>
+                    </div>
                   </td>
+                  <td class="d-flex pb-20">
+                    <button class="btn btn-outline-success btn-sm" @click="approveEvent(event.id)">Approve</button>
+                    <button class="btn btn-outline-primary btn-sm" @click="openRejectModal(event.id)">Reject</button>
+                  </td>
+                  <RejectMessageModalComponent :rejectModal="rejectModal" @close="handleClose" />
                 </tr>
-                <tr v-if="eventList && eventList.length === 0">
+                <tr v-if="authStore.isOrganizer && eventList && eventList.length === 0">
+                  <td colspan="8" class="no-data">No events available</td>
+                </tr>
+                <tr v-if="authStore.isAdmin && allEventList && allEventList.length === 0">
                   <td colspan="8" class="no-data">No events available</td>
                 </tr>
               </tbody>
             </table>
           </div>
-          </div>
         </div>
-        <div v-if="showTicketsTable">
-          <ticket-list :tickets="ticketList" :eventID="eventID" />
-        </div>
+      </div>
+      <div v-if="showTicketsTable">
+        <ticket-list :tickets="ticketList" :eventID="eventID" />
+      </div>
 
       <!-- Event Form Section -->
       <div v-if="activeTab === 'eventForm'">
@@ -618,5 +648,34 @@ body {
   background-color: #fff;
   border: 1px solid #ddd;
   color: #999;
+}
+.tooltip-container {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip-container .tooltip-text {
+  visibility: hidden;
+  width: 300px; /* adjust as needed */
+  background-color: #ffffff;
+  color: #131212;
+  text-align: center;
+  border: 1px solid lightgray;
+  padding: 5px;
+  position: absolute;
+  z-index: 1;
+  /* bottom: 0; Position the tooltip above the text */
+  /* left: 50%; */
+  margin-left: 0; /* Adjust to center */
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.tooltip-container:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+.pb-20{
+  padding:20px 0px;
 }
 </style>
