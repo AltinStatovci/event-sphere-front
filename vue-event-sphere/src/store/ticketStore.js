@@ -69,6 +69,7 @@ export const useTicketStore = defineStore('ticket', () => {
         eventName: ticket.eventName,
         price: ticket.price,
         ticketType: ticket.ticketType,
+        ticketAmount: ticket.ticketAmount,
         bookingReference: ticket.bookingReference,
       }));
       return tickets;

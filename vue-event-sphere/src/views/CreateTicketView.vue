@@ -11,6 +11,7 @@ const ticketById = ref(null);
 const formData = reactive({
 
   ticketType: '',
+  ticketAmount: 0,
   price: 0,
   bookingReference: '',
 });
@@ -77,6 +78,7 @@ const changeTab = (tab) => {
               <tr v-for="ticket in ticketList" :key="ticket.id">
                 <td>{{ ticket.eventName }}</td>
                 <td>{{ ticket.ticketType }}</td>
+                <td>{{ ticket.ticketAmount }}</td>
                 <td>{{ ticket.price }}</td>
                 <td>{{ ticket.bookingReference }}</td>
                 <td>

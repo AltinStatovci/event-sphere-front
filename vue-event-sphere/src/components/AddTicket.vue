@@ -12,6 +12,7 @@ const props = defineProps({
 const formData = reactive({
     eventID: props.eventID,
     ticketType: '',
+    ticketAmount: 0,
     price: 0,
     bookingReference: '',
 });
@@ -48,6 +49,11 @@ const handleSubmit = async () => {
                                 <label class="small mb-1" for="ticketType">Ticket Type</label>
                                 <input class="form-control" id="ticketType" type="text" placeholder="Enter ticket type"
                                     v-model.trim="formData.ticketType">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="small mb-1" for="price">Price</label>
+                                <input class="form-control" id="price" type="number" placeholder="Enter amount"
+                                    v-model.trim="formData.ticketAmount">
                             </div>
                         </div>
                         <div class="row gx-3 mb-3">
