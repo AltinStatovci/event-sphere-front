@@ -19,6 +19,7 @@ import PaymentPage from '@/views/PaymentPageView.vue';
 import CreateEventView from "@/views/CreateEventView.vue";
 import NearYouView from '@/views/NearYouView.vue';
 import CreateTicketView from "@/views/CreateTicketView.vue";
+import LogsView from "@/views/LogsView.vue";
 
 
 
@@ -122,6 +123,12 @@ const routes = [
     name: 'paymentDashboard',
     component:Payment,
     meta: { requiresAuth: true },
+  },
+  {
+    path: '/logs',
+    name: 'logs',
+    component:LogsView,
+    meta: { requiresAuth: true , requiresAdmin: true},
   }
 ];
 
