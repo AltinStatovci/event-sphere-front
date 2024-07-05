@@ -10,9 +10,13 @@ const props = defineProps({
 const currentPage = ref(1);
 const pageSize = 10;
 
+const sortedLogs = computed(() => {
+  return [...props.logs].sort((a, b) => new Date(b.timeStamp) - new Date(a.timeStamp));
+});
+
 const paginatedLogs = computed(() => {
   const startIndex = (currentPage.value - 1) * pageSize;
-  return props.logs.slice(startIndex, startIndex + pageSize);
+  return sortedLogs.value.slice(startIndex, startIndex + pageSize);
 });
 
 const totalPages = computed(() => Math.ceil(props.logs.length / pageSize));
@@ -30,11 +34,25 @@ function extractAfterBy(message) {
   const index = message.indexOf(keyword);
 
   if (index === -1) {
-    return "Unknown"; // Return an empty string if "by" is not found
+    return "Unknown"; // Return "Unknown" if "by" is not found
   }
 
-  return message.substring(index + keyword.length).trim();
+  // Extract substring after "by" and trim whitespace
+  const substring = message.substring(index + keyword.length).trim();
+
+  // Regular expression to match an email address
+  const emailRegex = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g;
+
+  // Find the first email address in the substring
+  const emailMatch = substring.match(emailRegex);
+
+  if (emailMatch) {
+    return emailMatch[0];
+  } else {
+    return "Unknown";
+  }
 }
+
 </script>
 
 <template>
