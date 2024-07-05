@@ -10,9 +10,13 @@ const props = defineProps({
 const currentPage = ref(1);
 const pageSize = 10;
 
+const sortedLogs = computed(() => {
+  return [...props.logs].sort((a, b) => new Date(b.timeStamp) - new Date(a.timeStamp));
+});
+
 const paginatedLogs = computed(() => {
   const startIndex = (currentPage.value - 1) * pageSize;
-  return props.logs.slice(startIndex, startIndex + pageSize);
+  return sortedLogs.value.slice(startIndex, startIndex + pageSize);
 });
 
 const totalPages = computed(() => Math.ceil(props.logs.length / pageSize));
@@ -25,7 +29,32 @@ watch(() => props.logs, () => {
   setCurrentPage(1); // Reset to first page when logs change
 });
 
+function extractAfterBy(message) {
+  const keyword = "by";
+  const index = message.indexOf(keyword);
+
+  if (index === -1) {
+    return "Unknown"; // Return "Unknown" if "by" is not found
+  }
+
+  // Extract substring after "by" and trim whitespace
+  const substring = message.substring(index + keyword.length).trim();
+
+  // Regular expression to match an email address
+  const emailRegex = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g;
+
+  // Find the first email address in the substring
+  const emailMatch = substring.match(emailRegex);
+
+  if (emailMatch) {
+    return emailMatch[0];
+  } else {
+    return "Unknown";
+  }
+}
+
 </script>
+
 <template>
   <div>
     <div class="card mb-4">
@@ -37,6 +66,7 @@ watch(() => props.logs, () => {
             <th>Level</th>
             <th>Date</th>
             <th>Message</th>
+            <th>From</th>
           </tr>
           </thead>
           <tbody>
@@ -44,15 +74,21 @@ watch(() => props.logs, () => {
             <td>{{ log.level }}</td>
             <td>{{ formatLogDateTime(log.timeStamp) }}</td>
             <td>{{ log.messageTemplate.split(':').slice(0, -1).join(':') }}</td>
+            <td>{{ extractAfterBy(log.message) }}</td>
           </tr>
           <tr v-if="logs.length === 0">
-            <td colspan="3" class="no-data">No Logs available</td>
+            <td colspan="4" class="no-data">No Logs available</td>
           </tr>
           </tbody>
         </table>
         <nav v-if="logs.length > 0">
           <ul class="pagination justify-content-center">
-            <li class="page-item" v-for="(page, index) in totalPages" :key="index" :class="{ active: currentPage === page }">
+            <li
+                class="page-item"
+                v-for="page in totalPages"
+                :key="page"
+                :class="{ active: currentPage === page }"
+            >
               <a class="page-link" href="#" @click.prevent="setCurrentPage(page)">{{ page }}</a>
             </li>
           </ul>
@@ -61,7 +97,6 @@ watch(() => props.logs, () => {
     </div>
   </div>
 </template>
-
 
 <style scoped>
 h1 {
@@ -122,5 +157,4 @@ h1 {
   color: #fff;
   border-color: #0061f2;
 }
-
 </style>
