@@ -19,6 +19,7 @@ const selectedTicket = reactive({
     id: props.ticketId,
     eventID: props.eventId,
     ticketType: '',
+    ticketAmount: 0,
     price: 0,
     bookingReference: '',
 });
@@ -63,6 +64,13 @@ const updateTicket = async () => {
                                 <input class="form-control" id="editTicketType" type="text"
                                     v-model.trim="selectedTicket.ticketType">
                             </div>
+                            <div class="col-md-6">
+                                <label class="small mb-1" for="editPrice">Price</label>
+                                <input class="form-control" id="editPrice" type="text"
+                                    v-model.trim="selectedTicket.ticketAmount">
+                            </div>
+                        </div>
+                        <div class="row gx-3 mb-3">
                         </div>
                         <div class="row gx-3 mb-3">
                             <div class="col-md-6">
