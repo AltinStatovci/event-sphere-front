@@ -25,7 +25,18 @@ watch(() => props.logs, () => {
   setCurrentPage(1); // Reset to first page when logs change
 });
 
+function extractAfterBy(message) {
+  const keyword = "by";
+  const index = message.indexOf(keyword);
+
+  if (index === -1) {
+    return "Unknown"; // Return an empty string if "by" is not found
+  }
+
+  return message.substring(index + keyword.length).trim();
+}
 </script>
+
 <template>
   <div>
     <div class="card mb-4">
@@ -37,6 +48,7 @@ watch(() => props.logs, () => {
             <th>Level</th>
             <th>Date</th>
             <th>Message</th>
+            <th>From</th>
           </tr>
           </thead>
           <tbody>
@@ -44,15 +56,21 @@ watch(() => props.logs, () => {
             <td>{{ log.level }}</td>
             <td>{{ formatLogDateTime(log.timeStamp) }}</td>
             <td>{{ log.messageTemplate.split(':').slice(0, -1).join(':') }}</td>
+            <td>{{ extractAfterBy(log.message) }}</td>
           </tr>
           <tr v-if="logs.length === 0">
-            <td colspan="3" class="no-data">No Logs available</td>
+            <td colspan="4" class="no-data">No Logs available</td>
           </tr>
           </tbody>
         </table>
         <nav v-if="logs.length > 0">
           <ul class="pagination justify-content-center">
-            <li class="page-item" v-for="(page, index) in totalPages" :key="index" :class="{ active: currentPage === page }">
+            <li
+                class="page-item"
+                v-for="page in totalPages"
+                :key="page"
+                :class="{ active: currentPage === page }"
+            >
               <a class="page-link" href="#" @click.prevent="setCurrentPage(page)">{{ page }}</a>
             </li>
           </ul>
@@ -61,7 +79,6 @@ watch(() => props.logs, () => {
     </div>
   </div>
 </template>
-
 
 <style scoped>
 h1 {
@@ -122,5 +139,4 @@ h1 {
   color: #fff;
   border-color: #0061f2;
 }
-
 </style>
