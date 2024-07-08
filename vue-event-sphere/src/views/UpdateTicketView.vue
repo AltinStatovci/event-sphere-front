@@ -41,9 +41,16 @@ const updateTicket = async () => {
             location.reload();
         });
     } catch (e) {
+        let errorMessage = 'Failed to update ticket'; // Default message
+        if (e.response && e.response.data && e.response.data.error) {
+            errorMessage = e.response.data.error;
+        } else if (e.message) {
+            errorMessage = e.message;
+        }
+
         Swal.fire({
             title: 'Error!',
-            text: e.response ? e.response.data : e.message || 'Failed to add ticket',
+            text: errorMessage,
             icon: 'error'
         });
     }
@@ -65,7 +72,7 @@ const updateTicket = async () => {
                                     v-model.trim="selectedTicket.ticketType">
                             </div>
                             <div class="col-md-6">
-                                <label class="small mb-1" for="editPrice">Price</label>
+                                <label class="small mb-1" for="editPrice">Amount</label>
                                 <input class="form-control" id="editPrice" type="text"
                                     v-model.trim="selectedTicket.ticketAmount">
                             </div>
