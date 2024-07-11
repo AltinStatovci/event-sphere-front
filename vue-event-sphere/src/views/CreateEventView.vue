@@ -40,7 +40,7 @@ const formData = reactive({
   dateCreated: new Date().toISOString(),
   image: '',
   isApproved: false,
-  scheduleDate: '',
+  scheduleDate: new Date().toISOString(),
 });
 
 const imageUrl = ref('https://t4.ftcdn.net/jpg/05/65/22/41/360_F_565224180_QNRiRQkf9Fw0dKRoZGwUknmmfk51SuSS.jpg');
@@ -276,21 +276,19 @@ const approveEvent = async (id) => {
                 </tr>
               </thead>
               <tbody v-for="event in eventD" :key="event.id">
-                <td>{{ event.eventName }}</td>
-                <td>{{ event.address }}</td>
-                <td>{{ event.categoryName }}</td>
-                <td>{{ formatDateTime(event.startDate) }}</td>
-                <td>{{ formatDateTime(event.endDate) }}</td>
-                <td>{{ event.maxAttendance }}</td>
-                <td>{{ event.availableTickets }}</td>
-                <td>
-                  <button class="btn btn-outline-danger btn-sm" @click="deleteEvent(event.id)">Delete</button>
-                  <button class="btn btn-outline-primary btn-sm" @click="openEditForm(event.id)">Edit</button>
-                  <button class="btn btn-outline-secondary btn-sm" @click="getTickets(event.id)">See Tickets</button>
-                </td>
-                <tr
-                  v-if="eventList && eventList.length === 0 || eventD && eventD.length === 0 || eventS && eventS.length === 0">
-                  <td colspan="8" class="no-data">No events available</td>
+                <tr>
+                  <td>{{ event.eventName }}</td>
+                  <td>{{ event.address }}</td>
+                  <td>{{ event.categoryName }}</td>
+                  <td>{{ formatDateTime(event.startDate) }}</td>
+                  <td>{{ formatDateTime(event.endDate) }}</td>
+                  <td>{{ event.maxAttendance }}</td>
+                  <td>{{ event.availableTickets }}</td>
+                  <td>
+                    <button class="btn btn-outline-danger btn-sm" @click="deleteEvent(event.id)">Delete</button>
+                    <button class="btn btn-outline-primary btn-sm" @click="openEditForm(event.id)">Edit</button>
+                    <button class="btn btn-outline-secondary btn-sm" @click="getTickets(event.id)">See Tickets</button>
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -327,9 +325,6 @@ const approveEvent = async (id) => {
                     <button class="btn btn-outline-danger btn-sm" @click="deleteEvent(event.id)">Delete</button>
                   </td>
                 </tr>
-                <tr v-if="allEventList.length === 0">
-                  <td colspan="9" class="no-data">No events available</td>
-                </tr>
               </tbody>
             </table>
           </div>
@@ -364,9 +359,6 @@ const approveEvent = async (id) => {
                     <button class="btn btn-outline-primary btn-sm" @click="openEditForm(event.id)">Edit</button>
                   </td>
                 </tr>
-                <tr v-if="eventList && eventList.length === 0">
-                  <td colspan="8" class="no-data">No events available</td>
-                </tr>
               </tbody>
             </table>
 
@@ -388,10 +380,11 @@ const approveEvent = async (id) => {
                   <th scope="col">Available Tickets</th>
                   <th scope="col">Aproved</th>
                   <th scope="col">Schedule Date</th>
-                  <th scope="col">Actions</th>
+                  <th scope="col"></th>
                 </tr>
               </thead>
               <tbody v-for="event in eventS" :key="event.id">
+                <tr>
                 <td>{{ event.eventName }}</td>
                 <td>{{ event.address }}</td>
                 <td>{{ event.categoryName }}</td>
@@ -399,16 +392,12 @@ const approveEvent = async (id) => {
                 <td>{{ formatDateTime(event.endDate) }}</td>
                 <td>{{ event.maxAttendance }}</td>
                 <td>{{ event.availableTickets }}</td>
-                <td>{{ event.isApproved ? 'Approved' : 'Scheduled' }}</td>
-                <td>{{ event.scheduleDate }}</td>
-
-
+                <td>{{ event.isApproved ? 'Approved' : 'Pending' }}</td>
+                <td>{{ formatDateTime(event.scheduleDate) }}</td>
                 <td>
                   <button class="btn btn-outline-danger btn-sm" @click="deleteEvent(event.id)">Delete</button>
                   <button class="btn btn-outline-primary btn-sm" @click="openEditForm(event.id)">Edit</button>
                 </td>
-                <tr v-if="eventList && eventList.length === 0">
-                  <td colspan="8" class="no-data">No events available</td>
                 </tr>
               </tbody>
             </table>
@@ -447,9 +436,6 @@ const approveEvent = async (id) => {
                     <button class="btn btn-outline-success btn-sm" @click="approveEvent(event.id)">Approve</button>
                     <button class="btn btn-outline-primary btn-sm">Reject</button>
                   </td>
-                </tr>
-                <tr v-if="eventList && eventList.length === 0">
-                  <td colspan="8" class="no-data">No events available</td>
                 </tr>
               </tbody>
             </table>
