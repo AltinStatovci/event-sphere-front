@@ -21,6 +21,9 @@ const categoryStore = useCategoryStore();
 const locations = ref([]);
 const categories = ref([]);
 const ticketList = ref([]);
+const now = new Date();
+const formattedNow = now.toISOString(); // Get YYYY-MM-DDTHH:MM format
+console.log("Current DateTime:", formattedNow);
 
 
 const formData = reactive({
@@ -38,6 +41,7 @@ const formData = reactive({
   dateCreated: new Date().toISOString(),
   image: '',
   isApproved: false,
+  scheduleDate: new Date().toISOString(),
 });
 
 const imageUrl = ref('https://t4.ftcdn.net/jpg/05/65/22/41/360_F_565224180_QNRiRQkf9Fw0dKRoZGwUknmmfk51SuSS.jpg');
@@ -86,6 +90,8 @@ const handleImageUpload = (event) => {
 const eventList = ref([]);
 
 const allEventList = ref([])
+const eventD = ref([])
+const eventS = ref([])
 
 const fetchEvents = async () => {
   eventList.value = await eventStore.getEventByOrganizer(authStore.id);
@@ -93,6 +99,12 @@ const fetchEvents = async () => {
 
 const fetchAllEvents = async () => {
   allEventList.value = await eventStore.getEvents()
+}
+const fetchEventsD = async () => {
+  eventD.value = await eventStore.getEventsD()
+}
+const fetchEventsS = async () => {
+  eventS.value = await eventStore.getEventsS()
 }
 
 const getAllLocations = async () => {
@@ -115,6 +127,8 @@ const getAllCategories = async () => {
 
 onMounted(() => {
   fetchEvents();
+  fetchEventsD();
+  fetchEventsS();
   fetchAllEvents();
   getAllLocations();
   getAllCategories();
@@ -158,6 +172,7 @@ const openEditForm = async (eventId) => {
   formData.maxAttendance = eventById.value.maxAttendance;
   formData.availableTickets = eventById.value.availableTickets;
   formData.image = eventById.value.image;
+  formData.scheduleDate = eventById.value.scheduleDate;
 
   changeTab('eventForm');
 };
@@ -247,7 +262,6 @@ const truncateDescription = (text) => {
   const maxLength = 50; // adjust as needed
   return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
 };
-
 </script>
 
 
@@ -265,7 +279,7 @@ const truncateDescription = (text) => {
 
       <div v-if="activeTab === 'eventList'">
         <div class="card mb-4" v-if="authStore.isOrganizer">
-          <div class="card-header">Approved Events</div>
+          <div class="card-header">Published Events</div>
           <div class="card-body">
             <table class="table">
               <thead>
@@ -280,8 +294,8 @@ const truncateDescription = (text) => {
                   <th scope="col"></th>
                 </tr>
               </thead>
-              <tbody v-for="event in eventList" :key="event.id">
-                <tr v-if="event.isApproved">
+              <tbody v-for="event in eventD" :key="event.id">
+                <tr>
                   <td>{{ event.eventName }}</td>
                   <td>{{ event.address }}</td>
                   <td>{{ event.categoryName }}</td>
@@ -294,9 +308,6 @@ const truncateDescription = (text) => {
                     <button class="btn btn-outline-primary btn-sm" @click="openEditForm(event.id)">Edit</button>
                     <button class="btn btn-outline-secondary btn-sm" @click="getTickets(event.id)">See Tickets</button>
                   </td>
-                </tr>
-                <tr v-if="eventList && eventList.length === 0">
-                  <td colspan="8" class="no-data">No events available</td>
                 </tr>
               </tbody>
             </table>
@@ -333,9 +344,6 @@ const truncateDescription = (text) => {
                     <button class="btn btn-outline-danger btn-sm" @click="deleteEvent(event.id)">Delete</button>
                   </td>
                 </tr>
-                <tr v-if="allEventList.length === 0">
-                  <td colspan="9" class="no-data">No events available</td>
-                </tr>
               </tbody>
             </table>
           </div>
@@ -370,8 +378,45 @@ const truncateDescription = (text) => {
                     <button class="btn btn-outline-primary btn-sm" @click="openEditForm(event.id)">Edit</button>
                   </td>
                 </tr>
-                <tr v-if="eventList && eventList.length === 0">
-                  <td colspan="8" class="no-data">No events available</td>
+              </tbody>
+            </table>
+
+
+          </div>
+        </div>
+        <div class="card mb-4" v-if="authStore.isOrganizer">
+          <div class="card-header">Scheduled Events</div>
+          <div class="card-body">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">Event Name</th>
+                  <th scope="col">Location</th>
+                  <th scope="col">Category Name</th>
+                  <th scope="col">Start Date</th>
+                  <th scope="col">End Date</th>
+                  <th scope="col">Max Attendees</th>
+                  <th scope="col">Available Tickets</th>
+                  <th scope="col">Aproved</th>
+                  <th scope="col">Schedule Date</th>
+                  <th scope="col"></th>
+                </tr>
+              </thead>
+              <tbody v-for="event in eventS" :key="event.id">
+                <tr>
+                <td>{{ event.eventName }}</td>
+                <td>{{ event.address }}</td>
+                <td>{{ event.categoryName }}</td>
+                <td>{{ formatDateTime(event.startDate) }}</td>
+                <td>{{ formatDateTime(event.endDate) }}</td>
+                <td>{{ event.maxAttendance }}</td>
+                <td>{{ event.availableTickets }}</td>
+                <td>{{ event.isApproved ? 'Approved' : 'Pending' }}</td>
+                <td>{{ formatDateTime(event.scheduleDate) }}</td>
+                <td>
+                  <button class="btn btn-outline-danger btn-sm" @click="deleteEvent(event.id)">Delete</button>
+                  <button class="btn btn-outline-primary btn-sm" @click="openEditForm(event.id)">Edit</button>
+                </td>
                 </tr>
               </tbody>
             </table>
@@ -405,6 +450,8 @@ const truncateDescription = (text) => {
                   <td>{{ formatDateTime(event.endDate) }}</td>
                   <td>{{ event.maxAttendance }}</td>
                   <td>{{ event.availableTickets }}</td>
+                  <td>{{ event.description }}</td>
+
                   <td>
                     <div class="tooltip-container">
                       <span>{{ truncateDescription(event.description) }}</span>
@@ -494,7 +541,12 @@ const truncateDescription = (text) => {
                       <input class="form-control" id="availableTickets" type="number"
                         v-model="formData.availableTickets">
                     </div>
-                    <div class="col-md-6 w-50">
+                    <div class="col-md-6 w-25">
+                      <label class="small mb-1" for="ScheduleDate">ScheduleDate</label>
+                      <input class="form-control" id="ScheduleDate" type="datetime-local"
+                        v-model="formData.scheduleDate">
+                    </div>
+                    <div class="col-md-12 w-50">
                       <label class="small mb-1" for="description">Description</label>
                       <input class="form-control" id="description" type="text" placeholder="Enter description"
                         v-model.trim="formData.description">

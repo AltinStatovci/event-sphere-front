@@ -62,7 +62,8 @@ export const useEventStore = defineStore('event', () => {
         maxAttendance: event.maxAttendance,
         availableTickets: event.availableTickets,
         photoData: event.photoData,
-        isApproved: event.isApproved
+        isApproved: event.isApproved,
+        scheduleDate: event.scheduleDate,
       }));
 
       events.value = allEvents;
@@ -73,6 +74,8 @@ export const useEventStore = defineStore('event', () => {
       return [];
     }
   }
+
+  
 
 
   async function getEventById(id) {
@@ -128,6 +131,67 @@ export const useEventStore = defineStore('event', () => {
         availableTickets: event.availableTickets,
         photoData: event.photoData,
         isApproved: event.isApproved
+      }));
+      events.value = allEvents;
+      console.log(events.value);
+      return allEvents;
+    } catch (err) {
+      console.error('Error fetching events:', err);
+      return [];
+    }
+  }
+  async function getEventsD() {
+    try {
+      const response = await client.get(`${url}Event/date`);
+      const eventData = response.data;
+
+      const allEvents = eventData.map(event => ({
+        id: event.id,
+        eventName: event.eventName,
+        description: event.description,
+        address: event.address,
+        locationId: event.locationId,
+        categoryName: event.categoryName,
+        startDate: event.startDate,
+        endDate: event.endDate,
+        image: event.image,
+        organizerName: event.organizerName,
+        maxAttendance: event.maxAttendance,
+        availableTickets: event.availableTickets,
+        photoData: event.photoData,
+        isApproved: event.isApproved,
+        scheduleDate : event.scheduleDate
+      }));
+      events.value = allEvents;
+      console.log(events.value);
+      return allEvents;
+    } catch (err) {
+      console.error('Error fetching events:', err);
+      return [];
+    }
+  }
+
+  async function getEventsS() {
+    try {
+      const response = await client.get(`${url}Event/datetime`);
+      const eventData = response.data;
+
+      const allEvents = eventData.map(event => ({
+        id: event.id,
+        eventName: event.eventName,
+        description: event.description,
+        address: event.address,
+        locationId: event.locationId,
+        categoryName: event.categoryName,
+        startDate: event.startDate,
+        endDate: event.endDate,
+        image: event.image,
+        organizerName: event.organizerName,
+        maxAttendance: event.maxAttendance,
+        availableTickets: event.availableTickets,
+        photoData: event.photoData,
+        isApproved: event.isApproved,
+        scheduleDate : event.scheduleDate
       }));
       events.value = allEvents;
       console.log(events.value);
@@ -320,6 +384,6 @@ export const useEventStore = defineStore('event', () => {
     }
   }
 
-  return { getEventByCategory, getEventsByName, getEventByOrganizer, getEventById, addEvent, updateEvent, getEvents, deleteEvent, event, events, filteredEvents, getEventsByCity, getEventsByCountry, approveEvent, rejectEvent };
+  return { getEventByCategory, getEventsByName, getEventByOrganizer, getEventById, addEvent, updateEvent, getEvents, deleteEvent, event, events, filteredEvents, getEventsByCity, getEventsByCountry, approveEvent, rejectEvent, getEventsS, getEventsD };
 
 });
