@@ -12,6 +12,7 @@ const props = defineProps({
 const formData = reactive({
     eventID: props.eventID,
     ticketType: '',
+    ticketAmount: 0,
     price: 0,
     bookingReference: '',
 });
@@ -27,9 +28,16 @@ const handleSubmit = async () => {
             location.reload();
         });
     } catch (e) {
+        let errorMessage = 'Failed to add ticket'; // Default message
+        if (e.response && e.response.data && e.response.data.error) {
+            errorMessage = e.response.data.error;
+        } else if (e.message) {
+            errorMessage = e.message;
+        }
+
         Swal.fire({
             title: 'Error!',
-            text: e.response ? e.response.data : e.message || 'Failed to add ticket',
+            text: errorMessage,
             icon: 'error'
         });
     }
@@ -48,6 +56,11 @@ const handleSubmit = async () => {
                                 <label class="small mb-1" for="ticketType">Ticket Type</label>
                                 <input class="form-control" id="ticketType" type="text" placeholder="Enter ticket type"
                                     v-model.trim="formData.ticketType">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="small mb-1" for="price">Amount</label>
+                                <input class="form-control" id="price" type="number" placeholder="Enter amount"
+                                    v-model.trim="formData.ticketAmount">
                             </div>
                         </div>
                         <div class="row gx-3 mb-3">

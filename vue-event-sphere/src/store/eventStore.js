@@ -355,14 +355,35 @@ export const useEventStore = defineStore('event', () => {
     }
   }
 
-  async function approveEvent(eventId){
-    try{
+  async function approveEvent(eventId) {
+    try {
       await client.post(`${url}Event/approve/${eventId}`)
     }
-    catch (error){
+    catch (error) {
       console.error('Error approving the event', error);
       throw error;
     }
   }
-  return { getEventByCategory, getEventsByName, getEventByOrganizer,getEventsS,getEventsD, getEventById, addEvent, updateEvent, getEvents, deleteEvent, event, events, filteredEvents, getEventsByCity, getEventsByCountry, getEventByOrganizer, approveEvent };
+  async function rejectEvent(eventId, message) {
+    try {
+
+      const formData = new FormData();
+      formData.append("id", eventId);
+      formData.append("message", message);
+
+      const response = await client.post(`${url}Event/reject`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        }
+      });
+
+      console.log('Response:', response.data);
+    } catch (error) {
+      console.error('Error rejecting the event', error.response ? error.response.data : error);
+      throw error;
+    }
+  }
+
+  return { getEventByCategory, getEventsByName, getEventByOrganizer, getEventById, addEvent, updateEvent, getEvents, deleteEvent, event, events, filteredEvents, getEventsByCity, getEventsByCountry, approveEvent, rejectEvent, getEventsS, getEventsD };
+
 });

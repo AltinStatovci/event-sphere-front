@@ -15,7 +15,7 @@ onMounted(() => {
 
 <template>
     <div>
-      <div v-for="ticket in store.tickets" :key="ticket.id">
+      <div>
         <TicketCard :ticket="ticket" />
       </div>
     </div>

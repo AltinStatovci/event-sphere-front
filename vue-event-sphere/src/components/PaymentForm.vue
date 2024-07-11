@@ -1,6 +1,92 @@
+<template>
+  <div class="container">
+    <h1 class="h3 mb-5">Payment</h1>
+    <div class="row">
+      <!-- Left -->
+      <div class="col-lg-9">
+        <div class="accordion" id="accordionPayment">
+          <!-- Credit card -->
+          <div class="accordion-item mb-3">
+            <h2 class="h5 px-4 py-3 accordion-header d-flex justify-content-between align-items-center">
+              <div class="form-check w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#collapseCC" aria-expanded="false">
+                <input class="form-check-input" type="radio" name="payment" id="payment1" v-model="selectedPaymentMethod" value="creditCard">
+                <label class="form-check-label pt-1" for="payment1">
+                  Credit Card
+                </label>
+              </div>
+              <span>
+                <!-- SVG for Credit Card Icon -->
+              </span>
+            </h2>
+            <div id="collapseCC" class="accordion-collapse collapse" :class="{ show: selectedPaymentMethod === 'creditCard' }" data-bs-parent="#accordionPayment">
+              <div class="accordion-body">
+                <div class="mb-3">
+                  <label class="form-label" for="card-number">Card Number</label>
+                  <div id="card-element" class="card-element"></div>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Name on card</label>
+                  <input type="text" class="form-control" v-model="creditCard.name">
+                </div>
+                <div class="row">
+                  <div class="col-lg-4">
+                    <div class="mb-3">
+                      <label class="form-label">Expiry date</label>
+                      <div id="card-expiry" class="card-element"></div>
+                    </div>
+                  </div>
+                  <div class="col-lg-4">
+                    <div class="mb-3">
+                      <label class="form-label">CVV Code</label>
+                      <div id="card-cvc" class="card-element"></div>
+                    </div>
+                  </div>
+                  <div class="col-lg-4">
+                    <div class="mb-3">
+                      <label class="form-label">Zip Code</label>
+                      <input type="text" class="form-control" v-model="creditCard.zipCode">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Right -->
+      <div class="col-lg-3">
+        <div class="card position-sticky top-0">
+          <div class="p-3 bg-light bg-opacity-10">
+            <h6 class="card-title mb-3">Payment Summary</h6>
+            <div class="d-flex justify-content-between mb-1 small">
+              <span>Subtotal</span> <span>{{ formatCurrency(subtotal) }}</span>
+            </div>
+            <div class="form-group">
+              <label for="promo-code">Promo Code</label>
+              <input type="text" id="promo-code" v-model="promoCode" />
+              <button type="button" @click="validatePromoCode">Apply Promo Code</button>
+            </div>
+            <div v-if="promoCode && discount > 0" class="discount-card">
+             
+              <p>Discount Applied: {{ discount }}%</p>
+            </div>
+            <hr>
+            <div class="d-flex justify-content-between mb-4 small">
+              <span>TOTAL</span> <strong class="text-dark">{{ formatCurrency(total) }}</strong>
+            </div>
+            <button class="btn btn-primary w-100 mt-2" type="button" @click="submitPayment" :disabled="loading">
+              Pay
+            </button>
+            <div v-if="error" class="error-message">{{ error }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { loadStripe } from '@stripe/stripe-js';
 import axios from 'axios';
 import { useAuthStore } from "@/store/authStore.js";
@@ -9,8 +95,14 @@ import { usePaymentStore } from '@/store/paymentStore';
 import Swal from "sweetalert2";
 import { useRouter } from 'vue-router';
 
-const cardHolderName = ref('');
-const zipCode = ref('');
+const selectedPaymentMethod = ref('creditCard');
+const creditCard = ref({
+  name: '',
+  expiry: '',
+  cvc: '',
+  zipCode: ''
+});
+const promoCode = ref('');
 const stripe = ref(null);
 const cardNumberElement = ref(null);
 const cardExpiryElement = ref(null);
@@ -22,10 +114,30 @@ const ticketStore = useTicketStore();
 const paymentStore = usePaymentStore();
 const ticket = ref(null);
 const router = useRouter();
+const discount = ref(0);
 
 const path = window.location.pathname;
 const segments = path.split('/');
 const id = segments[segments.length - 1];
+
+const originalAmount = computed(() => {
+  if (ticket.value && paymentStore.amount) {
+    return paymentStore.amount * ticket.value.price;
+  }
+  return 0;
+});
+
+const discountedAmount = computed(() => {
+  return originalAmount.value * (1 - discount.value / 100);
+});
+
+const subtotal = computed(() => {
+  return originalAmount.value;
+});
+
+const total = computed(() => {
+  return discountedAmount.value;
+});
 
 onMounted(async () => {
   try {
@@ -69,14 +181,37 @@ onMounted(async () => {
   }
 });
 
+const validatePromoCode = async () => {
+  try {
+    const response = await axios.post('http://localhost:5220/api/payment/validatePromoCode', { code: promoCode.value });
+    discount.value = response.data.discount;
+    error.value = null;
+    Swal.fire({
+      title: "Promo Code Applied!",
+      text: `You got a ${discount.value}% discount!`,
+      icon: "success",
+      confirmButtonText: "OK"
+    });
+  } catch (err) {
+    discount.value = 0;
+    error.value = err.response?.data || 'Invalid or expired promo code.';
+    Swal.fire({
+      title: "Invalid Promo Code",
+      text: "The promo code you entered is invalid or expired.",
+      icon: "error",
+      confirmButtonText: "OK"
+    });
+  }
+};
+
 const submitPayment = async () => {
   loading.value = true;
   error.value = null;
 
   try {
     const { token, error: stripeError } = await stripe.value.createToken(cardNumberElement.value, {
-      name: cardHolderName.value,
-      address_zip: zipCode.value
+      name: creditCard.value.name,
+      address_zip: creditCard.value.zipCode
     });
 
     if (stripeError) {
@@ -93,16 +228,19 @@ const submitPayment = async () => {
 
 const processPayment = async (stripeToken) => {
   try {
-    const totalAmount = paymentStore.amount * ticket.value.price;
+    const originalAmount = paymentStore.amount * ticket.value.price;
+    const discountedAmount = originalAmount * (1 - discount.value / 100);
+    
     const response = await axios.post('http://localhost:5220/api/Payment', {
       userID: authStore.id,
       ticketID: ticket.value.id,
       amount: paymentStore.amount,
-      price: totalAmount,
+      price: discountedAmount,
       paymentMethod: 'Stripe',
       paymentDate: new Date().toISOString(),
       stripeToken: stripeToken,
-      paymentStatus: true
+      paymentStatus: true,
+      promoCode: promoCode.value
     });
 
     if (response.status === 204 || response.status === 201 || response.status === 200) {
@@ -131,37 +269,14 @@ const processPayment = async (stripeToken) => {
     }
   }
 };
+
+const formatCurrency = (amount) => {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD'
+  }).format(amount);
+};
 </script>
-
-<template>
-  <div class="payment-form-container">
-    <form @submit.prevent="submitPayment" class="payment-form">
-      <div class="form-group">
-        <label for="card-holder-name">Card Holder Name</label>
-        <input type="text" id="card-holder-name" v-model="cardHolderName" required />
-      </div>
-      <div class="form-group">
-        <label for="card-number">Card Number</label>
-        <div id="card-element" class="card-element"></div>
-      </div>
-      <div class="form-group">
-        <label for="card-expiry">Expiration Date</label>
-        <div id="card-expiry" class="card-element"></div>
-      </div>
-      <div class="form-group">
-        <label for="card-cvc">CVC</label>
-        <div id="card-cvc" class="card-element"></div>
-      </div>
-      <div class="form-group">
-        <label for="zip-code">ZIP Code</label>
-        <input type="text" id="zip-code" v-model="zipCode" required />
-      </div>
-      <button type="submit" :disabled="loading">Pay</button>
-    </form>
-    <p v-if="error" class="error-message">{{ error }}</p>
-  </div>
-</template>
-
 
 <style scoped>
 .payment-form-container {

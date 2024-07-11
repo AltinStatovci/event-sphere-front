@@ -1,7 +1,7 @@
 <script setup>
 import UpdateTicketView from '@/views/UpdateTicketView.vue';
 import AddTicket from '@/components/AddTicket.vue';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import Swal from 'sweetalert2';
 import { useTicketStore } from '@/store/ticketStore';
 
@@ -14,7 +14,6 @@ const props = defineProps({
 
 const activeTab = ref('ticketList');
 const selectedTicketId = ref(null);
-
 
 const deleteTicket = async (ticketId) => {
     try {
@@ -78,6 +77,20 @@ const changeTab = (tab) => {
                             <button class="btn btn-outline-primary btn-sm"
                                 @click="openEditForm(ticket.id)">Edit</button>
                         </td>
+                    </tr>
+                </tbody>
+            </table>
+            <table class="table mt-4">
+                <thead>
+                    <tr>
+                        <th scope="col">Ticket Type</th>
+                        <th scope="col">Count</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr  v-for="ticket in tickets" :key="ticket.id">
+                        <td>{{ ticket.ticketType }}</td>
+                        <td>{{ ticket.ticketAmount }}</td>
                     </tr>
                 </tbody>
             </table>
