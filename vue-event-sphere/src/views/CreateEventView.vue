@@ -20,6 +20,9 @@ const categoryStore = useCategoryStore();
 const locations = ref([]);
 const categories = ref([]);
 const ticketList = ref([]);
+const now = new Date();
+const formattedNow = now.toISOString(); // Get YYYY-MM-DDTHH:MM format
+console.log("Current DateTime:", formattedNow);
 
 
 const formData = reactive({
@@ -37,6 +40,7 @@ const formData = reactive({
   dateCreated: new Date().toISOString(),
   image: '',
   isApproved: false,
+  scheduleDate: '',
 });
 
 const imageUrl = ref('https://t4.ftcdn.net/jpg/05/65/22/41/360_F_565224180_QNRiRQkf9Fw0dKRoZGwUknmmfk51SuSS.jpg');
@@ -85,6 +89,8 @@ const handleImageUpload = (event) => {
 const eventList = ref([]);
 
 const allEventList = ref([])
+const eventD = ref([])
+const eventS = ref([])
 
 const fetchEvents = async () => {
   eventList.value = await eventStore.getEventByOrganizer(authStore.id);
@@ -92,6 +98,12 @@ const fetchEvents = async () => {
 
 const fetchAllEvents = async () => {
   allEventList.value = await eventStore.getEvents()
+}
+const fetchEventsD = async () => {
+  eventD.value = await eventStore.getEventsD()
+}
+const fetchEventsS = async () => {
+  eventS.value = await eventStore.getEventsS()
 }
 
 const getAllLocations = async () => {
@@ -114,6 +126,8 @@ const getAllCategories = async () => {
 
 onMounted(() => {
   fetchEvents();
+  fetchEventsD();
+  fetchEventsS();
   fetchAllEvents();
   getAllLocations();
   getAllCategories();
@@ -157,6 +171,7 @@ const openEditForm = async (eventId) => {
   formData.maxAttendance = eventById.value.maxAttendance;
   formData.availableTickets = eventById.value.availableTickets;
   formData.image = eventById.value.image;
+  formData.scheduleDate = eventById.value.scheduleDate;
 
   changeTab('eventForm');
 };
@@ -210,7 +225,7 @@ const getTickets = async (id) => {
     });
   }
 }
-const approveEvent = async(id) => {
+const approveEvent = async (id) => {
   try {
     await eventStore.approveEvent(id);
     Swal.fire({
@@ -227,6 +242,7 @@ const approveEvent = async(id) => {
     });
   }
 }
+
 </script>
 
 
@@ -242,9 +258,9 @@ const approveEvent = async(id) => {
       </nav>
       <hr class="mt-0 mb-4">
 
-      <div v-if="activeTab === 'eventList' ">
+      <div v-if="activeTab === 'eventList'">
         <div class="card mb-4" v-if="authStore.isOrganizer">
-          <div class="card-header">Approved Events</div>
+          <div class="card-header">Published Events</div>
           <div class="card-body">
             <table class="table">
               <thead>
@@ -259,22 +275,21 @@ const approveEvent = async(id) => {
                   <th scope="col"></th>
                 </tr>
               </thead>
-              <tbody v-for="event in eventList" :key="event.id">
-                <tr v-if="event.isApproved">
-                  <td>{{ event.eventName }}</td>
-                  <td>{{ event.address }}</td>
-                  <td>{{ event.categoryName }}</td>
-                  <td>{{ formatDateTime(event.startDate) }}</td>
-                  <td>{{ formatDateTime(event.endDate) }}</td>
-                  <td>{{ event.maxAttendance }}</td>
-                  <td>{{ event.availableTickets }}</td>
-                  <td>
-                    <button class="btn btn-outline-danger btn-sm" @click="deleteEvent(event.id)">Delete</button>
-                    <button class="btn btn-outline-primary btn-sm" @click="openEditForm(event.id)">Edit</button>
-                    <button class="btn btn-outline-secondary btn-sm" @click="getTickets(event.id)">See Tickets</button>
-                  </td>
-                </tr>
-                <tr v-if="eventList && eventList.length === 0">
+              <tbody v-for="event in eventD" :key="event.id">
+                <td>{{ event.eventName }}</td>
+                <td>{{ event.address }}</td>
+                <td>{{ event.categoryName }}</td>
+                <td>{{ formatDateTime(event.startDate) }}</td>
+                <td>{{ formatDateTime(event.endDate) }}</td>
+                <td>{{ event.maxAttendance }}</td>
+                <td>{{ event.availableTickets }}</td>
+                <td>
+                  <button class="btn btn-outline-danger btn-sm" @click="deleteEvent(event.id)">Delete</button>
+                  <button class="btn btn-outline-primary btn-sm" @click="openEditForm(event.id)">Edit</button>
+                  <button class="btn btn-outline-secondary btn-sm" @click="getTickets(event.id)">See Tickets</button>
+                </td>
+                <tr
+                  v-if="eventList && eventList.length === 0 || eventD && eventD.length === 0 || eventS && eventS.length === 0">
                   <td colspan="8" class="no-data">No events available</td>
                 </tr>
               </tbody>
@@ -320,9 +335,9 @@ const approveEvent = async(id) => {
           </div>
         </div>
         <div class="card mb-4" v-if="authStore.isOrganizer">
-        <div class="card-header">Waiting for approval</div>
+          <div class="card-header">Waiting for approval</div>
           <div class="card-body">
-        <table class="table">
+            <table class="table">
               <thead>
                 <tr>
                   <th scope="col">Event Name</th>
@@ -354,12 +369,55 @@ const approveEvent = async(id) => {
                 </tr>
               </tbody>
             </table>
+
+
           </div>
-          </div>
-          <div class="card mb-4" v-if="authStore.isAdmin">
-        <div class="card-header">Waiting for approval</div>
+        </div>
+        <div class="card mb-4" v-if="authStore.isOrganizer">
+          <div class="card-header">Scheduled Events</div>
           <div class="card-body">
-        <table class="table">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">Event Name</th>
+                  <th scope="col">Location</th>
+                  <th scope="col">Category Name</th>
+                  <th scope="col">Start Date</th>
+                  <th scope="col">End Date</th>
+                  <th scope="col">Max Attendees</th>
+                  <th scope="col">Available Tickets</th>
+                  <th scope="col">Aproved</th>
+                  <th scope="col">Schedule Date</th>
+                  <th scope="col">Actions</th>
+                </tr>
+              </thead>
+              <tbody v-for="event in eventS" :key="event.id">
+                <td>{{ event.eventName }}</td>
+                <td>{{ event.address }}</td>
+                <td>{{ event.categoryName }}</td>
+                <td>{{ formatDateTime(event.startDate) }}</td>
+                <td>{{ formatDateTime(event.endDate) }}</td>
+                <td>{{ event.maxAttendance }}</td>
+                <td>{{ event.availableTickets }}</td>
+                <td>{{ event.isApproved ? 'Approved' : 'Scheduled' }}</td>
+                <td>{{ event.scheduleDate }}</td>
+
+
+                <td>
+                  <button class="btn btn-outline-danger btn-sm" @click="deleteEvent(event.id)">Delete</button>
+                  <button class="btn btn-outline-primary btn-sm" @click="openEditForm(event.id)">Edit</button>
+                </td>
+                <tr v-if="eventList && eventList.length === 0">
+                  <td colspan="8" class="no-data">No events available</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card mb-4" v-if="authStore.isAdmin">
+          <div class="card-header">Waiting for approval</div>
+          <div class="card-body">
+            <table class="table">
               <thead>
                 <tr>
                   <th scope="col">Organizer Name</th>
@@ -384,7 +442,7 @@ const approveEvent = async(id) => {
                   <td>{{ formatDateTime(event.endDate) }}</td>
                   <td>{{ event.maxAttendance }}</td>
                   <td>{{ event.availableTickets }}</td>
-                  <td>{{event.description}}</td>
+                  <td>{{ event.description }}</td>
                   <td>
                     <button class="btn btn-outline-success btn-sm" @click="approveEvent(event.id)">Approve</button>
                     <button class="btn btn-outline-primary btn-sm">Reject</button>
@@ -396,11 +454,11 @@ const approveEvent = async(id) => {
               </tbody>
             </table>
           </div>
-          </div>
         </div>
-        <div v-if="showTicketsTable">
-          <ticket-list :tickets="ticketList" :eventID="eventID" />
-        </div>
+      </div>
+      <div v-if="showTicketsTable">
+        <ticket-list :tickets="ticketList" :eventID="eventID" />
+      </div>
 
       <!-- Event Form Section -->
       <div v-if="activeTab === 'eventForm'">
@@ -464,7 +522,12 @@ const approveEvent = async(id) => {
                       <input class="form-control" id="availableTickets" type="number"
                         v-model="formData.availableTickets">
                     </div>
-                    <div class="col-md-6 w-50">
+                    <div class="col-md-6 w-25">
+                      <label class="small mb-1" for="ScheduleDate">ScheduleDate</label>
+                      <input class="form-control" id="ScheduleDate" type="datetime-local"
+                        v-model="formData.scheduleDate">
+                    </div>
+                    <div class="col-md-12 w-50">
                       <label class="small mb-1" for="description">Description</label>
                       <input class="form-control" id="description" type="text" placeholder="Enter description"
                         v-model.trim="formData.description">
