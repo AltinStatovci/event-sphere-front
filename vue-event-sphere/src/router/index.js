@@ -20,7 +20,7 @@ import CreateEventView from "@/views/CreateEventView.vue";
 import NearYouView from '@/views/NearYouView.vue';
 import CreateTicketView from "@/views/CreateTicketView.vue";
 import LogsView from "@/views/LogsView.vue";
-import NotificationView from "@/views/NotificationView.vue";
+
 
 
 
@@ -131,12 +131,7 @@ const routes = [
     component:LogsView,
     meta: { requiresAuth: true , requiresAdmin: true},
   },
-  {
-    path: '/notifications',
-    name: 'notifications',
-    component:NotificationView,
 
-  }
 ];
 
 const router = createRouter({

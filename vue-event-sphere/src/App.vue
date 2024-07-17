@@ -7,6 +7,25 @@ import { useAuthStore } from "@/store/authStore.js";
 const authStore = useAuthStore();
 const route = useRoute();
 
+import { toast } from 'vue3-toastify';
+import 'vue3-toastify/dist/index.css';
+import connection from '@/signalR/useSignalR.js';
+
+connection.on("ReceiveNotification", (message) => {
+  toast.success(message, {
+    position: "top-right",
+    timeout: 5000,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    showCloseButtonOnHover: true,
+    hideProgressBar: false,
+    closeButton: "button",
+    icon: true,
+    rtl: false
+  });
+});
+
 
 </script>
 
