@@ -13,7 +13,9 @@ import connection from '@/signalR/useSignalR.js';
 
 connection.on("ReceiveNotification", (message) => {
   toast.success(message, {
+
     position: "top-right",
+
     timeout: 5000,
     closeOnClick: true,
     pauseOnHover: true,
@@ -22,7 +24,8 @@ connection.on("ReceiveNotification", (message) => {
     hideProgressBar: false,
     closeButton: "button",
     icon: true,
-    rtl: false
+    rtl: false,
+
   });
 });
 
