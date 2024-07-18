@@ -4,14 +4,13 @@ import { useLocationStore } from '@/store/locationStore';
 import { onMounted, ref, watch, computed } from 'vue';
 import EventCard from '@/components/EventCard.vue';
 
-
 const locationStore = useLocationStore();
+const eventStore = useEventStore();
 const locations = ref([]);
+const events = ref([]);
 const filterBy = ref('');
 const selectedCity = ref('');
 const selectedCountry = ref('');
-const eventStore = useEventStore();
-const events = ref([]);
 
 const getAllLocations = async () => {
   try {
@@ -40,6 +39,29 @@ const getEventsByCountry = async (country) => {
   }
 };
 
+const getUserLocation = async () => {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(async (position) => {
+      const latitude = position.coords.latitude;
+      const longitude = position.coords.longitude;
+      await getEventsNearUser(latitude, longitude);
+    }, (error) => {
+      console.error(error);
+    });
+  } else {
+    console.error('Geolocation is not supported by this browser.');
+  }
+};
+
+const getEventsNearUser = async (latitude, longitude) => {
+  try {
+    const response = await eventStore.getEventsNearUser({ latitude, longitude });
+    events.value = response;
+  } catch (err) {
+    console.error(err);
+  }
+};
+
 const uniqueCountries = computed(() => {
   const countrySet = new Set();
   locations.value.forEach(location => {
@@ -50,6 +72,7 @@ const uniqueCountries = computed(() => {
 
 onMounted(async () => {
   await getAllLocations();
+  await getUserLocation();
 });
 
 watch([filterBy, selectedCity, selectedCountry], async ([newFilterBy, newSelectedCity, newSelectedCountry]) => {
@@ -65,7 +88,7 @@ watch([filterBy, selectedCity, selectedCountry], async ([newFilterBy, newSelecte
   <div class="container mt-5">
     <h3 class="event-title">Discover Local Happenings: Your Personalized Event Guide!</h3>
     <p class="lead text-center mt-2">
-      Whether you're looking for concerts, festivals, workshops, or local meetups, we've got you covered. Our platform brings you the latest and most exciting events happening in your area, tailored to your interests and location. 
+      Whether you're looking for concerts, festivals, workshops, or local meetups, we've got you covered. Our platform brings you the latest and most exciting events happening in your area, tailored to your interests and location.
     </p>
     <div class="location-selector d-flex">
       <div class="mb-3 mr-3">
