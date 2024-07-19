@@ -383,7 +383,19 @@ export const useEventStore = defineStore('event', () => {
       throw error;
     }
   }
+  async function getEventsNearUser({ latitude, longitude }) {
+    try {
+      const response = await client.get(`${url}Event/nearby`, {
+        params: { latitude, longitude }
+      });
+      events.value = response.data;
+      return events.value;
+    } catch (err) {
+      console.error('Error fetching nearby events:', err);
+      return [];
+    }
+  }
 
-  return { getEventByCategory, getEventsByName, getEventByOrganizer, getEventById, addEvent, updateEvent, getEvents, deleteEvent, event, events, filteredEvents, getEventsByCity, getEventsByCountry, approveEvent, rejectEvent, getEventsS, getEventsD };
+  return { getEventByCategory, getEventsByName, getEventByOrganizer, getEventById, addEvent, updateEvent, getEvents, deleteEvent, event, events, filteredEvents, getEventsByCity, getEventsByCountry, approveEvent, rejectEvent, getEventsS, getEventsD, getEventsNearUser };
 
 });
