@@ -2,9 +2,9 @@
 import { useAuthStore } from "@/store/authStore.js";
 import { useRouter } from "vue-router";
 import DropdownLi from "@/components/DropdownLi.vue";
-import Logo from "@/assets/Logo.svg";
 import Location from "@/assets/Location.svg";
 import { useEventStore } from "@/store/eventStore";
+import Notification from '@/components/Notification.vue';
 import { ref, watch } from "vue";
 
 const eventStore = useEventStore();
@@ -45,11 +45,11 @@ const getEventsByName = async (name) => {
   try {
     const response = await eventStore.getEventsByName(name);
     eventbyname.value = response;
-    console.log("eventiiiiii", eventbyname);
   } catch (err) {
     console.error(err);
   }
 };
+
 const toEventDetails = async (eventId) => {
   router.push({
     path: `/eventdetails/${eventId}`
@@ -70,8 +70,7 @@ watch(eventname, (newValue) => {
 <template>
   <nav class="navbar navbar-expand-lg bg-body-tertiary">
     <div class="container-fluid">
-      <!-- <Logo /> -->
-       <img src="../assets/Logo1.png" width="60px" height="60px">
+      <img src="../assets/Logo1.png" width="60px" height="60px">
       <a class="navbar-brand title" href="/">EventSphere</a>
 
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
@@ -82,7 +81,7 @@ watch(eventname, (newValue) => {
               Events
             </a>
             <ul class="dropdown-menu">
-              <dropdown-li />
+              <DropdownLi />
             </ul>
           </li>
           <li class="nav-item">
@@ -95,7 +94,7 @@ watch(eventname, (newValue) => {
           </li>
         </ul>
         <div class="search-container input-group justify-content-center position-relative">
-          <div class="form-outline bg-white rounded" data-mdb-input-init>
+          <div class="form-outline bg-white rounded">
             <form @submit.prevent="getEventsByName(eventname)">
               <input type="search" id="form1" class="form-control" v-model="eventname" />
               <label class="form-label" for="form1">Search</label>
@@ -114,6 +113,11 @@ watch(eventname, (newValue) => {
         </div>
         <div>
           <ul class="navbar-nav mb-2 mb-lg-0" v-if="authStore.loggedInUser">
+            <li class="nav-item custom-margin-right">
+              <i class="fas fa-bell mt-3" @click="$refs.notification.toggleNotifications()"
+                style="font-size: 1.7rem;"></i>
+              <Notification ref="notification" />
+            </li>
             <li class="nav-item dropdown custom-margin-right">
               <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button"
                 data-bs-toggle="dropdown" aria-expanded="false">
@@ -151,7 +155,7 @@ watch(eventname, (newValue) => {
   </nav>
 </template>
 
-<style>
+<style scoped>
 .custom-margin-right {
   margin-right: 5px;
 }
@@ -195,6 +199,11 @@ watch(eventname, (newValue) => {
 }
 
 .bi-person-circle {
+  font-size: 30px;
+  color: #1e1f22;
+}
+
+.bi-bell {
   font-size: 30px;
   color: #1e1f22;
 }

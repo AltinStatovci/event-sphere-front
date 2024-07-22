@@ -7,6 +7,28 @@ import { useAuthStore } from "@/store/authStore.js";
 const authStore = useAuthStore();
 const route = useRoute();
 
+import { toast } from 'vue3-toastify';
+import 'vue3-toastify/dist/index.css';
+import connection from '@/signalR/useSignalR.js';
+
+connection.on("ReceiveNotification", (message) => {
+  toast.success(message, {
+
+    position: "top-right",
+
+    timeout: 5000,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    showCloseButtonOnHover: true,
+    hideProgressBar: false,
+    closeButton: "button",
+    icon: true,
+    rtl: false,
+
+  });
+});
+
 
 </script>
 
@@ -15,7 +37,7 @@ const route = useRoute();
     <nav>
       <Header
 
-        v-if="route.name !== 'login' && route.name !== 'register' && route.name !== 'dashboard' && route.name !== 'profile' && route.name !== 'paymentDashboard'&& route.name !== 'logs' && route.name !== 'report' && route.name !== 'manageEvent' && route.name !== 'manageTickets'" />
+        v-if="route.name !== 'login' && route.name !== 'notification' && route.name !== 'register' && route.name !== 'dashboard' && route.name !== 'profile' && route.name !== 'paymentDashboard'&& route.name !== 'logs' && route.name !== 'report' && route.name !== 'manageEvent' && route.name !== 'manageTickets'" />
 
     </nav>
 

@@ -23,6 +23,7 @@ import LogsView from "@/views/LogsView.vue";
 
 
 
+
 const routes = [
   {
     path: '/register',
@@ -129,7 +130,8 @@ const routes = [
     name: 'logs',
     component:LogsView,
     meta: { requiresAuth: true , requiresAdmin: true},
-  }
+  },
+
 ];
 
 const router = createRouter({
