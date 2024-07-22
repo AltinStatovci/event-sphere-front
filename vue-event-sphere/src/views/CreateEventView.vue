@@ -40,7 +40,7 @@ const formData = reactive({
   availableTickets: 0,
   dateCreated: new Date().toISOString(),
   image: '',
-  isApproved: false,
+  isApproved: true,
   scheduleDate: new Date().toISOString(),
 });
 
@@ -51,6 +51,17 @@ const isEditMode = ref(false);
 
 const handleSubmit = async () => {
   try {
+    let isApproved;
+    if (isSpam(formData.description) || isSpam(formData.eventName) || isSpam(formData.address)) {
+      formData.isApproved = false;
+      await Swal.fire({
+        title: "Event Under Review",
+        text: "Your event has gone into review for possible spam.",
+        icon: "warning"
+      });
+    } else {
+      formData.isApproved = true;
+    }
     if (isEditMode.value) {
       await eventStore.updateEvent(formData);
       Swal.fire({
@@ -243,6 +254,24 @@ const approveEvent = async (id) => {
     });
   }
 }
+const disapproveEvent = async (id) => {
+  try {
+    await eventStore.disapproveEvent(id);
+    Swal.fire({
+      title: "Event Disapproved successfully!",
+      icon: "success"
+    }).then(() => {
+      location.reload();
+    });
+  } catch (err) {
+    await Swal.fire({
+      title: "Error!",
+      text: err.value,
+      icon: "error"
+    });
+  }
+}
+
 const rejectModal = ref({
   visible: false,
   eventId: null
@@ -262,6 +291,25 @@ const truncateDescription = (text) => {
   const maxLength = 50; // adjust as needed
   return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
 };
+
+const isSpam = (description) => {
+  // Implement your spam detection logic here
+  const spamKeywords = [ "free", "urgent", "limited time", "cheap", "guarantee", "risk-free", 
+  "bonus", "best price", "exclusive", "bargain", "click here", "subscribe","shit","fuck",
+  "opt-in", "sign up", "join now", "contact us", "more information", "free trial", 
+  "free access", "no cost", "credit card", "bank account", "loan", "investment", 
+  "spam", "junk", "fake", "scam", "fraud", "virus", "malware", "phishing", 
+  "porn", "sex", "nude", "xxx", "lottery", "gamble", "betting", "casino", 
+  "viagra", "cialis", "prescription", "medication", "drug", "pills", 
+  "debt", "financing", "miracle", "cure", "make money", "work from home", 
+  "earn cash", "double your money"];
+   const hasSpamKeyword = spamKeywords.some(keyword => description.includes(keyword));
+
+  // Check for gibberish (repeated letters)
+  const hasGibberish = /(\w)\1{3,}/.test(description);
+
+  return hasSpamKeyword || hasGibberish;
+};
 </script>
 
 
@@ -279,7 +327,7 @@ const truncateDescription = (text) => {
 
       <div v-if="activeTab === 'eventList'">
         <div class="card mb-4" v-if="authStore.isOrganizer">
-          <div class="card-header">Published Events</div>
+          <div class="card-header">Published Events <i class="bi bi-check-lg"></i></div>
           <div class="card-body">
             <table class="table">
               <thead>
@@ -291,6 +339,7 @@ const truncateDescription = (text) => {
                   <th scope="col">End Date</th>
                   <th scope="col">Max Attendees</th>
                   <th scope="col">Available Tickets</th>
+                  <th scope="col">Description</th>
                   <th scope="col"></th>
                 </tr>
               </thead>
@@ -304,17 +353,25 @@ const truncateDescription = (text) => {
                   <td>{{ event.maxAttendance }}</td>
                   <td>{{ event.availableTickets }}</td>
                   <td>
+                    <div class="tooltip-container">
+                      <span>{{ truncateDescription(event.description) }}</span>
+                      <div class="tooltip-text">{{ event.description }}</div>
+                    </div>
+                  </td>
+                  <td>
+                  <div class="button-container">
                     <button class="btn btn-outline-danger btn-sm" @click="deleteEvent(event.id)">Delete</button>
                     <button class="btn btn-outline-primary btn-sm" @click="openEditForm(event.id)">Edit</button>
                     <button class="btn btn-outline-secondary btn-sm" @click="getTickets(event.id)">See Tickets</button>
-                  </td>
+                   </div>
+                   </td>
                 </tr>
               </tbody>
             </table>
           </div>
         </div>
         <div class="card mb-4" v-if="authStore.isAdmin">
-          <div class="card-header">Event List</div>
+          <div class="card-header">Published Events <i class="bi bi-check-lg"></i></div>
           <div class="card-body">
             <table class="table">
               <thead>
@@ -327,7 +384,9 @@ const truncateDescription = (text) => {
                   <th scope="col">End Date</th>
                   <th scope="col">Max Attendees</th>
                   <th scope="col">Available Tickets</th>
+                  <th scope="col">Description</th>
                   <th scope="col"></th>
+                  
                 </tr>
               </thead>
               <tbody v-for="event in allEventList" :key="event.id">
@@ -341,7 +400,18 @@ const truncateDescription = (text) => {
                   <td>{{ event.maxAttendance }}</td>
                   <td>{{ event.availableTickets }}</td>
                   <td>
+                    <div class="tooltip-container">
+                      <span>{{ truncateDescription(event.description) }}</span>
+                      <div class="tooltip-text">{{ event.description }}</div>
+                    </div>
+                  </td>
+                  
+                  <RejectMessageModalComponent :rejectModal="rejectModal" @close="handleClose" />
+                  <td>
+                  <div class="button-container">
+                    <button class="btn btn-outline-success btn-sm" @click="disapproveEvent(event.id)">Disapprove</button>
                     <button class="btn btn-outline-danger btn-sm" @click="deleteEvent(event.id)">Delete</button>
+                  </div>
                   </td>
                 </tr>
               </tbody>
@@ -349,7 +419,7 @@ const truncateDescription = (text) => {
           </div>
         </div>
         <div class="card mb-4" v-if="authStore.isOrganizer">
-          <div class="card-header">Waiting for approval</div>
+          <div class="card-header">Waiting for approval <i class="bi bi-exclamation-octagon"></i></div>
           <div class="card-body">
             <table class="table">
               <thead>
@@ -361,6 +431,7 @@ const truncateDescription = (text) => {
                   <th scope="col">End Date</th>
                   <th scope="col">Max Attendees</th>
                   <th scope="col">Available Tickets</th>
+                  <th scope="col">Description</th>
                   <th scope="col"></th>
                 </tr>
               </thead>
@@ -374,8 +445,16 @@ const truncateDescription = (text) => {
                   <td>{{ event.maxAttendance }}</td>
                   <td>{{ event.availableTickets }}</td>
                   <td>
-                    <button class="btn btn-outline-danger btn-sm" @click="deleteEvent(event.id)">Delete</button>
-                    <button class="btn btn-outline-primary btn-sm" @click="openEditForm(event.id)">Edit</button>
+                    <div class="tooltip-container">
+                      <span>{{ truncateDescription(event.description) }}</span>
+                      <div class="tooltip-text">{{ event.description }}</div>
+                    </div>
+                  </td>
+                  <td>
+                     <div class="button-container">
+              <button class="btn btn-outline-danger btn-sm" @click="deleteEvent(event.id)">Delete</button>
+              <button class="btn btn-outline-primary btn-sm" @click="openEditForm(event.id)">Edit</button>
+            </div>
                   </td>
                 </tr>
               </tbody>
@@ -385,7 +464,7 @@ const truncateDescription = (text) => {
           </div>
         </div>
         <div class="card mb-4" v-if="authStore.isOrganizer">
-          <div class="card-header">Scheduled Events</div>
+          <div class="card-header">Scheduled Events <i class="bi bi-hourglass-split"></i></div>
           <div class="card-body">
             <table class="table">
               <thead>
@@ -399,6 +478,7 @@ const truncateDescription = (text) => {
                   <th scope="col">Available Tickets</th>
                   <th scope="col">Aproved</th>
                   <th scope="col">Schedule Date</th>
+                  <th scope="col">Description</th>
                   <th scope="col"></th>
                 </tr>
               </thead>
@@ -414,8 +494,15 @@ const truncateDescription = (text) => {
                 <td>{{ event.isApproved ? 'Approved' : 'Pending' }}</td>
                 <td>{{ formatDateTime(event.scheduleDate) }}</td>
                 <td>
-                  <button class="btn btn-outline-danger btn-sm" @click="deleteEvent(event.id)">Delete</button>
-                  <button class="btn btn-outline-primary btn-sm" @click="openEditForm(event.id)">Edit</button>
+                    <div class="tooltip-container">
+                      <span>{{ truncateDescription(event.description) }}</span>
+                      <div class="tooltip-text">{{ event.description }}</div>
+                    </div>
+                  </td>
+                <td><div class="button-container">
+              <button class="btn btn-outline-danger btn-sm" @click="deleteEvent(event.id)">Delete</button>
+              <button class="btn btn-outline-primary btn-sm" @click="openEditForm(event.id)">Edit</button>
+            </div>
                 </td>
                 </tr>
               </tbody>
@@ -423,7 +510,7 @@ const truncateDescription = (text) => {
           </div>
         </div>
         <div class="card mb-4" v-if="authStore.isAdmin">
-          <div class="card-header">Waiting for approval</div>
+          <div class="card-header">Waiting for approval <i class="bi bi-exclamation-octagon"></i></div>
           <div class="card-body">
             <table class="table">
               <thead>
@@ -450,17 +537,17 @@ const truncateDescription = (text) => {
                   <td>{{ formatDateTime(event.endDate) }}</td>
                   <td>{{ event.maxAttendance }}</td>
                   <td>{{ event.availableTickets }}</td>
-                  <td>{{ event.description }}</td>
-
-                  <td>
-                    <div class="tooltip-container">
+                  <td><div class="tooltip-container">
                       <span>{{ truncateDescription(event.description) }}</span>
                       <div class="tooltip-text">{{ event.description }}</div>
-                    </div>
-                  </td>
-                  <td class="d-flex pb-20">
+                    </div></td>
+                  <td></td>
+  
+                  <td>
+                  <div class="button-container">
                     <button class="btn btn-outline-success btn-sm" @click="approveEvent(event.id)">Approve</button>
                     <button class="btn btn-outline-primary btn-sm" @click="openRejectModal(event.id)">Reject</button>
+                  </div>
                   </td>
                   <RejectMessageModalComponent :rejectModal="rejectModal" @close="handleClose" />
                 </tr>
@@ -699,7 +786,7 @@ body {
   padding: 10px;
   background-color: #fff;
   border: 1px solid #ddd;
-  color: #999;
+  color: #CCCC00;
 }
 .tooltip-container {
   position: relative;
@@ -730,4 +817,46 @@ body {
 .pb-20{
   padding:20px 0px;
 }
+.table {
+  width: 100%;
+}
+
+.table th,
+.table td {
+  padding: 8px;
+  text-align: left;
+  vertical-align: middle; /* Ensures vertical alignment of content */
+}
+
+.button-container {
+  display: flex;
+  gap: 10px; /* Adjust spacing between buttons */
+  align-items: center; /* Aligns buttons vertically in the center */
+}
+
+.button-container button {
+  margin: 0;
+}
+
+.tooltip-container {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip-container .tooltip-text {
+  visibility: hidden;
+  width: 200px;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  border-radius: 5px;
+  padding: 5px;
+  position: absolute;
+  z-index: 1;
+}
+
+.tooltip-container:hover .tooltip-text {
+  visibility: visible;
+}
+
 </style>

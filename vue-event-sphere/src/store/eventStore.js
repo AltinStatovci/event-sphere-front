@@ -364,6 +364,15 @@ export const useEventStore = defineStore('event', () => {
       throw error;
     }
   }
+  async function disapproveEvent(eventId) {
+    try {
+      await client.post(`${url}Event/disapprove/${eventId}`)
+    }
+    catch (error) {
+      console.error('Error disapproving the event', error);
+      throw error;
+    }
+  }
   async function rejectEvent(eventId, message) {
     try {
 
@@ -396,6 +405,7 @@ export const useEventStore = defineStore('event', () => {
     }
   }
 
-  return { getEventByCategory, getEventsByName, getEventByOrganizer, getEventById, addEvent, updateEvent, getEvents, deleteEvent, event, events, filteredEvents, getEventsByCity, getEventsByCountry, approveEvent, rejectEvent, getEventsS, getEventsD, getEventsNearUser };
+  return { getEventByCategory, getEventsByName, getEventByOrganizer, getEventById, addEvent, updateEvent, getEvents, deleteEvent, event, events, filteredEvents, getEventsByCity, getEventsByCountry, approveEvent,disapproveEvent, rejectEvent, getEventsS, getEventsD };
+
 
 });
