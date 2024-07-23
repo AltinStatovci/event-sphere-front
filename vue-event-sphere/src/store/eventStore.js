@@ -405,7 +405,10 @@ export const useEventStore = defineStore('event', () => {
     }
   }
 
-  return { getEventByCategory, getEventsByName, getEventByOrganizer, getEventById, addEvent, updateEvent, getEvents, deleteEvent, event, events, filteredEvents, getEventsByCity, getEventsByCountry, approveEvent,disapproveEvent, rejectEvent, getEventsS, getEventsD };
+  return { getEventByCategory, getEventsByName, getEventByOrganizer,
+     getEventById, addEvent, updateEvent, getEvents, deleteEvent,
+      event, events, filteredEvents, getEventsByCity, getEventsByCountry,
+       approveEvent,disapproveEvent, rejectEvent, getEventsS, getEventsD, getEventsNearUser };
 
 
 });
