@@ -26,6 +26,8 @@ const formattedNow = now.toISOString(); // Get YYYY-MM-DDTHH:MM format
 console.log("Current DateTime:", formattedNow);
 
 
+
+
 const formData = reactive({
   id: '',
   eventName: '',
@@ -49,7 +51,11 @@ const imageUrl = ref('https://t4.ftcdn.net/jpg/05/65/22/41/360_F_565224180_QNRiR
 const selectedEventId = ref(null);
 const isEditMode = ref(false);
 
+const imageValidationMessage = ref('');
+const imageInputClass = ref('');
+
 const handleSubmit = async () => {
+
   try {
     let isApproved;
     if (isSpam(formData.description) || isSpam(formData.eventName) || isSpam(formData.address)) {
@@ -62,6 +68,17 @@ const handleSubmit = async () => {
     } else {
       formData.isApproved = true;
     }
+
+    if (!formData.image) {
+      imageValidationMessage.value = 'You need to upload the image';
+      imageInputClass.value = 'is-invalid';
+      return;
+    } else {
+      imageValidationMessage.value = '';
+      imageInputClass.value = '';
+    }
+
+
     if (isEditMode.value) {
       await eventStore.updateEvent(formData);
       Swal.fire({
@@ -83,6 +100,7 @@ const handleSubmit = async () => {
     }
   } catch (e) {
     await Swal.fire({
+
       title: "Error!",
       text: e.message,
       icon: "error"
@@ -95,6 +113,8 @@ const handleImageUpload = (event) => {
   if (file) {
     formData.image = file;
     imageUrl.value = URL.createObjectURL(file);
+    imageValidationMessage.value = '';
+    imageInputClass.value = '';
   }
 };
 
@@ -294,14 +314,14 @@ const truncateDescription = (text) => {
 
 const isSpam = (description) => {
   // Implement your spam detection logic here
-  const spamKeywords = [ "free", "urgent", "limited time", "cheap", "guarantee", "risk-free", 
+  const spamKeywords = [ "free", "urgent", "limited time", "cheap", "guarantee", "risk-free",
   "bonus", "best price", "exclusive", "bargain", "click here", "subscribe","shit","fuck",
-  "opt-in", "sign up", "join now", "contact us", "more information", "free trial", 
-  "free access", "no cost", "credit card", "bank account", "loan", "investment", 
-  "spam", "junk", "fake", "scam", "fraud", "virus", "malware", "phishing", 
-  "porn", "sex", "nude", "xxx", "lottery", "gamble", "betting", "casino", 
-  "viagra", "cialis", "prescription", "medication", "drug", "pills", 
-  "debt", "financing", "miracle", "cure", "make money", "work from home", 
+  "opt-in", "sign up", "join now", "contact us", "more information", "free trial",
+  "free access", "no cost", "credit card", "bank account", "loan", "investment",
+  "spam", "junk", "fake", "scam", "fraud", "virus", "malware", "phishing",
+  "porn", "sex", "nude", "xxx", "lottery", "gamble", "betting", "casino",
+  "viagra", "cialis", "prescription", "medication", "drug", "pills",
+  "debt", "financing", "miracle", "cure", "make money", "work from home",
   "earn cash", "double your money"];
    const hasSpamKeyword = spamKeywords.some(keyword => description.includes(keyword));
 
@@ -386,7 +406,7 @@ const isSpam = (description) => {
                   <th scope="col">Available Tickets</th>
                   <th scope="col">Description</th>
                   <th scope="col"></th>
-                  
+
                 </tr>
               </thead>
               <tbody v-for="event in allEventList" :key="event.id">
@@ -405,7 +425,7 @@ const isSpam = (description) => {
                       <div class="tooltip-text">{{ event.description }}</div>
                     </div>
                   </td>
-                  
+
                   <RejectMessageModalComponent :rejectModal="rejectModal" @close="handleClose" />
                   <td>
                   <div class="button-container">
@@ -542,7 +562,7 @@ const isSpam = (description) => {
                       <div class="tooltip-text">{{ event.description }}</div>
                     </div></td>
                   <td></td>
-  
+
                   <td>
                   <div class="button-container">
                     <button class="btn btn-outline-success btn-sm" @click="approveEvent(event.id)">Approve</button>
@@ -641,15 +661,16 @@ const isSpam = (description) => {
                   </div>
                   <div class="row gx-3 mb-3">
                     <div class="col-md-12">
-                      <div class="card mb-4 mb-xl-0">
+                      <div class="card mb-4 mb-xl-0" :class="imageInputClass">
                         <div class="card-header">Event Image</div>
                         <div class="card-body text-center" style="align-self: center;">
                           <div class="image-container" :style="{ backgroundImage: `url(${imageUrl})` }">
                             <div v-if="!imageUrl" class="placeholder">No Image Selected</div>
                           </div>
                           <div class="small font-italic text-muted mb-4">Upload your EventImage</div>
+                          <div class="small font-italic text-muted mb-4"><p style="color: red">{{imageValidationMessage}}</p></div>
                           <input class="form-control" id="file" type="file" ref="fileInput" @change="handleImageUpload"
-                            style="display: none;">
+                            style="display: none;" >
                           <button class="btn btn-outline-primary" type="button" @click="$refs.fileInput.click()">Upload
                             new image</button>
                         </div>
@@ -857,6 +878,10 @@ body {
 
 .tooltip-container:hover .tooltip-text {
   visibility: visible;
+}
+
+.is-invalid {
+  border-color: red;
 }
 
 </style>
