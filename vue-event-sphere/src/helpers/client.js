@@ -36,7 +36,7 @@ instance.interceptors.response.use(function (response) {
 
     await Swal.fire({
         title: "Error!",
-        text: error.response.data.error.message,
+        text: error.response.data.error,
         icon: "error"
     });
 
