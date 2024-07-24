@@ -67,7 +67,6 @@
               <button type="button" @click="validatePromoCode">Apply Promo Code</button>
             </div>
             <div v-if="promoCode && discount > 0" class="discount-card">
-             
               <p>Discount Applied: {{ discount }}%</p>
             </div>
             <hr>
@@ -235,49 +234,33 @@ const processPayment = async (stripeToken) => {
       userID: authStore.id,
       ticketID: ticket.value.id,
       amount: paymentStore.amount,
-      price: discountedAmount,
       paymentMethod: 'Stripe',
+      paymentStatus: true, // Assuming payment is completed at this point
       paymentDate: new Date().toISOString(),
       stripeToken: stripeToken,
-      paymentStatus: true,
-      promoCode: promoCode.value
+      promoCode: promoCode.value,
+      discount: discount.value
     });
 
-    if (response.status === 204 || response.status === 201 || response.status === 200) {
-      await Swal.fire({
-        title: "Payment successful!",
-        text: "Thank you for your purchase!",
+    if (response.status === 200) {
+      Swal.fire({
+        title: "Payment Successful!",
+        text: "Your payment has been processed successfully.",
         icon: "success",
         confirmButtonText: "OK"
       }).then(() => {
-        router.push({ name: 'home' });
+        router.push("/confirmation");
       });
-    } else {
-      console.error('Unexpected response:', response);
-      error.value = 'An unexpected error occurred after processing the payment.';
     }
   } catch (err) {
-    if (err.response && err.response.data && err.response.data.message === 'There are not enough tickets available') {
-      await Swal.fire({
-        title: "Purchase failed",
-        text: "There are not enough tickets available.",
-        icon: "error",
-        confirmButtonText: "OK"
-      });
-    } else {
-      error.value = 'An error occurred while processing your payment.';
-    }
+    error.value = err.response?.data || 'An error occurred while processing your payment.';
   }
 };
 
-const formatCurrency = (amount) => {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD'
-  }).format(amount);
+const formatCurrency = (value) => {
+  return value.toLocaleString(undefined, { style: 'currency', currency: 'USD' });
 };
 </script>
-
 <style scoped>
 .payment-form-container {
   max-width: 500px;

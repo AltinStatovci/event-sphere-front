@@ -1,6 +1,6 @@
 <script setup>
 import { useRouter } from 'vue-router';
-import { defineProps, onMounted, ref } from 'vue';
+import { defineProps, onMounted, reactive } from 'vue';
 import { useLocationStore } from '@/store/locationStore';
 
 const locationStore = useLocationStore();
@@ -19,19 +19,35 @@ function goToEvent(eventId) {
   router.push(redirectUrl);
 }
 
-const location = ref({ city: '', country:'' });
+const location = reactive({ city: '', country: '' });
 
 const getLocation = async () => {
   try {
     const loc = await locationStore.getLocationById(props.event.locationId);
-    location.value = loc;
+    location.city = loc.city;
+    location.country = loc.country;
   } catch (err) {
     console.error(err);
   }
 }
 
+const event = reactive({ ...props.event });
+
+const handleTicketUpdate = (updateEvent) => {
+  const { eventId, availableTickets } = updateEvent.detail || {};
+  if (eventId === event.id) {
+    event.availableTickets = availableTickets;
+  }
+};
+
 onMounted(async () => {
   await getLocation();
+  
+  window.addEventListener('ticketUpdate', handleTicketUpdate);
+
+  return () => {
+    window.removeEventListener('ticketUpdate', handleTicketUpdate);
+  };
 })
 
 function formatDateString(dateString) {
@@ -66,7 +82,7 @@ function formatDateString(dateString) {
             <i class="bi bi-geo-alt-fill mr-2"></i>{{ location.city }}, {{ location.country }}
           </p>
           <p class="card-text text-center mb-4" style="color: #666;">
-            <i class="bi bi-ticket-perforated mr-2"></i> Tickets left:<strong class="ticket-nr"> {{ event.availableTickets }}</strong>
+            <i class="bi bi-ticket-perforated mr-2"></i> Tickets left:<strong class="ticket-nr">{{ event.availableTickets }}</strong>
           </p>
           <div class="text-center">
             <button @click="() => goToEvent(event.id)" class="btn btn-primary" style=" border: none; padding: 10px 20px; border-radius: 5px;">
@@ -119,5 +135,4 @@ i {
 .event-card:hover {
   transform: scale(1.1); /* Scale the card to 110% of its original size on hover */
 }
-
 </style>
