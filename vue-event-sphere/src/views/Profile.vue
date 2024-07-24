@@ -78,6 +78,15 @@ const changePassword = async () => {
     return;
   }
 
+  if (password.value.newPassword === password.value.currentPassword) {
+    await Swal.fire({
+      title: "Error!",
+      text: "New Password is same as Current Password.",
+      icon: "error"
+    });
+    return;
+  }
+
   try {
     const result = await Swal.fire({
       title: "Are you sure?",
@@ -100,11 +109,7 @@ const changePassword = async () => {
     }
   } catch (error) {
     console.error('Failed to change user password:', error);
-    await Swal.fire({
-      title: "Error!",
-      text: "Old Password incorrect.",
-      icon: "error"
-    });
+
   }
 };
 
