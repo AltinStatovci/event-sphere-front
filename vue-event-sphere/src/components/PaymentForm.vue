@@ -242,14 +242,14 @@ const processPayment = async (stripeToken) => {
       discount: discount.value
     });
 
-    if (response.status === 200) {
+    if (response.status === 200 || response.status === 201 || response.status === 202 || response.status === 203) {
       Swal.fire({
         title: "Payment Successful!",
         text: "Your payment has been processed successfully.",
         icon: "success",
         confirmButtonText: "OK"
       }).then(() => {
-        router.push("/confirmation");
+        router.push("/");
       });
     }
   } catch (err) {
