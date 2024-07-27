@@ -1,10 +1,10 @@
 <script setup>
 import { useRouter } from 'vue-router';
-import { defineProps, onMounted, reactive } from 'vue';
+import { defineProps, onMounted, reactive, onBeforeUnmount } from 'vue';
 import { useLocationStore } from '@/store/locationStore';
+import signalRTickets from '@/signalR/signalRTickets';
 
 const locationStore = useLocationStore();
-
 const router = useRouter();
 
 const props = defineProps({
@@ -48,7 +48,11 @@ onMounted(async () => {
   return () => {
     window.removeEventListener('ticketUpdate', handleTicketUpdate);
   };
-})
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('ticketUpdate', handleTicketUpdate);
+});
 
 function formatDateString(dateString) {
   const monthsFull = [
@@ -82,7 +86,7 @@ function formatDateString(dateString) {
             <i class="bi bi-geo-alt-fill mr-2"></i>{{ location.city }}, {{ location.country }}
           </p>
           <p class="card-text text-center mb-4" style="color: #666;">
-            <i class="bi bi-ticket-perforated mr-2"></i> Tickets left:<strong class="ticket-nr">{{ event.availableTickets }}</strong>
+            <i class="bi bi-ticket-perforated mr-2"></i> Tickets left: <strong class="ticket-nr">{{ event.availableTickets }}</strong>
           </p>
           <div class="text-center">
             <button @click="() => goToEvent(event.id)" class="btn btn-primary" style=" border: none; padding: 10px 20px; border-radius: 5px;">
