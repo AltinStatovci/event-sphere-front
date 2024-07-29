@@ -43,7 +43,7 @@ const formData = reactive({
   dateCreated: new Date().toISOString(),
   image: '',
   isApproved: true,
-  scheduleDate: new Date().toISOString(),
+  scheduleDate: '',
 });
 
 const imageUrl = ref('https://t4.ftcdn.net/jpg/05/65/22/41/360_F_565224180_QNRiRQkf9Fw0dKRoZGwUknmmfk51SuSS.jpg');
@@ -80,6 +80,7 @@ const handleSubmit = async () => {
 
 
     if (isEditMode.value) {
+      console.log(formData);
       await eventStore.updateEvent(formData);
       Swal.fire({
         title: "Event Updated successfully!",
@@ -313,7 +314,6 @@ const truncateDescription = (text) => {
 };
 
 const isSpam = (description) => {
-  // Implement your spam detection logic here
   const spamKeywords = [ "free", "urgent", "limited time", "cheap", "guarantee", "risk-free",
   "bonus", "best price", "exclusive", "bargain", "click here", "subscribe","shit","fuck",
   "opt-in", "sign up", "join now", "contact us", "more information", "free trial",
@@ -325,7 +325,6 @@ const isSpam = (description) => {
   "earn cash", "double your money"];
    const hasSpamKeyword = spamKeywords.some(keyword => description.includes(keyword));
 
-  // Check for gibberish (repeated letters)
   const hasGibberish = /(\w)\1{3,}/.test(description);
 
   return hasSpamKeyword || hasGibberish;
@@ -340,7 +339,7 @@ const isSpam = (description) => {
       <nav class="nav nav-borders">
         <a class="nav-link" :class="{ active: activeTab === 'eventList' }" @click.prevent="changeTab('eventList')">Event
           List</a>
-        <a class="nav-link" :class="{ active: activeTab === 'eventForm' }" @click.prevent="changeTab('eventForm')">Event
+        <a v-if="authStore.isOrganizer" class="nav-link" :class="{ active: activeTab === 'eventForm' }" @click.prevent="changeTab('eventForm')">Event
           Form</a>
       </nav>
       <hr class="mt-0 mb-4">

@@ -85,7 +85,11 @@ onMounted(async () => {
   categoryNames.value = categories.map(category => category.categoryName);
 
   const eventsPromises = categories.map(async category => {
-    const events = await eventStore.getEventByCategory(category.id);
+    let events = await eventStore.getEventByCategory(category.id);
+    
+    const now = new Date();
+    events = events.filter(event => event.isApproved && new Date(event.scheduleDate) < now);
+    
     return { categoryId: category.id, categoryName: category.categoryName, events };
   });
 
@@ -104,6 +108,7 @@ onMounted(async () => {
     nextSlide();
   }, 7000);
 });
+
 
 const filteredCategories = computed(() => {
   return Object.values(eventsByCategoryId.value).filter(category => category.events && category.events.length > 0);
