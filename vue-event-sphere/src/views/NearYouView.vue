@@ -24,20 +24,30 @@ const getAllLocations = async () => {
 const getEventsByCity = async (city) => {
   try {
     const response = await eventStore.getEventsByCity(city);
-    events.value = response;
+    
+    const now = new Date();
+    const filteredEvents = response.filter(event => event.isApproved && new Date(event.scheduleDate) < now);
+    
+    events.value = filteredEvents;
   } catch (err) {
     console.error(err);
   }
 };
 
+
 const getEventsByCountry = async (country) => {
   try {
     const response = await eventStore.getEventsByCountry(country);
-    events.value = response;
+    
+    const now = new Date();
+    const filteredEvents = response.filter(event => event.isApproved && new Date(event.scheduleDate) < now);
+    
+    events.value = filteredEvents;
   } catch (err) {
     console.error(err);
   }
 };
+
 
 const getUserLocation = async () => {
   if (navigator.geolocation) {

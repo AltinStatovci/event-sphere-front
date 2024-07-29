@@ -13,12 +13,18 @@ const route = useRoute();
 const categoryId = ref(route.params.id);
 
 const getData = async (id) => {
-  eventsByCategoryId.value[id] = await eventStore.getEventByCategory(id);
+  let events = await eventStore.getEventByCategory(id);
+  
+  const now = new Date();
+  events = events.filter(event => event.isApproved && new Date(event.scheduleDate) < now);
+  
+  eventsByCategoryId.value[id] = events;
 }
 
 onMounted(async () => {
   await getData(categoryId.value);
 });
+
 
 watch(
     () => route.params.id,

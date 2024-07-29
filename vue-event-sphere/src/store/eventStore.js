@@ -26,7 +26,8 @@ export const useEventStore = defineStore('event', () => {
         category: event.categoryID,
         availableTickets: event.availableTickets,
         photoData: event.photoData,
-        isApproved: event.isApproved
+        isApproved: event.isApproved,
+        scheduleDate: event.scheduleDate
       }));
 
 
@@ -97,7 +98,8 @@ export const useEventStore = defineStore('event', () => {
         maxAttendance: eventData.maxAttendance,
         availableTickets: eventData.availableTickets,
         photoData: eventData.photoData,
-        isApproved: event.isApproved
+        isApproved: event.isApproved,
+        scheduleDate: eventData.scheduleDate,
 
       };
 
@@ -217,7 +219,8 @@ export const useEventStore = defineStore('event', () => {
         category: event.categoryID,
         availableTickets: event.availableTickets,
         photoData: event.photoData,
-        isApproved: event.isApproved
+        isApproved: event.isApproved,
+        scheduleDate: event.scheduleDate,
       }));
 
 
@@ -280,7 +283,9 @@ export const useEventStore = defineStore('event', () => {
         category: event.categoryID,
         availableTickets: event.availableTickets,
         photoData: event.photoData,
-        isApproved: event.isApproved
+        isApproved: event.isApproved,
+        scheduleDate: event.scheduleDate,
+        isApproved: event.isApproved,
       }));
 
 
@@ -327,6 +332,7 @@ export const useEventStore = defineStore('event', () => {
       formData.append('AvailableTickets', event.availableTickets);
       formData.append('DateCreated', event.dateCreated);
       formData.append('IsApproved', event.isApproved);
+      formData.append('ScheduleDate',event.scheduleDate);
 
       if (event.image) {
         formData.append('newImage', event.image);
