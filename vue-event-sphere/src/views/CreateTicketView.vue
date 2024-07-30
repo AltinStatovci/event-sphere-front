@@ -1,6 +1,6 @@
 
 <script setup>
-import { ref, reactive, onMounted } from "vue";
+import {ref, reactive, onMounted, computed, watch} from "vue";
 import { useTicketStore } from "@/store/ticketStore.js";
 import Swal from "sweetalert2";
 import SideBar from "@/components/SideBar.vue";
@@ -9,7 +9,6 @@ const ticketStore = useTicketStore();
 const ticketById = ref(null);
 
 const formData = reactive({
-
   ticketType: '',
   ticketAmount: 0,
   price: 0,
@@ -55,6 +54,29 @@ const activeTab = ref('ticketList');
 const changeTab = (tab) => {
   activeTab.value = tab;
 };
+
+const currentPageTicket = ref(1);
+const pageSizeTicket = 10;
+
+const sortedTickets = computed(() => {
+  return [...ticketList.value].sort((a, b) => new Date(b.paymentDate) - new Date(a.paymentDate));
+});
+
+const paginatedTicket = computed(() => {
+  const startIndex = (currentPageTicket.value - 1) * pageSizeTicket;
+  return sortedTickets.value.slice(startIndex, startIndex + pageSizeTicket);
+});
+
+const totalPagesTickets = computed(() => Math.ceil(ticketList.value.length / pageSizeTicket));
+
+const setCurrentPageTicket = (page) => {
+  currentPageTicket.value = page;
+};
+
+watch(() => ticketList.value, () => {
+  currentPageTicket.value = 1; // Reset to first page when payments change
+});
+
 </script>
 
 <template>
@@ -69,13 +91,14 @@ const changeTab = (tab) => {
               <tr>
                 <th scope="col">Event Name</th>
                 <th scope="col">Ticket Type</th>
-                <th scope="col">Price</th>
+                <th scope="col">Ticket Amount</th>
+                <th scope="col">Ticket Price</th>
                 <th scope="col">Booking Reference</th>
                 <th scope="col"></th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="ticket in ticketList" :key="ticket.id">
+              <tr v-for="ticket in paginatedTicket" :key="ticket.id">
                 <td>{{ ticket.eventName }}</td>
                 <td>{{ ticket.ticketType }}</td>
                 <td>{{ ticket.ticketAmount }}</td>
@@ -87,6 +110,18 @@ const changeTab = (tab) => {
               </tr>
             </tbody>
           </table>
+          <nav v-if="ticketList.length > 0">
+            <ul class="pagination justify-content-center">
+              <li
+                  class="page-item"
+                  v-for="page in totalPagesTickets"
+                  :key="page"
+                  :class="{ active: currentPageTicket === page }"
+              >
+                <a class="page-link" href="#" @click.prevent="setCurrentPageTicket(page)">{{ page }}</a>
+              </li>
+            </ul>
+          </nav>
         </div>
       </div>
     </div>

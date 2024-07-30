@@ -1,6 +1,5 @@
-
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import SideBar from "@/components/SideBar.vue";
 import { useAuthStore } from "@/store/authStore.js";
 import { usePaymentStore } from "@/store/paymentStore.js";
@@ -28,6 +27,28 @@ const formatPaymentDateTime = (dateString) => {
   return `${formattedDate} - ${formattedTime}`;
 };
 
+const currentPagePayment = ref(1);
+const pageSizePayment = 10;
+
+const sortedPayments = computed(() => {
+  return [...payments.value].sort((a, b) => new Date(b.paymentDate) - new Date(a.paymentDate));
+});
+
+const paginatedPayments = computed(() => {
+  const startIndex = (currentPagePayment.value - 1) * pageSizePayment;
+  return sortedPayments.value.slice(startIndex, startIndex + pageSizePayment);
+});
+
+const totalPagesPayments = computed(() => Math.ceil(payments.value.length / pageSizePayment));
+
+const setCurrentPagePayment = (page) => {
+  currentPagePayment.value = page;
+};
+
+watch(() => payments.value, () => {
+  currentPagePayment.value = 1; // Reset to first page when payments change
+});
+
 onMounted(async () => {
   if (authStore.isOrganizer) {
     await eventStore.getEventByOrganizer(authStore.id);
@@ -41,7 +62,6 @@ onMounted(async () => {
   }
 });
 </script>
-
 
 <template>
   <div class="d-flex">
@@ -68,31 +88,43 @@ onMounted(async () => {
           <div class="card-body">
             <table class="table">
               <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>User Name</th>
-                  <th>Ticket ID</th>
-                  <th>Amount</th>
-                  <th>Payment Method</th>
-                  <th>Payment Status</th>
-                  <th>Payment Date</th>
-                </tr>
+              <tr>
+                <th>ID</th>
+                <th>User Name</th>
+                <th>Ticket ID</th>
+                <th>Amount</th>
+                <th>Payment Method</th>
+                <th>Payment Status</th>
+                <th>Payment Date</th>
+              </tr>
               </thead>
               <tbody>
-                <tr v-for="payment in payments" :key="payment.id">
-                  <td>{{ payment.id }}</td>
-                  <td>{{ payment.userName || 'N/A' }}</td>
-                  <td>{{ payment.ticketName || 'N/A' }}</td>
-                  <td>{{ payment.amount }}</td>
-                  <td>{{ payment.paymentMethod }}</td>
-                  <td>{{ payment.paymentStatus }}</td>
-                  <td>{{ formatPaymentDateTime(payment.paymentDate) }}</td>
-                </tr>
-                <tr v-if="payments.length === 0">
-                  <td colspan="7" class="no-data">No payments available</td>
-                </tr>
+              <tr v-for="payment in paginatedPayments" :key="payment.id">
+                <td>{{ payment.id }}</td>
+                <td>{{ payment.userName || 'N/A' }}</td>
+                <td>{{ payment.ticketName || 'N/A' }}</td>
+                <td>{{ payment.amount }}</td>
+                <td>{{ payment.paymentMethod }}</td>
+                <td>{{ payment.paymentStatus }}</td>
+                <td>{{ formatPaymentDateTime(payment.paymentDate) }}</td>
+              </tr>
+              <tr v-if="payments.length === 0">
+                <td colspan="7" class="no-data">No payments available</td>
+              </tr>
               </tbody>
             </table>
+            <nav v-if="payments.length > 0">
+              <ul class="pagination justify-content-center">
+                <li
+                    class="page-item"
+                    v-for="page in totalPagesPayments"
+                    :key="page"
+                    :class="{ active: currentPagePayment === page }"
+                >
+                  <a class="page-link" href="#" @click.prevent="setCurrentPagePayment(page)">{{ page }}</a>
+                </li>
+              </ul>
+            </nav>
           </div>
         </div>
       </div>

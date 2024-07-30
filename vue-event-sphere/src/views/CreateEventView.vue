@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, onMounted } from "vue";
+import {ref, reactive, onMounted, computed, watch} from "vue";
 import { useEventStore } from "@/store/eventStore.js";
 import { useAuthStore } from "@/store/authStore.js";
 import { useRouter } from "vue-router";
@@ -329,6 +329,107 @@ const isSpam = (description) => {
 
   return hasSpamKeyword || hasGibberish;
 };
+//Pagination
+
+
+//EventD
+const currentPageEventD = ref(1);
+const pageSizeEventD = 10;
+
+const sortedEventD = computed(() => {
+  return [...eventD.value].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+});
+
+
+const paginatedEventD = computed(() => {
+  const startIndex = (currentPageEventD.value - 1) * pageSizeEventD;
+  return sortedEventD.value.slice(startIndex, startIndex + pageSizeEventD);
+});
+
+const totalPagesEventD = computed(() => Math.ceil(eventD.value.length / pageSizeEventD));
+
+const setCurrentPageEventD = (page) => {
+  currentPageEventD.value = page;
+};
+
+watch(() => eventD.value, () => {
+  currentPageEventD.value = 1; // Reset to first page when payments change
+});
+
+// All Events List
+const currentPageAllEventsList = ref(1);
+const pageSizeAllEventsList = 10;
+
+const sortedAllEventsList = computed(() => {
+  return [...allEventList.value].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+});
+
+
+const paginatedAllEventsList = computed(() => {
+  const startIndex = (currentPageAllEventsList.value - 1) * pageSizeAllEventsList;
+  return sortedAllEventsList.value.slice(startIndex, startIndex + pageSizeAllEventsList);
+});
+
+const totalPagesAllEventsList = computed(() => Math.ceil(eventD.value.length / pageSizeAllEventsList));
+
+const setCurrentPageAllEventsList = (page) => {
+  currentPageAllEventsList.value = page;
+};
+
+watch(() => allEventList.value, () => {
+  currentPageAllEventsList.value = 1; // Reset to first page when payments change
+});
+
+// EventS
+const currentPageEventS = ref(1);
+const pageSizeEventS = 10;
+
+const sortedEventS = computed(() => {
+  return [...eventS.value].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+});
+
+
+const paginatedEventS = computed(() => {
+  const startIndex = (currentPageEventS.value - 1) * pageSizeEventS;
+  return sortedEventS.value.slice(startIndex, startIndex + pageSizeEventS);
+});
+
+const totalPagesEventS = computed(() => Math.ceil(eventS.value.length / pageSizeEventS));
+
+const setCurrentPageEventS = (page) => {
+  currentPageEventS.value = page;
+};
+
+watch(() => eventS.value, () => {
+  currentPageEventS.value = 1; // Reset to first page when payments change
+});
+
+//Event LIst
+
+const currentPageAllEvents = ref(1);
+const pageSizeAllEvents = 10;
+
+const sortedAllEvents = computed(() => {
+  return [...eventList.value].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+});
+
+
+const paginatedAllEvents = computed(() => {
+  const startIndex = (currentPageAllEvents.value - 1) * pageSizeAllEvents;
+  return sortedAllEvents.value.slice(startIndex, startIndex + pageSizeAllEvents);
+});
+
+const totalPagesAllEvents = computed(() => Math.ceil(eventD.value.length / pageSizeAllEvents));
+
+const setCurrentPageAllEvents = (page) => {
+  currentPageAllEvents.value = page;
+};
+
+watch(() => eventList.value, () => {
+  currentPageAllEvents.value = 1; // Reset to first page when payments change
+});
+
+
 </script>
 
 
@@ -362,7 +463,7 @@ const isSpam = (description) => {
                   <th scope="col"></th>
                 </tr>
               </thead>
-              <tbody v-for="event in eventD" :key="event.id">
+              <tbody v-for="event in paginatedEventD" :key="event.id">
                 <tr>
                   <td>{{ event.eventName }}</td>
                   <td>{{ event.address }}</td>
@@ -387,6 +488,18 @@ const isSpam = (description) => {
                 </tr>
               </tbody>
             </table>
+            <nav v-if="eventD.length > 0">
+              <ul class="pagination justify-content-center">
+                <li
+                    class="page-item"
+                    v-for="page in totalPagesEventD"
+                    :key="page"
+                    :class="{ active: currentPageEventD === page }"
+                >
+                  <a class="page-link" href="#" @click.prevent="setCurrentPageEventD(page)">{{ page }}</a>
+                </li>
+              </ul>
+            </nav>
           </div>
         </div>
         <div class="card mb-4" v-if="authStore.isAdmin">
@@ -408,7 +521,7 @@ const isSpam = (description) => {
 
                 </tr>
               </thead>
-              <tbody v-for="event in allEventList" :key="event.id">
+              <tbody v-for="event in paginatedAllEventsList" :key="event.id">
                 <tr v-if="event.isApproved">
                   <td>{{ event.organizerName }}</td>
                   <td>{{ event.eventName }}</td>
@@ -435,6 +548,18 @@ const isSpam = (description) => {
                 </tr>
               </tbody>
             </table>
+            <nav v-if="allEventList.length > 0">
+              <ul class="pagination justify-content-center">
+                <li
+                    class="page-item"
+                    v-for="page in totalPagesAllEventsList"
+                    :key="page"
+                    :class="{ active: currentPageAllEventsList === page }"
+                >
+                  <a class="page-link" href="#" @click.prevent="setCurrentPageAllEventsList(page)">{{ page }}</a>
+                </li>
+              </ul>
+            </nav>
           </div>
         </div>
         <div class="card mb-4" v-if="authStore.isOrganizer">
@@ -454,7 +579,7 @@ const isSpam = (description) => {
                   <th scope="col"></th>
                 </tr>
               </thead>
-              <tbody v-for="event in eventList" :key="event.id">
+              <tbody v-for="event in paginatedAllEvents" :key="event.id">
                 <tr v-if="!event.isApproved">
                   <td>{{ event.eventName }}</td>
                   <td>{{ event.address }}</td>
@@ -478,8 +603,18 @@ const isSpam = (description) => {
                 </tr>
               </tbody>
             </table>
-
-
+            <nav v-if="eventList.length > 0">
+              <ul class="pagination justify-content-center">
+                <li
+                    class="page-item"
+                    v-for="page in totalPagesAllEvents"
+                    :key="page"
+                    :class="{ active: currentPageAllEvents === page }"
+                >
+                  <a class="page-link" href="#" @click.prevent="setCurrentPageAllEvents(page)">{{ page }}</a>
+                </li>
+              </ul>
+            </nav>
           </div>
         </div>
         <div class="card mb-4" v-if="authStore.isOrganizer">
@@ -501,7 +636,7 @@ const isSpam = (description) => {
                   <th scope="col"></th>
                 </tr>
               </thead>
-              <tbody v-for="event in eventS" :key="event.id">
+              <tbody v-for="event in paginatedEventS" :key="event.id">
                 <tr>
                 <td>{{ event.eventName }}</td>
                 <td>{{ event.address }}</td>
@@ -526,6 +661,18 @@ const isSpam = (description) => {
                 </tr>
               </tbody>
             </table>
+            <nav v-if="eventS.length > 0">
+              <ul class="pagination justify-content-center">
+                <li
+                    class="page-item"
+                    v-for="page in totalPagesEventS"
+                    :key="page"
+                    :class="{ active: currentPageEventS === page }"
+                >
+                  <a class="page-link" href="#" @click.prevent="setCurrentPageEventS(page)">{{ page }}</a>
+                </li>
+              </ul>
+            </nav>
           </div>
         </div>
         <div class="card mb-4" v-if="authStore.isAdmin">
@@ -546,7 +693,7 @@ const isSpam = (description) => {
                   <th scope="col"></th>
                 </tr>
               </thead>
-              <tbody v-for="event in allEventList" :key="event.id">
+              <tbody v-for="event in paginatedAllEventsList" :key="event.id">
                 <tr v-if="!event.isApproved">
                   <td>{{ event.organizerName }}</td>
                   <td>{{ event.eventName }}</td>
@@ -578,6 +725,18 @@ const isSpam = (description) => {
                 </tr>
               </tbody>
             </table>
+            <nav v-if="allEventList.length > 0">
+              <ul class="pagination justify-content-center">
+                <li
+                    class="page-item"
+                    v-for="page in totalPagesAllEventsList"
+                    :key="page"
+                    :class="{ active: currentPageAllEventsList === page }"
+                >
+                  <a class="page-link" href="#" @click.prevent="setCurrentPageAllEventsList(page)">{{ page }}</a>
+                </li>
+              </ul>
+            </nav>
           </div>
         </div>
       </div>
