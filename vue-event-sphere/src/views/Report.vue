@@ -1,6 +1,6 @@
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue';
+import {ref, reactive, onMounted, computed, watch} from 'vue';
 import SideBar from "@/components/SideBar.vue";
 import { useAuthStore } from '@/store/authStore';
 import { useReportStore } from '@/store/reportStore';
@@ -194,6 +194,31 @@ const closeStatusModal = () => {
   selectedStatus.value = '';
 };
 
+
+const currentPageReport = ref(1);
+const pageSizeReport = 10;
+
+const sortedReport = computed(() => {
+  return [...reports.value].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+});
+
+
+const paginatedReport = computed(() => {
+  const startIndex = (currentPageReport.value - 1) * pageSizeReport;
+  return sortedReport.value.slice(startIndex, startIndex + pageSizeReport);
+});
+
+const totalPagesReport = computed(() => Math.ceil(reports.value.length / pageSizeReport));
+
+const setCurrentPageReport = (page) => {
+  currentPageReport.value = page;
+};
+
+watch(() => reports.value, () => {
+  currentPageReport.value = 1; // Reset to first page when payments change
+});
+
+
 </script>
 
 
@@ -226,7 +251,7 @@ const closeStatusModal = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr v-for="report in reports" :key="report.id">
+                                <tr v-for="report in paginatedReport" :key="report.id">
                                     <td>{{ report.userName }}</td>
                                     <td>{{ report.userlastName }}</td>
                                     <td>{{ report.userEmail }}</td>
@@ -249,6 +274,18 @@ const closeStatusModal = () => {
                         </tr>
                             </tbody>
                         </table>
+                      <nav v-if="reports.length > 0">
+                        <ul class="pagination justify-content-center">
+                          <li
+                              class="page-item"
+                              v-for="page in totalPagesReport"
+                              :key="page"
+                              :class="{ active: currentPageReport === page }"
+                          >
+                            <a class="page-link" href="#" @click.prevent="setCurrentPageReport(page)">{{ page }}</a>
+                          </li>
+                        </ul>
+                      </nav>
                     </div>
                 </div>
             </div>
