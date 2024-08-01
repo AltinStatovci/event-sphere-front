@@ -134,41 +134,41 @@ onMounted(async () => {
 
 <style scoped>
 .dashboard {
-    display: flex;
-    height: 100vh;
-    width: 100%;
+  display: flex;
+  height: 100vh;
+  width: 100%;
 }
 
 .content {
-    flex: 1;
-    padding: 20px;
-    margin-left: 20px;
-    margin-top: 40px;
-    margin-right: 40px;
-    margin-bottom: 150px;
-    background-color: rgba(33, 40, 50, 0.03);
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  flex: 1;
+  padding: 20px;
+  margin-left: 20px;
+  margin-top: 40px;
+  margin-right: 40px;
+  margin-bottom: 150px;
+  background-color: rgba(33, 40, 50, 0.03);
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 h1 {
-    margin-bottom: 20px;
-    color: #333;
-    font-size: 24px;
+  margin-bottom: 20px;
+  color: #333;
+  font-size: 24px;
 }
 
 .table-container {
-    overflow-x: auto;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow-x: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .no-data {
-    text-align: center;
-    padding: 10px;
-    background-color: #fff;
-    border: 1px solid #ddd;
-    color: #999;
+  text-align: center;
+  padding: 10px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  color: #999;
 }
 
 .card {
@@ -251,4 +251,3 @@ nav.nav-borders .nav-link {
   box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
 }
 </style>
-
