@@ -1,6 +1,6 @@
 <script setup>
 import { useRouter } from 'vue-router';
-import { defineProps, onMounted, reactive, onBeforeUnmount } from 'vue';
+import { defineProps, onMounted, reactive, onBeforeUnmount, ref } from 'vue';
 import { useLocationStore } from '@/store/locationStore';
 import { useAuthStore } from "@/store/authStore.js";
 import { useRCEventStore } from "@/store/RceventStore.js";
@@ -53,7 +53,7 @@ async function goToEvent(eventId) {
     console.error("Error handling RCEvent:", err);
   }
 }
-const location = ref({ city: '', country: '' });
+const location = reactive({ city: '', country: '' });
 
 
 const getLocation = async () => {
@@ -125,8 +125,7 @@ function formatDateString(dateString) {
             <i class="bi bi-geo-alt-fill mr-2"></i>{{ location.city }}, {{ location.country }}
           </p>
           <p class="card-text text-center mb-4" style="color: #666;">
-            <i class="bi bi-ticket-perforated mr-2"></i> Tickets left:<strong class="ticket-nr"> {{
-    event.availableTickets }}</strong>
+            <i class="bi bi-ticket-perforated mr-2"></i> Tickets left:<strong class="ticket-nr"> {{event.availableTickets }}</strong>
           </p>
           <div class="text-center">
             <button @click="() => goToEvent(event.id)" class="btn btn-primary"

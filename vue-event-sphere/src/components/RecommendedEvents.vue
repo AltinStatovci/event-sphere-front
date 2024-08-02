@@ -1,26 +1,10 @@
 <template>
-    <div class="recommended-events">
-        <h2 class="text-center mb-4">Recommended Events</h2>
-        <div v-if="COMPEvent.length === 0" class="text-center">
-            <p>No recommended events available.</p>
-        </div>
-        <div v-else>
+    <div class="recommended-events" v-if="COMPEvent.length > 0">
+        <h2 class="text-center mb-4">Events you might be interested in <span>{{ AuthStore.userName }}</span></h2>
+        <div>
             <div class="d-flex flex-wrap justify-content-center">
-                <div v-for="event in COMPEvent" :key="event.id" class="event-card mx-2 my-3">
-                    <img :src="`data:image/png;base64,${event.photoData}`" class="card-img-top" alt="Event Image">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ event.eventName }}</h5>
-                        <p class="card-text">{{ formatDateString(event.startDate) }} - {{
-            formatDateString(event.endDate) }}</p>
-                        <p class="card-text" v-if="event.location">{{ event.location.city }}, {{ event.location.country
-                            }}</p>
-                        <p class="card-text">Tickets left: <strong>{{ event.availableTickets }}</strong></p>
-                        <div class="text-center">
-                            <button @click="() => goToEvent(event.id)" class="btn btn-primary">
-                                Find out more
-                            </button>
-                        </div>
-                    </div>
+                <div class="d-flex justify-content-center flex-wrap" v-for="event in COMPEvent.slice(-4)" :key="event.id">
+                    <EventCard :event="event" />
                 </div>
             </div>
         </div>
@@ -33,6 +17,7 @@ import { useEventStore } from '@/store/eventStore.js';
 import { useRCEventStore } from '@/store/RceventStore.js';
 import { useAuthStore } from '@/store/authStore.js';
 import { useRouter } from 'vue-router';
+import EventCard from './EventCard.vue';
 
 const eventStore = useEventStore();
 const RceventStore = useRCEventStore();
@@ -93,19 +78,6 @@ onMounted(async () => {
     padding: 20px;
 }
 
-.event-card {
-    width: 23rem;
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease;
-    background-color: #fff;
-}
-
-.event-card:hover {
-    transform: scale(1.05);
-}
-
 .card-img-top {
     height: 250px;
     object-fit: cover;
@@ -136,5 +108,9 @@ onMounted(async () => {
 
 .btn-primary:hover {
     background-color: #4a7ab8;
+}
+span{
+    color: #4a7ab8;
+    text-transform: capitalize;
 }
 </style>

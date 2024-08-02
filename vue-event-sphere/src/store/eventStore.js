@@ -98,7 +98,7 @@ export const useEventStore = defineStore('event', () => {
         maxAttendance: eventData.maxAttendance,
         availableTickets: eventData.availableTickets,
         photoData: eventData.photoData,
-        isApproved: event.isApproved,
+        isApproved: eventData.isApproved,
         scheduleDate: eventData.scheduleDate,
 
       };
