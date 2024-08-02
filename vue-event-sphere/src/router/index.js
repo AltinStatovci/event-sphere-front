@@ -14,7 +14,7 @@ import Dashboard from "@/views/Dashboard.vue";
 import Profile from "@/views/Profile.vue";
 import Payment from "@/views/Payment.vue";
 import Report from "@/views/Report.vue";
-
+import Review from "@/views/ReviewView.vue";
 import PaymentPage from '@/views/PaymentPageView.vue';
 import CreateEventView from "@/views/CreateEventView.vue";
 import NearYouView from '@/views/NearYouView.vue';
@@ -131,7 +131,12 @@ const routes = [
     component:LogsView,
     meta: { requiresAuth: true , requiresAdmin: true},
   },
-
+  {
+    path: '/reviews/:organizerID',
+    name: 'Review',
+    component: Review,
+    props: true,
+  },
 ];
 
 const router = createRouter({

@@ -18,6 +18,19 @@ function goToTicket(id) {
   const redirectUrl = `/Ticket/${id}/event`;
   router.push(redirectUrl);
 }
+console.log('Event object:', props.event);
+
+function goToReviews(organizerID) {
+  if (organizerID) {
+    const reviewsUrl = `/reviews/${organizerID}`;
+    router.push(reviewsUrl);
+  } else {
+    console.error('Organizer ID is undefined');
+  }
+}
+
+
+
 const getLocation = async () => {
   try {
     const loc = await locationStore.getLocationById(props.event.locationId);
@@ -68,7 +81,11 @@ console.log(formatted);
       <p class="card-text"><i class="bi bi-geo-alt-fill mr-3"></i>{{ event.address }}, {{ location.city }}, {{ location.country }}</p>
       <p class="card-text"><i class="bi bi-calendar-event mr-3"></i> {{ formatTimeAndDate(event.startDate) }}</p>
       <p class="card-text"><i class="bi bi-calendar-event-fill"></i> {{ formatTimeAndDate(event.endDate) }}</p>
-      <p class="card-text"><i class="bi bi-person-fill"></i> {{ event.organizerName }}</p>
+      <p class="card-text"><i class="bi bi-person-fill"></i> 
+        <a @click="() => goToReviews(event.organizerID)" href="javascript:void(0)" class="organizer-link">
+          {{ event.organizerName }}
+        </a>
+      </p>
       <p class="card-text"><i class="bi bi-people"></i>Max attendance: {{ event.maxAttendance }}</p>
       <p class="card-text"><i class="bi bi-ticket-detailed"></i> Available tickets: {{ event.availableTickets }}</p>
       <button @click="() => goToTicket(event.id)" class="btn">Buy Ticket</button>
@@ -98,5 +115,13 @@ i{
   text-transform: none;
   background-color: transparent;
   color: #6596E0;
+}
+.organizer-link {
+  color: #6596E0;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.organizer-link:hover {
+  color: #4169e1;
 }
 </style>
