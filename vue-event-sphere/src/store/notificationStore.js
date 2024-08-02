@@ -6,16 +6,28 @@ export const useNotificationStore = defineStore('notification', () => {
     const url = 'http://localhost:5220/api/Notification/'; // Ensure this is correct
 
     const notifications = ref([]);
-    const unreadNotifications = ref([]); // Ensure this is initialized as an empty array
-
-
+    const unreadNotifications = ref([]);
 
     const markAsRead = async (notificationId) => {
         try {
-            const response = await client.post(`${url}mark-as-read/${notificationId}`);
+            const response = await client.post(`${url}markAsRead/${notificationId}`);
+            // Remove the notification from the unreadNotifications array after marking it as read
+            unreadNotifications.value = unreadNotifications.value.filter(notification => notification.id !== notificationId);
             return response.data;
         } catch (error) {
             console.error('Error marking notification as read:', error.response?.data || error.message);
+            throw error;
+        }
+    };
+
+    const markAllAsRead = async (userId) => {
+        try {
+            const response = await client.post(`${url}markAllAsRead/${userId}`);
+            // Clear the unreadNotifications array after marking all as read
+            unreadNotifications.value = [];
+            return response.data;
+        } catch (error) {
+            console.error('Error marking all notifications as read:', error.response?.data || error.message);
             throw error;
         }
     };
@@ -31,5 +43,5 @@ export const useNotificationStore = defineStore('notification', () => {
         }
     };
 
-    return {markAsRead, getUnreadNotifications, notifications, unreadNotifications };
+    return { markAsRead, markAllAsRead, getUnreadNotifications, notifications, unreadNotifications };
 });

@@ -38,19 +38,8 @@ async function handleSubmit() {
     const redirectUrl = `${route.query.redirect || "/"}`;
     await router.push(redirectUrl); 
   } catch (e) {
-    let errorMessage = 'An error occurred while logging in. Please try again later.';
+    formIsValid.value = false;
 
-    if (e.message.includes('Failed to authenticate.')) {
-      errorMessage = 'Invalid email or password. Please check your credentials.';
-    } else {
-      errorMessage = e.message; 
-    }
-
-    await Swal.fire({
-      title: "Error!",
-      text: errorMessage,
-      icon: "error"
-    });
   }
 }
 

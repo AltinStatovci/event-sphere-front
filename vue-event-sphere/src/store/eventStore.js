@@ -26,7 +26,8 @@ export const useEventStore = defineStore('event', () => {
         category: event.categoryID,
         availableTickets: event.availableTickets,
         photoData: event.photoData,
-        isApproved: event.isApproved
+        isApproved: event.isApproved,
+        scheduleDate: event.scheduleDate
       }));
 
 
@@ -97,7 +98,8 @@ export const useEventStore = defineStore('event', () => {
         maxAttendance: eventData.maxAttendance,
         availableTickets: eventData.availableTickets,
         photoData: eventData.photoData,
-        isApproved: event.isApproved
+        isApproved: event.isApproved,
+        scheduleDate: eventData.scheduleDate,
 
       };
 
@@ -217,7 +219,8 @@ export const useEventStore = defineStore('event', () => {
         category: event.categoryID,
         availableTickets: event.availableTickets,
         photoData: event.photoData,
-        isApproved: event.isApproved
+        isApproved: event.isApproved,
+        scheduleDate: event.scheduleDate,
       }));
 
 
@@ -280,7 +283,9 @@ export const useEventStore = defineStore('event', () => {
         category: event.categoryID,
         availableTickets: event.availableTickets,
         photoData: event.photoData,
-        isApproved: event.isApproved
+        isApproved: event.isApproved,
+        scheduleDate: event.scheduleDate,
+        isApproved: event.isApproved,
       }));
 
 
@@ -327,6 +332,7 @@ export const useEventStore = defineStore('event', () => {
       formData.append('AvailableTickets', event.availableTickets);
       formData.append('DateCreated', event.dateCreated);
       formData.append('IsApproved', event.isApproved);
+      formData.append('ScheduleDate',event.scheduleDate);
 
       if (event.image) {
         formData.append('newImage', event.image);
@@ -364,6 +370,15 @@ export const useEventStore = defineStore('event', () => {
       throw error;
     }
   }
+  async function disapproveEvent(eventId) {
+    try {
+      await client.post(`${url}Event/disapprove/${eventId}`)
+    }
+    catch (error) {
+      console.error('Error disapproving the event', error);
+      throw error;
+    }
+  }
   async function rejectEvent(eventId, message) {
     try {
 
@@ -383,7 +398,23 @@ export const useEventStore = defineStore('event', () => {
       throw error;
     }
   }
+  async function getEventsNearUser({ latitude, longitude }) {
+    try {
+      const response = await client.get(`${url}Event/nearby`, {
+        params: { latitude, longitude }
+      });
+      events.value = response.data;
+      return events.value;
+    } catch (err) {
+      console.error('Error fetching nearby events:', err);
+      return [];
+    }
+  }
 
-  return { getEventByCategory, getEventsByName, getEventByOrganizer, getEventById, addEvent, updateEvent, getEvents, deleteEvent, event, events, filteredEvents, getEventsByCity, getEventsByCountry, approveEvent, rejectEvent, getEventsS, getEventsD };
+  return { getEventByCategory, getEventsByName, getEventByOrganizer,
+     getEventById, addEvent, updateEvent, getEvents, deleteEvent,
+      event, events, filteredEvents, getEventsByCity, getEventsByCountry,
+       approveEvent,disapproveEvent, rejectEvent, getEventsS, getEventsD, getEventsNearUser };
+
 
 });

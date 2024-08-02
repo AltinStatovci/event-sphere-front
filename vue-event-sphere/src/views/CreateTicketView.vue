@@ -1,6 +1,5 @@
-
 <script setup>
-import { ref, reactive, onMounted } from "vue";
+import { ref, reactive, onMounted, computed, watch } from "vue";
 import { useTicketStore } from "@/store/ticketStore.js";
 import Swal from "sweetalert2";
 import SideBar from "@/components/SideBar.vue";
@@ -9,7 +8,6 @@ const ticketStore = useTicketStore();
 const ticketById = ref(null);
 
 const formData = reactive({
-
   ticketType: '',
   ticketAmount: 0,
   price: 0,
@@ -17,6 +15,7 @@ const formData = reactive({
 });
 
 const ticketList = ref([]);
+const selectedEvent = ref(null);
 
 const fetchTickets = async () => {
   ticketList.value = await ticketStore.getTickets();
@@ -44,56 +43,142 @@ const deleteTicket = async (ticketId) => {
 
 const showEditForm = ref(false);
 
-const openEditForm = (ticketId) => {
-  showEditForm.value = true;
-  selectedTicketId.value = ticketId;
-  ticketById.value = ticketStore.getTicketById(ticketId);
-};
 
-const activeTab = ref('ticketList');
+
+const activeTab = ref('eventList');
 
 const changeTab = (tab) => {
   activeTab.value = tab;
 };
+
+const currentPageTicket = ref(1);
+const pageSizeTicket = 10;
+
+const groupBy = (array, key) => {
+  return array.reduce((result, currentValue) => {
+    (result[currentValue[key]] = result[currentValue[key]] || []).push(currentValue);
+    return result;
+  }, {});
+}
+
+const groupedTickets = computed(() => {
+  return groupBy(ticketList.value, 'eventID');
+});
+
+const sortedGroupedTickets = computed(() => {
+  const grouped = groupBy(ticketList.value, 'eventID');
+  for (const key in grouped) {
+    grouped[key] = grouped[key].sort((a, b) => new Date(b.paymentDate) - new Date(a.paymentDate));
+  }
+  return grouped;
+});
+
+const paginatedTicket = computed(() => {
+  if (selectedEvent.value && sortedGroupedTickets.value[selectedEvent.value]) {
+    const startIndex = (currentPageTicket.value - 1) * pageSizeTicket;
+    return sortedGroupedTickets.value[selectedEvent.value].slice(startIndex, startIndex + pageSizeTicket);
+  }
+  return [];
+});
+
+const totalPagesTickets = computed(() => {
+  if (selectedEvent.value && groupedTickets.value[selectedEvent.value]) {
+    return Math.ceil(groupedTickets.value[selectedEvent.value].length / pageSizeTicket);
+  }
+  return 0;
+});
+
+const setCurrentPageTicket = (page) => {
+  currentPageTicket.value = page;
+};
+
+const selectEvent = (eventId) => {
+  selectedEvent.value = eventId;
+  currentPageTicket.value = 1;
+  activeTab.value = 'ticketList';
+};
+
+watch(() => ticketList.value, () => {
+  currentPageTicket.value = 1; // Reset to first page when tickets change
+});
+
 </script>
 
 <template>
   <div class="d-flex">
     <side-bar />
     <div class="container-xl px-4 mt-4">
-      <div class="card mb-4">
-        <div class="card-header">Ticket List</div>
+      <div class="card mb-4" v-if="activeTab === 'eventList'">
+        <div class="card-header">Event List</div>
         <div class="card-body">
           <table class="table">
             <thead>
-              <tr>
-                <th scope="col">Event Name</th>
-                <th scope="col">Ticket Type</th>
-                <th scope="col">Price</th>
-                <th scope="col">Booking Reference</th>
-                <th scope="col"></th>
-              </tr>
+            <tr>
+              <th scope="col">Event Name</th>
+              <th scope="col">Number of Tickets</th>
+              <th scope="col"></th>
+            </tr>
             </thead>
             <tbody>
-              <tr v-for="ticket in ticketList" :key="ticket.id">
-                <td>{{ ticket.eventName }}</td>
-                <td>{{ ticket.ticketType }}</td>
-                <td>{{ ticket.ticketAmount }}</td>
-                <td>{{ ticket.price }}</td>
-                <td>{{ ticket.bookingReference }}</td>
-                <td>
-                  <button class="btn btn-outline-danger btn-sm" @click="deleteTicket(ticket.id)">Delete</button>
-                </td>
-              </tr>
+            <tr v-for="(tickets, eventId) in groupedTickets" :key="eventId">
+              <td>{{ tickets[0].eventName }}</td>
+              <td>{{ tickets.length }}</td>
+              <td>
+                <button class="btn btn-outline-primary btn-sm" @click="selectEvent(eventId)">View Tickets</button>
+              </td>
+            </tr>
             </tbody>
           </table>
         </div>
       </div>
+
+      <div class="card mb-4" v-if="activeTab === 'ticketList'">
+        <div class="card-header d-flex justify-content-between">
+          Ticket List for {{ groupedTickets[selectedEvent]?.[0].eventName }}
+          <button class="btn btn-outline-primary btn-sm" @click="changeTab('eventList')">Back to Event List</button>
+        </div>
+        <div class="card-body">
+          <table class="table">
+            <thead>
+            <tr>
+              <th scope="col">Event Name</th>
+              <th scope="col">Ticket Type</th>
+              <th scope="col">Ticket Amount</th>
+              <th scope="col">Ticket Price</th>
+              <th scope="col">Booking Reference</th>
+              <th scope="col"></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="ticket in paginatedTicket" :key="ticket.id">
+              <td>{{ ticket.eventName }}</td>
+              <td>{{ ticket.ticketType }}</td>
+              <td>{{ ticket.ticketAmount }}</td>
+              <td>{{ ticket.price }}</td>
+              <td>{{ ticket.bookingReference }}</td>
+              <td>
+                <button class="btn btn-outline-danger btn-sm" @click="deleteTicket(ticket.id)">Delete</button>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+          <nav v-if="groupedTickets[selectedEvent]?.length > 0">
+            <ul class="pagination justify-content-center">
+              <li
+                  class="page-item"
+                  v-for="page in totalPagesTickets"
+                  :key="page"
+                  :class="{ active: currentPageTicket === page }"
+              >
+                <a class="page-link" href="#" @click.prevent="setCurrentPageTicket(page)">{{ page }}</a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
     </div>
   </div>
-
 </template>
-
 
 <style scoped>
 /* Your scoped styles here */

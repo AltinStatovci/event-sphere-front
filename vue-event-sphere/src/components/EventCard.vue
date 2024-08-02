@@ -1,9 +1,10 @@
 <script setup>
 import { useRouter } from 'vue-router';
-import { defineProps, onMounted, ref } from 'vue';
+import { defineProps, onMounted, reactive, onBeforeUnmount } from 'vue';
 import { useLocationStore } from '@/store/locationStore';
 import { useAuthStore } from "@/store/authStore.js";
 import { useRCEventStore } from "@/store/RceventStore.js";
+import signalRTickets from '@/signalR/signalRTickets';
 
 const locationStore = useLocationStore();
 const router = useRouter();
@@ -52,21 +53,41 @@ async function goToEvent(eventId) {
     console.error("Error handling RCEvent:", err);
   }
 }
-
 const location = ref({ city: '', country: '' });
+
 
 const getLocation = async () => {
   try {
     const loc = await locationStore.getLocationById(props.event.locationId);
-    location.value = loc;
+    location.city = loc.city;
+    location.country = loc.country;
   } catch (err) {
     console.error(err);
   }
 }
 
+const event = reactive({ ...props.event });
+
+const handleTicketUpdate = (updateEvent) => {
+  const { eventId, availableTickets } = updateEvent.detail || {};
+  if (eventId === event.id) {
+    event.availableTickets = availableTickets;
+  }
+};
+
 onMounted(async () => {
   await getLocation();
-})
+  
+  window.addEventListener('ticketUpdate', handleTicketUpdate);
+
+  return () => {
+    window.removeEventListener('ticketUpdate', handleTicketUpdate);
+  };
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('ticketUpdate', handleTicketUpdate);
+});
 
 function formatDateString(dateString) {
   const monthsFull = [

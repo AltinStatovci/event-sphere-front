@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, onMounted } from "vue";
+import {ref, reactive, onMounted, computed, watch} from "vue";
 import { useEventStore } from "@/store/eventStore.js";
 import { useAuthStore } from "@/store/authStore.js";
 import { useRouter } from "vue-router";
@@ -26,6 +26,8 @@ const formattedNow = now.toISOString(); // Get YYYY-MM-DDTHH:MM format
 console.log("Current DateTime:", formattedNow);
 
 
+
+
 const formData = reactive({
   id: '',
   eventName: '',
@@ -40,8 +42,8 @@ const formData = reactive({
   availableTickets: 0,
   dateCreated: new Date().toISOString(),
   image: '',
-  isApproved: false,
-  scheduleDate: new Date().toISOString(),
+  isApproved: true,
+  scheduleDate: '',
 });
 
 const imageUrl = ref('https://t4.ftcdn.net/jpg/05/65/22/41/360_F_565224180_QNRiRQkf9Fw0dKRoZGwUknmmfk51SuSS.jpg');
@@ -49,9 +51,36 @@ const imageUrl = ref('https://t4.ftcdn.net/jpg/05/65/22/41/360_F_565224180_QNRiR
 const selectedEventId = ref(null);
 const isEditMode = ref(false);
 
+const imageValidationMessage = ref('');
+const imageInputClass = ref('');
+
 const handleSubmit = async () => {
+
   try {
+    let isApproved;
+    if (isSpam(formData.description) || isSpam(formData.eventName) || isSpam(formData.address)) {
+      formData.isApproved = false;
+      await Swal.fire({
+        title: "Event Under Review",
+        text: "Your event has gone into review for possible spam.",
+        icon: "warning"
+      });
+    } else {
+      formData.isApproved = true;
+    }
+
+    if (!formData.image) {
+      imageValidationMessage.value = 'You need to upload the image';
+      imageInputClass.value = 'is-invalid';
+      return;
+    } else {
+      imageValidationMessage.value = '';
+      imageInputClass.value = '';
+    }
+
+
     if (isEditMode.value) {
+      console.log(formData);
       await eventStore.updateEvent(formData);
       Swal.fire({
         title: "Event Updated successfully!",
@@ -72,6 +101,7 @@ const handleSubmit = async () => {
     }
   } catch (e) {
     await Swal.fire({
+
       title: "Error!",
       text: e.message,
       icon: "error"
@@ -84,6 +114,8 @@ const handleImageUpload = (event) => {
   if (file) {
     formData.image = file;
     imageUrl.value = URL.createObjectURL(file);
+    imageValidationMessage.value = '';
+    imageInputClass.value = '';
   }
 };
 
@@ -243,6 +275,24 @@ const approveEvent = async (id) => {
     });
   }
 }
+const disapproveEvent = async (id) => {
+  try {
+    await eventStore.disapproveEvent(id);
+    Swal.fire({
+      title: "Event Disapproved successfully!",
+      icon: "success"
+    }).then(() => {
+      location.reload();
+    });
+  } catch (err) {
+    await Swal.fire({
+      title: "Error!",
+      text: err.value,
+      icon: "error"
+    });
+  }
+}
+
 const rejectModal = ref({
   visible: false,
   eventId: null
@@ -262,6 +312,124 @@ const truncateDescription = (text) => {
   const maxLength = 50; // adjust as needed
   return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
 };
+
+const isSpam = (description) => {
+  const spamKeywords = [ "free", "urgent", "limited time", "cheap", "guarantee", "risk-free",
+  "bonus", "best price", "exclusive", "bargain", "click here", "subscribe","shit","fuck",
+  "opt-in", "sign up", "join now", "contact us", "more information", "free trial",
+  "free access", "no cost", "credit card", "bank account", "loan", "investment",
+  "spam", "junk", "fake", "scam", "fraud", "virus", "malware", "phishing",
+  "porn", "sex", "nude", "xxx", "lottery", "gamble", "betting", "casino",
+  "viagra", "cialis", "prescription", "medication", "drug", "pills",
+  "debt", "financing", "miracle", "cure", "make money", "work from home",
+  "earn cash", "double your money"];
+   const hasSpamKeyword = spamKeywords.some(keyword => description.includes(keyword));
+
+  const hasGibberish = /(\w)\1{3,}/.test(description);
+
+  return hasSpamKeyword || hasGibberish;
+};
+//Pagination
+
+
+//EventD
+const currentPageEventD = ref(1);
+const pageSizeEventD = 10;
+
+const sortedEventD = computed(() => {
+  return [...eventD.value].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+});
+
+
+const paginatedEventD = computed(() => {
+  const startIndex = (currentPageEventD.value - 1) * pageSizeEventD;
+  return sortedEventD.value.slice(startIndex, startIndex + pageSizeEventD);
+});
+
+const totalPagesEventD = computed(() => Math.ceil(eventD.value.length / pageSizeEventD));
+
+const setCurrentPageEventD = (page) => {
+  currentPageEventD.value = page;
+};
+
+watch(() => eventD.value, () => {
+  currentPageEventD.value = 1; // Reset to first page when payments change
+});
+
+// All Events List
+const currentPageAllEventsList = ref(1);
+const pageSizeAllEventsList = 10;
+
+const sortedAllEventsList = computed(() => {
+  return [...allEventList.value].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+});
+
+
+const paginatedAllEventsList = computed(() => {
+  const startIndex = (currentPageAllEventsList.value - 1) * pageSizeAllEventsList;
+  return sortedAllEventsList.value.slice(startIndex, startIndex + pageSizeAllEventsList);
+});
+
+const totalPagesAllEventsList = computed(() => Math.ceil(eventD.value.length / pageSizeAllEventsList));
+
+const setCurrentPageAllEventsList = (page) => {
+  currentPageAllEventsList.value = page;
+};
+
+watch(() => allEventList.value, () => {
+  currentPageAllEventsList.value = 1; // Reset to first page when payments change
+});
+
+// EventS
+const currentPageEventS = ref(1);
+const pageSizeEventS = 10;
+
+const sortedEventS = computed(() => {
+  return [...eventS.value].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+});
+
+
+const paginatedEventS = computed(() => {
+  const startIndex = (currentPageEventS.value - 1) * pageSizeEventS;
+  return sortedEventS.value.slice(startIndex, startIndex + pageSizeEventS);
+});
+
+const totalPagesEventS = computed(() => Math.ceil(eventS.value.length / pageSizeEventS));
+
+const setCurrentPageEventS = (page) => {
+  currentPageEventS.value = page;
+};
+
+watch(() => eventS.value, () => {
+  currentPageEventS.value = 1; // Reset to first page when payments change
+});
+
+//Event LIst
+
+const currentPageAllEvents = ref(1);
+const pageSizeAllEvents = 10;
+
+const sortedAllEvents = computed(() => {
+  return [...eventList.value].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+});
+
+
+const paginatedAllEvents = computed(() => {
+  const startIndex = (currentPageAllEvents.value - 1) * pageSizeAllEvents;
+  return sortedAllEvents.value.slice(startIndex, startIndex + pageSizeAllEvents);
+});
+
+const totalPagesAllEvents = computed(() => Math.ceil(eventD.value.length / pageSizeAllEvents));
+
+const setCurrentPageAllEvents = (page) => {
+  currentPageAllEvents.value = page;
+};
+
+watch(() => eventList.value, () => {
+  currentPageAllEvents.value = 1; // Reset to first page when payments change
+});
+
+
 </script>
 
 
@@ -272,14 +440,14 @@ const truncateDescription = (text) => {
       <nav class="nav nav-borders">
         <a class="nav-link" :class="{ active: activeTab === 'eventList' }" @click.prevent="changeTab('eventList')">Event
           List</a>
-        <a class="nav-link" :class="{ active: activeTab === 'eventForm' }" @click.prevent="changeTab('eventForm')">Event
+        <a v-if="authStore.isOrganizer" class="nav-link" :class="{ active: activeTab === 'eventForm' }" @click.prevent="changeTab('eventForm')">Event
           Form</a>
       </nav>
       <hr class="mt-0 mb-4">
 
       <div v-if="activeTab === 'eventList'">
         <div class="card mb-4" v-if="authStore.isOrganizer">
-          <div class="card-header">Published Events</div>
+          <div class="card-header">Published Events <i class="bi bi-check-lg"></i></div>
           <div class="card-body">
             <table class="table">
               <thead>
@@ -291,10 +459,11 @@ const truncateDescription = (text) => {
                   <th scope="col">End Date</th>
                   <th scope="col">Max Attendees</th>
                   <th scope="col">Available Tickets</th>
+                  <th scope="col">Description</th>
                   <th scope="col"></th>
                 </tr>
               </thead>
-              <tbody v-for="event in eventD" :key="event.id">
+              <tbody v-for="event in paginatedEventD" :key="event.id">
                 <tr>
                   <td>{{ event.eventName }}</td>
                   <td>{{ event.address }}</td>
@@ -304,17 +473,37 @@ const truncateDescription = (text) => {
                   <td>{{ event.maxAttendance }}</td>
                   <td>{{ event.availableTickets }}</td>
                   <td>
+                    <div class="tooltip-container">
+                      <span>{{ truncateDescription(event.description) }}</span>
+                      <div class="tooltip-text">{{ event.description }}</div>
+                    </div>
+                  </td>
+                  <td>
+                  <div class="button-container">
                     <button class="btn btn-outline-danger btn-sm" @click="deleteEvent(event.id)">Delete</button>
                     <button class="btn btn-outline-primary btn-sm" @click="openEditForm(event.id)">Edit</button>
                     <button class="btn btn-outline-secondary btn-sm" @click="getTickets(event.id)">See Tickets</button>
-                  </td>
+                   </div>
+                   </td>
                 </tr>
               </tbody>
             </table>
+            <nav v-if="eventD.length > 0">
+              <ul class="pagination justify-content-center">
+                <li
+                    class="page-item"
+                    v-for="page in totalPagesEventD"
+                    :key="page"
+                    :class="{ active: currentPageEventD === page }"
+                >
+                  <a class="page-link" href="#" @click.prevent="setCurrentPageEventD(page)">{{ page }}</a>
+                </li>
+              </ul>
+            </nav>
           </div>
         </div>
         <div class="card mb-4" v-if="authStore.isAdmin">
-          <div class="card-header">Event List</div>
+          <div class="card-header">Published Events <i class="bi bi-check-lg"></i></div>
           <div class="card-body">
             <table class="table">
               <thead>
@@ -327,10 +516,12 @@ const truncateDescription = (text) => {
                   <th scope="col">End Date</th>
                   <th scope="col">Max Attendees</th>
                   <th scope="col">Available Tickets</th>
+                  <th scope="col">Description</th>
                   <th scope="col"></th>
+
                 </tr>
               </thead>
-              <tbody v-for="event in allEventList" :key="event.id">
+              <tbody v-for="event in paginatedAllEventsList" :key="event.id">
                 <tr v-if="event.isApproved">
                   <td>{{ event.organizerName }}</td>
                   <td>{{ event.eventName }}</td>
@@ -341,15 +532,38 @@ const truncateDescription = (text) => {
                   <td>{{ event.maxAttendance }}</td>
                   <td>{{ event.availableTickets }}</td>
                   <td>
+                    <div class="tooltip-container">
+                      <span>{{ truncateDescription(event.description) }}</span>
+                      <div class="tooltip-text">{{ event.description }}</div>
+                    </div>
+                  </td>
+
+                  <RejectMessageModalComponent :rejectModal="rejectModal" @close="handleClose" />
+                  <td>
+                  <div class="button-container">
+                    <button class="btn btn-outline-success btn-sm" @click="disapproveEvent(event.id)">Disapprove</button>
                     <button class="btn btn-outline-danger btn-sm" @click="deleteEvent(event.id)">Delete</button>
+                  </div>
                   </td>
                 </tr>
               </tbody>
             </table>
+            <nav v-if="allEventList.length > 0">
+              <ul class="pagination justify-content-center">
+                <li
+                    class="page-item"
+                    v-for="page in totalPagesAllEventsList"
+                    :key="page"
+                    :class="{ active: currentPageAllEventsList === page }"
+                >
+                  <a class="page-link" href="#" @click.prevent="setCurrentPageAllEventsList(page)">{{ page }}</a>
+                </li>
+              </ul>
+            </nav>
           </div>
         </div>
         <div class="card mb-4" v-if="authStore.isOrganizer">
-          <div class="card-header">Waiting for approval</div>
+          <div class="card-header">Waiting for approval <i class="bi bi-exclamation-octagon"></i></div>
           <div class="card-body">
             <table class="table">
               <thead>
@@ -361,10 +575,11 @@ const truncateDescription = (text) => {
                   <th scope="col">End Date</th>
                   <th scope="col">Max Attendees</th>
                   <th scope="col">Available Tickets</th>
+                  <th scope="col">Description</th>
                   <th scope="col"></th>
                 </tr>
               </thead>
-              <tbody v-for="event in eventList" :key="event.id">
+              <tbody v-for="event in paginatedAllEvents" :key="event.id">
                 <tr v-if="!event.isApproved">
                   <td>{{ event.eventName }}</td>
                   <td>{{ event.address }}</td>
@@ -374,18 +589,36 @@ const truncateDescription = (text) => {
                   <td>{{ event.maxAttendance }}</td>
                   <td>{{ event.availableTickets }}</td>
                   <td>
-                    <button class="btn btn-outline-danger btn-sm" @click="deleteEvent(event.id)">Delete</button>
-                    <button class="btn btn-outline-primary btn-sm" @click="openEditForm(event.id)">Edit</button>
+                    <div class="tooltip-container">
+                      <span>{{ truncateDescription(event.description) }}</span>
+                      <div class="tooltip-text">{{ event.description }}</div>
+                    </div>
+                  </td>
+                  <td>
+                     <div class="button-container">
+              <button class="btn btn-outline-danger btn-sm" @click="deleteEvent(event.id)">Delete</button>
+              <button class="btn btn-outline-primary btn-sm" @click="openEditForm(event.id)">Edit</button>
+            </div>
                   </td>
                 </tr>
               </tbody>
             </table>
-
-
+            <nav v-if="eventList.length > 0">
+              <ul class="pagination justify-content-center">
+                <li
+                    class="page-item"
+                    v-for="page in totalPagesAllEvents"
+                    :key="page"
+                    :class="{ active: currentPageAllEvents === page }"
+                >
+                  <a class="page-link" href="#" @click.prevent="setCurrentPageAllEvents(page)">{{ page }}</a>
+                </li>
+              </ul>
+            </nav>
           </div>
         </div>
         <div class="card mb-4" v-if="authStore.isOrganizer">
-          <div class="card-header">Scheduled Events</div>
+          <div class="card-header">Scheduled Events <i class="bi bi-hourglass-split"></i></div>
           <div class="card-body">
             <table class="table">
               <thead>
@@ -399,10 +632,11 @@ const truncateDescription = (text) => {
                   <th scope="col">Available Tickets</th>
                   <th scope="col">Aproved</th>
                   <th scope="col">Schedule Date</th>
+                  <th scope="col">Description</th>
                   <th scope="col"></th>
                 </tr>
               </thead>
-              <tbody v-for="event in eventS" :key="event.id">
+              <tbody v-for="event in paginatedEventS" :key="event.id">
                 <tr>
                   <td>{{ event.eventName }}</td>
                   <td>{{ event.address }}</td>
@@ -420,10 +654,22 @@ const truncateDescription = (text) => {
                 </tr>
               </tbody>
             </table>
+            <nav v-if="eventS.length > 0">
+              <ul class="pagination justify-content-center">
+                <li
+                    class="page-item"
+                    v-for="page in totalPagesEventS"
+                    :key="page"
+                    :class="{ active: currentPageEventS === page }"
+                >
+                  <a class="page-link" href="#" @click.prevent="setCurrentPageEventS(page)">{{ page }}</a>
+                </li>
+              </ul>
+            </nav>
           </div>
         </div>
         <div class="card mb-4" v-if="authStore.isAdmin">
-          <div class="card-header">Waiting for approval</div>
+          <div class="card-header">Waiting for approval <i class="bi bi-exclamation-octagon"></i></div>
           <div class="card-body">
             <table class="table">
               <thead>
@@ -440,7 +686,7 @@ const truncateDescription = (text) => {
                   <th scope="col"></th>
                 </tr>
               </thead>
-              <tbody v-for="event in allEventList" :key="event.id">
+              <tbody v-for="event in paginatedAllEventsList" :key="event.id">
                 <tr v-if="!event.isApproved">
                   <td>{{ event.organizerName }}</td>
                   <td>{{ event.eventName }}</td>
@@ -450,17 +696,17 @@ const truncateDescription = (text) => {
                   <td>{{ formatDateTime(event.endDate) }}</td>
                   <td>{{ event.maxAttendance }}</td>
                   <td>{{ event.availableTickets }}</td>
-                  <td>{{ event.description }}</td>
-
-                  <td>
-                    <div class="tooltip-container">
+                  <td><div class="tooltip-container">
                       <span>{{ truncateDescription(event.description) }}</span>
                       <div class="tooltip-text">{{ event.description }}</div>
-                    </div>
-                  </td>
-                  <td class="d-flex pb-20">
+                    </div></td>
+                  <td></td>
+
+                  <td>
+                  <div class="button-container">
                     <button class="btn btn-outline-success btn-sm" @click="approveEvent(event.id)">Approve</button>
                     <button class="btn btn-outline-primary btn-sm" @click="openRejectModal(event.id)">Reject</button>
+                  </div>
                   </td>
                   <RejectMessageModalComponent :rejectModal="rejectModal" @close="handleClose" />
                 </tr>
@@ -472,6 +718,18 @@ const truncateDescription = (text) => {
                 </tr>
               </tbody>
             </table>
+            <nav v-if="allEventList.length > 0">
+              <ul class="pagination justify-content-center">
+                <li
+                    class="page-item"
+                    v-for="page in totalPagesAllEventsList"
+                    :key="page"
+                    :class="{ active: currentPageAllEventsList === page }"
+                >
+                  <a class="page-link" href="#" @click.prevent="setCurrentPageAllEventsList(page)">{{ page }}</a>
+                </li>
+              </ul>
+            </nav>
           </div>
         </div>
       </div>
@@ -554,15 +812,16 @@ const truncateDescription = (text) => {
                   </div>
                   <div class="row gx-3 mb-3">
                     <div class="col-md-12">
-                      <div class="card mb-4 mb-xl-0">
+                      <div class="card mb-4 mb-xl-0" :class="imageInputClass">
                         <div class="card-header">Event Image</div>
                         <div class="card-body text-center" style="align-self: center;">
                           <div class="image-container" :style="{ backgroundImage: `url(${imageUrl})` }">
                             <div v-if="!imageUrl" class="placeholder">No Image Selected</div>
                           </div>
                           <div class="small font-italic text-muted mb-4">Upload your EventImage</div>
+                          <div class="small font-italic text-muted mb-4"><p style="color: red">{{imageValidationMessage}}</p></div>
                           <input class="form-control" id="file" type="file" ref="fileInput" @change="handleImageUpload"
-                            style="display: none;">
+                            style="display: none;" >
                           <button class="btn btn-outline-primary" type="button" @click="$refs.fileInput.click()">Upload
                             new image</button>
                         </div>
@@ -699,7 +958,7 @@ body {
   padding: 10px;
   background-color: #fff;
   border: 1px solid #ddd;
-  color: #999;
+  color: #CCCC00;
 }
 
 .tooltip-container {
@@ -734,4 +993,50 @@ body {
 .pb-20 {
   padding: 20px 0px;
 }
+.table {
+  width: 100%;
+}
+
+.table th,
+.table td {
+  padding: 8px;
+  text-align: left;
+  vertical-align: middle; /* Ensures vertical alignment of content */
+}
+
+.button-container {
+  display: flex;
+  gap: 10px; /* Adjust spacing between buttons */
+  align-items: center; /* Aligns buttons vertically in the center */
+}
+
+.button-container button {
+  margin: 0;
+}
+
+.tooltip-container {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip-container .tooltip-text {
+  visibility: hidden;
+  width: 200px;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  border-radius: 5px;
+  padding: 5px;
+  position: absolute;
+  z-index: 1;
+}
+
+.tooltip-container:hover .tooltip-text {
+  visibility: visible;
+}
+
+.is-invalid {
+  border-color: red;
+}
+
 </style>

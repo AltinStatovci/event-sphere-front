@@ -1,6 +1,5 @@
-
 <script setup>
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, onMounted, computed, watch } from 'vue';
 import SideBar from "@/components/SideBar.vue";
 import { useAuthStore } from '@/store/authStore';
 import { useReportStore } from '@/store/reportStore';
@@ -20,6 +19,8 @@ const reportName = ref('');
 const complaintDescription = ref('');
 const reportAnsw = ref('');
 const reports = ref([]);
+const usersWithReports = ref([]);
+const selectedUserId = ref(null);
 
 const user = reactive({
   id: authstore.id,
@@ -46,8 +47,8 @@ const fetchReports = async () => {
           'Authorization': `Bearer ${authstore.token}`,
         },
       });
-    } else if (user.roleName === 'User' || user.roleName ==='Organizer') {
-      response = await fetch(`http://localhost:5220/api/Report/GetReportByUserId/${authstore.id}`,{
+    } else if (user.roleName === 'User' || user.roleName === 'Organizer') {
+      response = await fetch(`http://localhost:5220/api/Report/GetReportByUserId/${authstore.id}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -57,9 +58,26 @@ const fetchReports = async () => {
     }
     if (!response.ok) throw new Error(`Failed to fetch reports: ${response.statusText}`);
     reports.value = await response.json();
+    groupReportsByUser();
   } catch (error) {
     console.error('Error fetching reports:', error.message);
   }
+};
+
+const groupReportsByUser = () => {
+  const grouped = reports.value.reduce((acc, report) => {
+    const userId = report.userId;
+    if (!acc[userId]) {
+      acc[userId] = { user: report.userName + ' ' + report.userlastName, count: 0, reports: [] };
+    }
+    acc[userId].count += 1;
+    acc[userId].reports.push(report);
+    return acc;
+  }, {});
+  usersWithReports.value = Object.entries(grouped).map(([userId, data]) => ({
+    userId,
+    ...data,
+  }));
 };
 
 const fetchUserDetails = async () => {
@@ -98,8 +116,9 @@ const handleSubmit = async () => {
   try {
     const response = await fetch(apiUrl, {
       method: method,
-      headers: { 'Content-Type': 'application/json'
-        , 'Authorization': `Bearer ${authstore.token}`
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authstore.token}`
       },
       body: JSON.stringify(complaintData),
     });
@@ -111,7 +130,6 @@ const handleSubmit = async () => {
     // If successful, fetch updated reports and reset form
     await fetchReports();
     changeTab('reportList');
-
 
     // Show success notification based on the mode
     if (isEditMode.value) {
@@ -173,7 +191,7 @@ const deleteReport = async (reportId) => {
       icon: "error"
     });
   }
-}
+};
 
 const resetForm = () => {
   isEditMode.value = false;
@@ -181,6 +199,7 @@ const resetForm = () => {
   complaintDescription.value = '';
   reportAnsw.value = '';
 };
+
 const showStatusModal = ref(false);
 const selectedStatus = ref('');
 
@@ -194,140 +213,160 @@ const closeStatusModal = () => {
   selectedStatus.value = '';
 };
 
+const currentPageUser = ref(1);
+const pageSizeUser = 10;
+
+const paginatedUsers = computed(() => {
+  const startIndex = (currentPageUser.value - 1) * pageSizeUser;
+  return usersWithReports.value.slice(startIndex, startIndex + pageSizeUser);
+});
+
+const totalPagesUser = computed(() => Math.ceil(usersWithReports.value.length / pageSizeUser));
+
+const setCurrentPageUser = (page) => {
+  currentPageUser.value = page;
+};
+
+const showUserReports = (userId) => {
+  selectedUserId.value = userId;
+};
+
+const clearUserReports = () => {
+  selectedUserId.value = null;
+};
+
+watch(() => reports.value, () => {
+  currentPageUser.value = 1; // Reset to first page when reports change
+});
+
 </script>
 
-
 <template>
-    <div class="d-flex">
-        <side-bar />
-        <div class="container-xl px-4 mt-4">
-            <nav class="nav nav-borders">
-                <a class="nav-link" :class="{ active: activeTab === 'reportList' }"
-                    @click.prevent="changeTab('reportList')">Report List</a>
-                <a class="nav-link" :class="{ active: activeTab === 'reportForm' }"
-                    @click.prevent="changeTab('reportForm')">Report Form</a>
+  <div class="d-flex">
+    <side-bar />
+    <div class="container-xl px-4 mt-4">
+      <nav class="nav nav-borders">
+        <a class="nav-link" :class="{ active: activeTab === 'reportList' }" @click.prevent="changeTab('reportList')">Report List</a>
+        <a class="nav-link" :class="{ active: activeTab === 'reportForm' }" @click.prevent="changeTab('reportForm')">Report Form</a>
+      </nav>
+      <hr class="mt-0 mb-4">
+
+      <div v-if="activeTab === 'reportList'">
+        <div class="card mb-4" v-if="!selectedUserId">
+          <div class="card-header">Users with Reports</div>
+          <div class="card-body">
+            <table class="table">
+              <thead>
+              <tr>
+                <th scope="col">User</th>
+                <th scope="col">Number of Reports</th>
+                <th scope="col">Actions</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr v-for="user in paginatedUsers" :key="user.userId">
+                <td>{{ user.user }}</td>
+                <td>{{ user.count }}</td>
+                <td>
+                  <button class="btn btn-outline-primary btn-sm" @click="showUserReports(user.userId)">View Reports</button>
+                </td>
+              </tr>
+              <tr v-if="usersWithReports.length === 0">
+                <td colspan="3" class="no-data">No users with reports available</td>
+              </tr>
+              </tbody>
+            </table>
+            <nav v-if="usersWithReports.length > 0">
+              <ul class="pagination justify-content-center">
+                <li class="page-item" v-for="page in totalPagesUser" :key="page" :class="{ active: currentPageUser === page }">
+                  <a class="page-link" href="#" @click.prevent="setCurrentPageUser(page)">{{ page }}</a>
+                </li>
+              </ul>
             </nav>
-            <hr class="mt-0 mb-4">
-
-            <div v-if="activeTab === 'reportList'">
-                <div class="card mb-4">
-                    <div class="card-header">Report List</div>
-                    <div class="card-body">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th scope="col">Name</th>
-                                    <th scope="col">Lastname</th>
-                                    <th scope="col">Email</th>
-                                    <th scope="col">Report Name</th>
-                                    <th scope="col">Description</th>
-                                    <th scope="col">Status</th>
-                                    <th scope="col">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="report in reports" :key="report.id">
-                                    <td>{{ report.userName }}</td>
-                                    <td>{{ report.userlastName }}</td>
-                                    <td>{{ report.userEmail }}</td>
-                                    <td>{{ report.reportName }}</td>
-                                    <td>{{ report.reportDesc }}</td>
-                                    <td>
-                                        <button class="btn btn-info btn-sm"
-                                            @click="openStatusModal(report.reportAnsw)">Read</button>
-                                    </td>
-
-                                    <td>
-                                        <button class="btn btn-danger btn-sm"
-                                            @click="deleteReport(report.reportId)">Delete</button>
-                                        <button v-if="user.roleName == 'Admin'" class="btn btn-success btn-sm"
-                                            @click="openUpdateModal(report)">Respond</button>
-                                    </td>
-                                </tr>
-                                <tr v-if="reports.length === 0">
-                            <td colspan="9" class="no-data">No reports available</td>
-                        </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <!-- Status Read Modal -->
-            <div v-if="showStatusModal" class="modal fade show" tabindex="-1" style="display: block;">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Status</h5>
-                            <button type="button" class="btn-close" @click="closeStatusModal"></button>
-                        </div>
-                        <div class="modal-body">
-                            <textarea rows="5" class="form-control" readonly>{{ selectedStatus }}</textarea>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" @click="closeStatusModal">Close</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div v-if="activeTab === 'reportForm'">
-                <div class="row">
-                    <div class="col-xl-12">
-                        <div class="card mb-4">
-                            <div class="card-header">{{ isEditMode ? 'Edit Report' : 'Create Report' }}</div>
-                            <div class="card-body">
-                                <form @submit.prevent="handleSubmit">
-                                    <div class="row gx-3 mb-3">
-                                        <div class="col-md-6">
-                                            <label class="small mb-1" for="userName">Name</label>
-                                            <input class="form-control" id="userName" type="text"
-                                                placeholder="Enter name" v-model="user.name" readonly>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="small mb-1" for="userlastName">Last Name</label>
-                                            <input class="form-control" id="userlastName" type="text"
-                                                placeholder="Enter last name" v-model="user.lastName" readonly>
-                                        </div>
-                                    </div>
-                                    <div class="row gx-3 mb-3">
-                                        <div class="col-md-12">
-                                            <label class="small mb-1" for="userEmail">Email</label>
-                                            <input class="form-control" id="userEmail" type="text"
-                                                placeholder="Enter email" v-model="user.email" readonly>
-                                            <br>
-                                        </div>
-                                        <br>
-                                        <hr>
-                                        <br>
-                                        <div class="col-md-12">
-                                            <label class="small mb-1" for="reportName">Report Name</label>
-                                            <input class="form-control" id="reportName" type="text"
-                                                placeholder="Enter report name" v-model="reportName">
-                                        </div>
-                                    </div>
-                                    <div class="row gx-3 mb-3">
-                                        <div class="col-md-12">
-                                            <label class="small mb-1" for="reportDesc">Description</label>
-                                            <textarea rows="5" cols="50" class="form-control" id="reportDesc"
-                                                type="text" placeholder="Enter Your Report"
-                                                v-model="complaintDescription"></textarea>
-                                        </div>
-                                        <div class="col-md-12" v-if="user.roleName === 'Admin'">
-                                            <label class="small mb-1" for="reportAnsw">Status</label>
-                                            <textarea class="form-control" id="reportAnsw" type="text"
-                                                placeholder="Enter status" v-model="reportAnsw"></textarea>
-                                        </div>
-                                    </div>
-                                    <button class="btn btn-primary" type="submit">{{ isEditMode ? 'Update Report' :
-                                        'Submit Report' }}</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+          </div>
         </div>
+        <div class="card mb-4" v-if="selectedUserId">
+          <div class="card-header d-flex justify-content-between">
+
+            Reports of User: {{ usersWithReports.find(user => user.userId === selectedUserId)?.user }}
+            <button class="btn btn-outline-primary btn-sm" @click="clearUserReports">Back to Users</button>
+          </div>
+          <div class="card-body">
+            <table class="table">
+              <thead>
+              <tr>
+                <th scope="col">Report Name</th>
+                <th scope="col">Report Description</th>
+                <th scope="col">Report Answer</th>
+                <th scope="col">Actions</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr v-for="report in usersWithReports.find(user => user.userId === selectedUserId)?.reports" :key="report.reportId">
+                <td>{{ report.reportName }}</td>
+                <td>{{ report.reportDesc }}</td>
+                <td>{{ report.reportAnsw }}</td>
+                <td>
+                  <button class="btn btn-info btn-sm"
+                          @click="openStatusModal(report.reportAnsw)">Read</button>
+                  <button class="btn btn-danger btn-sm" @click="deleteReport(report.reportId)">Delete</button>
+                  <button v-if="user.roleName == 'Admin'" class="btn btn-success btn-sm"
+                          @click="openUpdateModal(report)">Respond</button>
+                </td>
+              </tr>
+              <tr v-if="!usersWithReports.find(user => user.userId === selectedUserId)?.reports.length">
+                <td colspan="4" class="no-data">No reports available</td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Status Read Modal -->
+      <div v-if="showStatusModal" class="modal fade show" tabindex="-1" style="display: block;">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">status</h5>
+              <button type="button" class="btn-close" @click="closeStatusModal"></button>
+            </div>
+            <div class="modal-body">
+              <textarea rows="5" class="form-control" readonly>{{ selectedStatus }}</textarea>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" @click="closeStatusModal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <div v-if="activeTab === 'reportForm'">
+        <div class="card mb-4">
+          <div class="card-header">{{ isEditMode ? 'Update Report' : 'Create Report' }}</div>
+          <div class="card-body">
+            <form @submit.prevent="handleSubmit">
+              <div class="mb-3">
+                <label for="reportName" class="form-label">Report Name</label>
+                <input type="text" class="form-control" id="reportName" v-model="reportName" required>
+              </div>
+              <div class="mb-3">
+                <label for="complaintDescription" class="form-label">Report Description</label>
+                <textarea class="form-control" id="complaintDescription" v-model="complaintDescription" required></textarea>
+              </div>
+              <div class="mb-3" v-if="isEditMode">
+                <label for="reportAnsw" class="form-label">Report Answer</label>
+                <textarea class="form-control" id="reportAnsw" v-model="reportAnsw" required></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary">{{ isEditMode ? 'Update Report' : 'Create Report' }}</button>
+            </form>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
+
 </template>
 
 

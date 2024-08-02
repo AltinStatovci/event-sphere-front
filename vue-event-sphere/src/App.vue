@@ -10,6 +10,7 @@ const route = useRoute();
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
 import connection from '@/signalR/useSignalR.js';
+import ticketConnection from '@/signalR/signalRTickets.js';
 
 connection.on("ReceiveNotification", (message) => {
   toast.success(message, {
@@ -28,7 +29,10 @@ connection.on("ReceiveNotification", (message) => {
 
   });
 });
-
+ticketConnection.on("ReceiveTicketCountUpdate", (eventId, availableTickets) => {
+    console.log(`Event ID: ${eventId}, Available Tickets: ${availableTickets}`);
+    window.dispatchEvent(new CustomEvent('ticketUpdate', { detail: { eventId, availableTickets } }));
+});
 
 </script>
 
