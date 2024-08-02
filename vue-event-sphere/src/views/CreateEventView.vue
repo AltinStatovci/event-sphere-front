@@ -638,26 +638,19 @@ watch(() => eventList.value, () => {
               </thead>
               <tbody v-for="event in paginatedEventS" :key="event.id">
                 <tr>
-                <td>{{ event.eventName }}</td>
-                <td>{{ event.address }}</td>
-                <td>{{ event.categoryName }}</td>
-                <td>{{ formatDateTime(event.startDate) }}</td>
-                <td>{{ formatDateTime(event.endDate) }}</td>
-                <td>{{ event.maxAttendance }}</td>
-                <td>{{ event.availableTickets }}</td>
-                <td>{{ event.isApproved ? 'Approved' : 'Pending' }}</td>
-                <td>{{ formatDateTime(event.scheduleDate) }}</td>
-                <td>
-                    <div class="tooltip-container">
-                      <span>{{ truncateDescription(event.description) }}</span>
-                      <div class="tooltip-text">{{ event.description }}</div>
-                    </div>
+                  <td>{{ event.eventName }}</td>
+                  <td>{{ event.address }}</td>
+                  <td>{{ event.categoryName }}</td>
+                  <td>{{ formatDateTime(event.startDate) }}</td>
+                  <td>{{ formatDateTime(event.endDate) }}</td>
+                  <td>{{ event.maxAttendance }}</td>
+                  <td>{{ event.availableTickets }}</td>
+                  <td>{{ event.isApproved ? 'Approved' : 'Pending' }}</td>
+                  <td>{{ formatDateTime(event.scheduleDate) }}</td>
+                  <td>
+                    <button class="btn btn-outline-danger btn-sm" @click="deleteEvent(event.id)">Delete</button>
+                    <button class="btn btn-outline-primary btn-sm" @click="openEditForm(event.id)">Edit</button>
                   </td>
-                <td><div class="button-container">
-              <button class="btn btn-outline-danger btn-sm" @click="deleteEvent(event.id)">Delete</button>
-              <button class="btn btn-outline-primary btn-sm" @click="openEditForm(event.id)">Edit</button>
-            </div>
-                </td>
                 </tr>
               </tbody>
             </table>
@@ -967,6 +960,7 @@ body {
   border: 1px solid #ddd;
   color: #CCCC00;
 }
+
 .tooltip-container {
   position: relative;
   display: inline-block;
@@ -974,7 +968,8 @@ body {
 
 .tooltip-container .tooltip-text {
   visibility: hidden;
-  width: 300px; /* adjust as needed */
+  width: 300px;
+  /* adjust as needed */
   background-color: #ffffff;
   color: #131212;
   text-align: center;
@@ -984,7 +979,8 @@ body {
   z-index: 1;
   /* bottom: 0; Position the tooltip above the text */
   /* left: 50%; */
-  margin-left: 0; /* Adjust to center */
+  margin-left: 0;
+  /* Adjust to center */
   opacity: 0;
   transition: opacity 0.3s;
 }
@@ -993,8 +989,9 @@ body {
   visibility: visible;
   opacity: 1;
 }
-.pb-20{
-  padding:20px 0px;
+
+.pb-20 {
+  padding: 20px 0px;
 }
 .table {
   width: 100%;
