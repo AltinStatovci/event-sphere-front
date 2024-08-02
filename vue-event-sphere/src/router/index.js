@@ -20,7 +20,6 @@ import CreateEventView from "@/views/CreateEventView.vue";
 import NearYouView from '@/views/NearYouView.vue';
 import CreateTicketView from "@/views/CreateTicketView.vue";
 import LogsView from "@/views/LogsView.vue";
-import RecommendEvents from '@/views/RecommendEvents.vue';
 
 
 
@@ -105,13 +104,6 @@ const routes = [
     component:Report,
     meta: { requiresAuth: true },
   },
-  {
-    path: '/RecomandEvent',
-    name: 'RecomandEvent',
-    component:RecommendEvents,
-    meta: { requiresAuth: true },
-  },
-
   {
     path: '/payment/:id',
     name: 'payment',

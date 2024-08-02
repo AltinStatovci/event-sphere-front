@@ -138,6 +138,7 @@ watch([filterBy, selectedCity, selectedCountry], async ([newFilterBy, newSelecte
   font-weight: 600;
   background: -webkit-linear-gradient(60deg, #0f0101, #5f6877);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   text-align: center;
 }

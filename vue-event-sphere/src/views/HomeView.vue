@@ -6,6 +6,7 @@ import EventCard from '@/components/EventCard.vue';
 import { useAuthStore } from "@/store/authStore.js";
 import { useRouter } from 'vue-router';
 import { useLocationStore } from '@/store/locationStore';
+import RecommendedEvents from '@/components/RecommendedEvents.vue';
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -86,10 +87,10 @@ onMounted(async () => {
 
   const eventsPromises = categories.map(async category => {
     let events = await eventStore.getEventByCategory(category.id);
-    
+
     const now = new Date();
     events = events.filter(event => event.isApproved && new Date(event.scheduleDate) < now);
-    
+
     return { categoryId: category.id, categoryName: category.categoryName, events };
   });
 
@@ -172,6 +173,8 @@ const truncateDescription = (text) => {
     </div>
 
     <br />
+    <RecommendedEvents />
+    <br />
 
     <div v-for="(category, categoryId) in filteredCategories" :key="categoryId" class="">
       <div class="d-flex justify-content-center">
@@ -179,10 +182,11 @@ const truncateDescription = (text) => {
         <h2 class="text-center category-name">{{ category.categoryName }}</h2>
       </div>
       <div class="d-flex justify-content-center flex-wrap">
-        <EventCard class="event-card" v-for="event in category.events.slice(0, 4)" :key="event.id" :event="event"/>
+        <EventCard class="event-card" v-for="event in category.events.slice(0, 4)" :key="event.id" :event="event" />
       </div>
     </div>
   </div>
+
 </template>
 
 <style scoped>
@@ -195,7 +199,8 @@ const truncateDescription = (text) => {
   width: 100%;
   height: 45vh;
   overflow: hidden;
-  background-color: snowhite; /* Match this color with your slide content */
+  background-color: snowhite;
+  /* Match this color with your slide content */
 }
 
 .slideshow-item {
@@ -300,11 +305,13 @@ const truncateDescription = (text) => {
   margin-right: 20px;
 }
 
-.slide-fade-enter-active, .slide-fade-leave-active {
+.slide-fade-enter-active,
+.slide-fade-leave-active {
   transition: opacity 1s;
 }
 
-.slide-fade-enter, .slide-fade-leave-to {
+.slide-fade-enter,
+.slide-fade-leave-to {
   opacity: 0;
 }
 </style>

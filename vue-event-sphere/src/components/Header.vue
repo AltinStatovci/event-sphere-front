@@ -31,9 +31,6 @@ const onHome = () => {
 const onAboutUs = () => {
   router.push({ path: "/about" });
 };
-const onRecommend = () => {
-  router.push({ path: "/RecomandEvent" });
-};
 const onNearYou = () => {
   router.push({ path: "/nearYou" });
 };
@@ -94,9 +91,6 @@ watch(eventname, (newValue) => {
           </li>
           <li class="nav-item">
             <a class="nav-link active custom-font-size" @click="onAboutUs" role="button">About us</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link active custom-font-size" @click="onRecommend" role="button">RecommendEvent</a>
           </li>
         </ul>
         <div class="search-container input-group justify-content-center position-relative">
@@ -170,6 +164,7 @@ watch(eventname, (newValue) => {
   font-size: 1.5rem;
   background: -webkit-linear-gradient(45deg, #0f0101, #6b6767);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
