@@ -14,6 +14,7 @@ export default {
     const authStore = useAuthStore();
     const route = useRoute();
     const organizerID = route.params.organizerID ? parseInt(route.params.organizerID) : null;
+    const isLoading = ref(true);
 
     const newReview = ref({
       reviewerId: '',
@@ -30,6 +31,7 @@ export default {
     onMounted(async () => {
       newReview.value.reviewerId = authStore.id;
       await loadReviews();
+      isLoading.value = false;
     });
 
     const loadReviews = async () => {
@@ -55,7 +57,8 @@ export default {
         setTimeout(() => {
           notification.value.message = '';
         }, 3000);
-        await loadReviews(); // Reload reviews to update the average rating
+        // Refresh the page to get updated reviews and average rating
+        location.reload();
       } catch (error) {
         console.error('Error adding review:', error);
         notification.value = {
@@ -118,6 +121,7 @@ export default {
       organizerID,
       formatTimeAndDate,
       notification,
+      isLoading,
     };
   },
 };
@@ -143,7 +147,7 @@ export default {
       </li>
     </ul>
 
-    <div class="text-center mb-4">
+    <div class="text-center mb-4" v-if="!isLoading">
       <p>
         Average Rating:
         <star-rating :rating="averageRating" :maxStars="5" :readonly="true" class="average-rating"></star-rating>
