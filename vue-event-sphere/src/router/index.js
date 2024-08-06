@@ -20,6 +20,8 @@ import CreateEventView from "@/views/CreateEventView.vue";
 import NearYouView from '@/views/NearYouView.vue';
 import CreateTicketView from "@/views/CreateTicketView.vue";
 import LogsView from "@/views/LogsView.vue";
+import PromoCodeView from '@/views/PromoCodeView.vue';
+import CreatePromoCodeView from '@/views/PromoCodeView.vue';
 
 
 
@@ -86,6 +88,12 @@ const routes = [
     meta: { requiresAuth: true , requiresAdminOrOrganizer:true},
   },
   {
+    path: '/managePromoCode',
+    name: 'managePromoCode',
+    component:CreatePromoCodeView,
+    meta: { requiresAuth: true, requiresAdminOrOrganizer: true },
+  },
+  {
     path: '/manageTickets',
     name: 'manageTickets',
     component: CreateTicketView,
@@ -117,6 +125,7 @@ const routes = [
     component:CreateEventView,
     meta: { requiresAuth: true, requiresAdminOrOrganizer: true },
   },
+  
 
   {
     path: '/paymentDashboard',
