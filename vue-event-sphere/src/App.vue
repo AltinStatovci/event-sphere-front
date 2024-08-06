@@ -41,7 +41,7 @@ ticketConnection.on("ReceiveTicketCountUpdate", (eventId, availableTickets) => {
     <nav>
       <Header
 
-        v-if="route.name !== 'login' && route.name !== 'notification' && route.name !== 'register' && route.name !== 'dashboard' && route.name !== 'profile' && route.name !== 'paymentDashboard'&& route.name !== 'logs' && route.name !== 'report' && route.name !== 'manageEvent' && route.name !== 'manageTickets'" />
+        v-if="route.name !== 'login' && route.name !== 'notification' && route.name !== 'register' && route.name !== 'dashboard' && route.name !== 'profile' && route.name !== 'paymentDashboard'&& route.name !== 'logs' && route.name !== 'report' && route.name !== 'manageEvent' && route.name !== 'manageTickets' && route.name !== 'managePromoCode'" />
 
     </nav>
 
