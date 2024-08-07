@@ -55,7 +55,7 @@ ticketConnection.on("ReceiveTicketCountUpdate", (eventId, availableTickets) => {
     <footer>
       <Footer
 
-        v-if="route.name !== 'login' && route.name !== 'register' &&  route.name !== 'dashboard' && route.name !== 'profile' && route.name !== 'paymentDashboard' && route.name !== 'report' && route.name !== 'logs' && route.name !== 'manageTickets' && route.name !== 'manageEvent'" />
+        v-if="route.name !== 'login' &&  route.name !== 'register' &&  route.name !== 'dashboard' && route.name !== 'profile' && route.name !== 'paymentDashboard' && route.name !== 'report' && route.name !== 'logs' && route.name !== 'manageTickets' && route.name !== 'managePromoCode' && route.name !== 'manageEvent'" />
 
 
     </footer>
@@ -71,6 +71,7 @@ ticketConnection.on("ReceiveTicketCountUpdate", (eventId, availableTickets) => {
 
 main {
   flex: 1;
+  min-height: 55.5vh;
 }
 
 :root {
