@@ -286,7 +286,7 @@ export const useEventStore = defineStore('event', () => {
         photoData: event.photoData,
         isApproved: event.isApproved,
         scheduleDate: event.scheduleDate,
-        isApproved: event.isApproved,
+
       }));
 
 

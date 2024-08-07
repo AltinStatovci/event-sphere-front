@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, onMounted } from 'vue';
+import {ref, reactive, onMounted, computed, watch} from 'vue';
 import SideBar from "@/components/SideBar.vue";
 import { usePromoCodeStore } from '@/store/promoCodeStore';
 import Swal from "sweetalert2";
@@ -118,6 +118,31 @@ const resetForm = () => {
   formData.isValid = false;
 };
 
+
+const currentPagePromoCode = ref(1)
+const pageSizePromoCode = 6;
+
+const sortedPromoCodes = computed(() => {
+  return [...promoCodes.value].sort((a, b) => b.discountPercentage - a.discountPercentage);
+});
+
+const paginatedPromoCodes = computed(() => {
+  const startIndex = (currentPagePromoCode.value - 1) * pageSizePromoCode;
+  return sortedPromoCodes.value.slice(startIndex, startIndex + pageSizePromoCode);
+});
+
+const totalPagesPromoCodes = computed(() => Math.ceil(promoCodes.value.length / pageSizePromoCode));
+
+const setCurrentPagePromoCodes = (page) => {
+  currentPagePromoCode.value = page;
+};
+
+
+watch(() => promoCodes.value, () => {
+  setCurrentPagePromoCodes(1); // Reset to first page when users change
+});
+
+
 </script>
 
 
@@ -149,7 +174,7 @@ const resetForm = () => {
               </tr>
             </thead>
             <tbody>
-              <tr v-for="promoCode in promoCodes" :key="promoCode.id">
+              <tr v-for="promoCode in paginatedPromoCodes" :key="promoCode.id">
                 <td>{{ promoCode.code }}</td>
                 <td>{{ promoCode.discountPercentage }}</td>
                 <td>{{ new Date(promoCode.expiryDate).toLocaleDateString() }}</td>
@@ -161,6 +186,18 @@ const resetForm = () => {
               </tr>
             </tbody>
           </table>
+          <nav v-if="promoCodes.length > 0">
+            <ul class="pagination justify-content-center">
+              <li
+                  class="page-item"
+                  v-for="page in totalPagesPromoCodes"
+                  :key="page"
+                  :class="{ active: currentPagePromoCode === page }"
+              >
+                <a class="page-link" href="#" @click.prevent="setCurrentPagePromoCodes(page)">{{ page }}</a>
+              </li>
+            </ul>
+          </nav>
         </div>
       </div>
 
