@@ -143,9 +143,9 @@ export const useEventStore = defineStore('event', () => {
       return [];
     }
   }
-  async function getEventsD() {
+  async function getEventsD(id) {
     try {
-      const response = await client.get(`${url}Event/date`);
+      const response = await client.get(`${url}Event/date/${id}`);
       const eventData = response.data;
 
       const allEvents = eventData.map(event => ({
@@ -174,9 +174,9 @@ export const useEventStore = defineStore('event', () => {
     }
   }
 
-  async function getEventsS() {
+  async function getEventsS(id) {
     try {
-      const response = await client.get(`${url}Event/datetime`);
+      const response = await client.get(`${url}Event/datetime/${id}`);
       const eventData = response.data;
 
       const allEvents = eventData.map(event => ({

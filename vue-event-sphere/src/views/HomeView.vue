@@ -173,7 +173,9 @@ const truncateDescription = (text) => {
     </div>
 
     <br />
+    <div v-if="!authStore.isOrganizer && !authStore.isAdmin">
     <RecommendedEvents />
+    </div>
     <br />
 
     <div v-for="(category, categoryId) in filteredCategories" :key="categoryId" class="">
