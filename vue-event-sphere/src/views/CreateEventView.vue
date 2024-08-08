@@ -346,7 +346,14 @@ const paginatedEventD = computed(() => {
   return sortedEventD.value.slice(startIndex, startIndex + pageSizeEventD);
 });
 
-const totalPagesEventD = computed(() => Math.ceil(eventD.value.length / pageSizeEventD));
+const approvedEvents = computed(() => {
+  return eventD.value.filter(event => event.isApproved);
+});
+
+const totalPagesEventD = computed(() => {
+  return Math.ceil(approvedEvents.value.length / pageSizeAllEvents);
+});
+
 
 const setCurrentPageEventD = (page) => {
   currentPageEventD.value = page;
@@ -466,7 +473,7 @@ watch(() => eventList.value, () => {
                 </tr>
               </thead>
               <tbody v-for="event in paginatedEventD" :key="event.id">
-                <tr>
+                <tr v-if="event.isApproved">
                   <td>{{ event.eventName }}</td>
                   <td>{{ event.address }}</td>
                   <td>{{ event.categoryName }}</td>
@@ -581,7 +588,7 @@ watch(() => eventList.value, () => {
                   <th scope="col"></th>
                 </tr>
               </thead>
-              <tbody v-for="event in paginatedAllEvents" :key="event.id">
+              <tbody v-for="event in allEventList" :key="event.id">
                 <tr v-if="!event.isApproved">
                   <td>{{ event.eventName }}</td>
                   <td>{{ event.address }}</td>
@@ -605,7 +612,7 @@ watch(() => eventList.value, () => {
                 </tr>
               </tbody>
             </table>
-            <nav v-if="eventList.length > 0">
+            <!-- <nav v-if="eventList.length > 0">
               <ul class="pagination justify-content-center">
                 <li
                     class="page-item"
@@ -616,7 +623,7 @@ watch(() => eventList.value, () => {
                   <a class="page-link" href="#" @click.prevent="setCurrentPageAllEvents(page)">{{ page }}</a>
                 </li>
               </ul>
-            </nav>
+            </nav> -->
           </div>
         </div>
         <div class="card mb-4" v-if="authStore.isOrganizer">
@@ -688,7 +695,7 @@ watch(() => eventList.value, () => {
                   <th scope="col"></th>
                 </tr>
               </thead>
-              <tbody v-for="event in paginatedAllEventsList" :key="event.id">
+              <tbody v-for="event in allEventList" :key="event.id">
                 <tr v-if="!event.isApproved">
                   <td>{{ event.organizerName }}</td>
                   <td>{{ event.eventName }}</td>
@@ -720,7 +727,7 @@ watch(() => eventList.value, () => {
                 </tr>
               </tbody>
             </table>
-            <nav v-if="allEventList.length > 0">
+            <!-- <nav v-if="allEventList.length > 0">
               <ul class="pagination justify-content-center">
                 <li
                     class="page-item"
@@ -731,7 +738,7 @@ watch(() => eventList.value, () => {
                   <a class="page-link" href="#" @click.prevent="setCurrentPageAllEventsList(page)">{{ page }}</a>
                 </li>
               </ul>
-            </nav>
+            </nav> -->
           </div>
         </div>
       </div>
