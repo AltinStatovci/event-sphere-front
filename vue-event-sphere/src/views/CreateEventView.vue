@@ -358,7 +358,7 @@ watch(() => eventD.value, () => {
 
 // All Events List
 const currentPageAllEventsList = ref(1);
-const pageSizeAllEventsList = 10;
+const pageSizeAllEventsList = 6;
 
 const sortedAllEventsList = computed(() => {
   return [...allEventList.value].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
@@ -370,7 +370,7 @@ const paginatedAllEventsList = computed(() => {
   return sortedAllEventsList.value.slice(startIndex, startIndex + pageSizeAllEventsList);
 });
 
-const totalPagesAllEventsList = computed(() => Math.ceil(eventD.value.length / pageSizeAllEventsList));
+const totalPagesAllEventsList = computed(() => Math.ceil(allEventList.value.length / pageSizeAllEventsList));
 
 const setCurrentPageAllEventsList = (page) => {
   currentPageAllEventsList.value = page;
@@ -434,9 +434,11 @@ watch(() => eventList.value, () => {
 
 
 <template>
-  <div class="d-flex">
+  <div class="d-flex d-inline-flex w-100">
+    <div class="fixed-div" style="position: fixed;">
     <side-bar />
-    <div class="container-xl px-4 mt-4">
+    </div>
+    <div class="container-xl px-4 mt-4" style="margin-left: 20%;">
       <nav class="nav nav-borders">
         <a class="nav-link" :class="{ active: activeTab === 'eventList' }" @click.prevent="changeTab('eventList')">Event
           List</a>
@@ -482,7 +484,7 @@ watch(() => eventList.value, () => {
                   <div class="button-container">
                     <button class="btn btn-outline-danger btn-sm" @click="deleteEvent(event.id)">Delete</button>
                     <button class="btn btn-outline-primary btn-sm" @click="openEditForm(event.id)">Edit</button>
-                    <button class="btn btn-outline-secondary btn-sm" @click="getTickets(event.id)">See Tickets</button>
+                    <button class="btn btn-outline-secondary btn-sm" @click="getTickets(event.id)">Tickets</button>
                    </div>
                    </td>
                 </tr>
