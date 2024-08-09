@@ -227,8 +227,8 @@
                     <div class="media-container-row">
                         <div class="col-md-12">
                             <div class="wrap-img">
-                                <img src="https://mobirise.com/bootstrap-template/about-us-page-template/assets/images/ayo-ogunseinde-316141-3333x3333.jpg"
-                                    class="img-responsive clients-img" media-simple="true" alt="Slide 1">
+                                <img src="../staff/meti.jpeg" class="img-responsive clients-img" media-simple="true"
+                                    alt="Slide 1">
                             </div>
                             <div class="text-center">
                                 <h4 class="my-1">Muhamed Hyseni</h4>
