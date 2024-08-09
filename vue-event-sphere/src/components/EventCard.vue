@@ -18,7 +18,6 @@ const props = defineProps({
   }
 });
 
-const userId = authStore.id;
 
 async function checkIfRCEventExists(userId, eventId) {
   try {
@@ -33,7 +32,9 @@ async function checkIfRCEventExists(userId, eventId) {
 
 async function goToEvent(eventId) {
   try {
+    if(authStore.isLoggedIn){
     // Check if RCEvent already exists
+    const userId = authStore.id;
     const exists = await checkIfRCEventExists(userId, eventId);
     if (exists) {
       console.log("RCEvent already exists for this user and event. Updating ecount.");
@@ -46,6 +47,11 @@ async function goToEvent(eventId) {
       };
       await RceventStore.submitRCEvent(rcEventData);
     }
+  }
+  else{
+    const redirectUrl = `/eventdetails/${eventId}`;
+    router.push(redirectUrl);
+  }
     // Redirect to the event details page
     const redirectUrl = `/eventdetails/${eventId}`;
     router.push(redirectUrl);

@@ -115,7 +115,7 @@ watch(eventname, (newValue) => {
           <ul class="navbar-nav mb-2 mb-lg-0" v-if="authStore.loggedInUser">
             <li class="nav-item custom-margin-right">
               <i class="fas fa-bell mt-3" @click="$refs.notification.toggleNotifications()"
-                style="font-size: 1.7rem;"></i>
+                style="font-size: 1.7rem; margin-top: 18px !important;"></i>
               <Notification ref="notification" />
             </li>
             <li class="nav-item dropdown custom-margin-right">

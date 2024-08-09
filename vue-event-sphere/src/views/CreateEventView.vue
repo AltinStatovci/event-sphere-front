@@ -133,10 +133,10 @@ const fetchAllEvents = async () => {
   allEventList.value = await eventStore.getEvents()
 }
 const fetchEventsD = async () => {
-  eventD.value = await eventStore.getEventsD()
+  eventD.value = await eventStore.getEventsD(authStore.id)
 }
 const fetchEventsS = async () => {
-  eventS.value = await eventStore.getEventsS()
+  eventS.value = await eventStore.getEventsS(authStore.id)
 }
 
 const getAllLocations = async () => {
