@@ -48,11 +48,6 @@ const fetchAllEvents = async () => {
     }
 };
 
-const goToEvent = (eventId) => {
-    const redirectUrl = `/eventdetails/${eventId}`;
-    router.push(redirectUrl);
-};
-
 const formatDateString = (dateString) => {
     const monthsFull = [
         "January", "February", "March", "April", "May", "June",

@@ -87,7 +87,6 @@ onMounted(async () => {
 
   const eventsPromises = categories.map(async category => {
     let events = await eventStore.getEventByCategory(category.id);
-
     const now = new Date();
     events = events.filter(event => event.isApproved && new Date(event.scheduleDate) < now);
 
@@ -173,8 +172,10 @@ const truncateDescription = (text) => {
     </div>
 
     <br />
-    <div v-if="!authStore.isOrganizer && !authStore.isAdmin">
-    <RecommendedEvents />
+    <div  v-if="authStore.isLoggedIn">
+      <div v-if="!authStore.isOrganizer && !authStore.isAdmin">
+        <RecommendedEvents />
+      </div>
     </div>
     <br />
 
